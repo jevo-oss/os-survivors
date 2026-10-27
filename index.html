@@ -69,6 +69,11 @@ p{margin:6px 0;font-size:13px;color:#e8dcc0}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
 .shopi{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.28);border-radius:10px;padding:6px;margin:6px 0;text-align:left;font-size:13px}.shopi img{width:34px;height:34px}.shopi .t{flex:1}.shopi small{display:block;color:#c9b58a;font-size:11px}
 .shopi button{border:2px solid var(--ink);border-radius:8px;background:linear-gradient(#ffcf6a,#b8700a);font:900 12px system-ui;padding:7px 8px;color:#2a1400;min-width:64px}.shopi button:disabled{filter:grayscale(1) brightness(.6)}
+.pbtn{position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:10px;width:50px;height:50px;z-index:4;display:none;border-radius:14px;border:2px solid var(--ink);background:linear-gradient(#4a3b29,#21180f);box-shadow:inset 0 0 0 1px rgba(214,170,90,.7),0 6px 14px rgba(0,0,0,.5);padding:0;touch-action:manipulation}
+.pbtn:before,.pbtn:after{content:"";position:absolute;top:15px;width:6px;height:18px;border-radius:2px;background:linear-gradient(#fff3c0,#d9a537);box-shadow:0 1px 0 #3a1e00}.pbtn:before{left:15px}.pbtn:after{right:15px}
+.pbtn:active{transform:scale(.94)}
+.btn.danger{background:linear-gradient(#a8443a,#6a1e16);color:#ffe9d8;text-shadow:0 1px 0 #000;font-size:14px;padding:10px}
+.cont small{display:block;font:600 11px "Trebuchet MS",system-ui;opacity:.75;margin-top:2px}
 .pips{letter-spacing:2px;color:#ffcf6a;font-size:10px}
 </style></head><body>
 <div id="sat"></div>
@@ -79,12 +84,17 @@ p{margin:6px 0;font-size:13px;color:#e8dcc0}
  <div class="blurb" id="blurb"></div>
  <div class="perks" id="perks"></div>
  <div class="row"><button class="btn sec" id="shopBtn">Shop · <span class="gold" id="gold"></span></button></div>
+ <button class="btn cont" id="contBtn" style="display:none">Continue run<small id="contInfo"></small></button>
  <button class="btn" id="startBtn">Play</button>
  <p id="best" style="font-size:11px;color:#a8977a;margin-top:8px"></p>
 </div></div>
 <div class="ov" id="shop"><div class="panel"><h2>Wise Old Shop</h2><p>Permanent upgrades for every class. <span class="gold" id="gold2"></span></p><div id="shopList"></div><button class="btn sec" id="shopBack">Back</button></div></div>
 <div class="ov" id="lvl"><div class="panel"><h2>Level up!</h2><div class="slots" id="slotinfo"></div><div id="choices"></div></div></div>
 <div class="ov" id="chest"><div class="panel"><h2>Treasure chest</h2><div class="reel"><img id="reelImg" alt=""></div><div id="chestWon"></div><button class="btn" id="chestBtn" style="display:none">Collect</button></div></div>
+<button class="pbtn" id="pauseBtn" aria-label="Pause"></button>
+<div class="ov" id="pause"><div class="panel"><h2>Paused</h2><div class="stat" id="pstats"></div><div class="slots" id="pslots"></div>
+ <button class="btn" id="resumeBtn">Resume</button><button class="btn sec" id="saveQuitBtn">Save &amp; Quit</button><button class="btn danger" id="quitBtn">Quit run</button>
+ <div id="quitConfirm" style="display:none"><p>Abandon this run? Progress, class XP and gold from it are lost.</p><div class="row"><button class="btn sec" id="quitNo">Keep playing</button><button class="btn danger" id="quitYes">Abandon</button></div></div></div></div>
 <div class="ov" id="over"><div class="panel"><h2 id="overT">Oh dear, you are dead!</h2><div class="stat" id="stats"></div><div id="cxp"></div><p id="skillsum" style="font-size:11px;color:#c9b58a"></p><div class="row"><button class="btn sec" id="menuBtn">Menu</button><button class="btn" id="againBtn">Play again</button></div></div></div>
 <script>
 (()=>{
@@ -595,7 +605,7 @@ const DBG={};function render(){const now=NOW=performance.now()/1000;const p=G.p;
  if(!G.menu&&!DBG.nh)hud(now)}
 function hud(now){const p=G.p,T=SAT+8,small=W<520;
  // top bar: level badge, HP, XP
- const bw=Math.min(W-24,520),bx=(W-bw)/2;panel(bx,T,bw,50,12);
+ const bw=Math.min(W-84,520),bx=Math.max(12,Math.min((W-bw)/2,W-72-bw));panel(bx,T,bw,50,12);
  ctx.save();ctx.beginPath();ctx.arc(bx+26,T+25,17,0,6.283);const q=ctx.createRadialGradient(bx+20,T+18,2,bx+26,T+25,17);q.addColorStop(0,'#ffe28a');q.addColorStop(1,'#a8700a');ctx.fillStyle=q;ctx.fill();ctx.strokeStyle='#0b0806';ctx.lineWidth=2;ctx.stroke();ctx.restore();txt(''+G.lvl,bx+26,T+31,'#fff',G.lvl>99?12:16,'center',900);
  bar(bx+50,T+8,bw-60-(small?0:0),15,p.hp/p.max,'#ff6a5a','#9a1a12',`${Math.ceil(p.hp)} / ${p.max}`);
  bar(bx+50,T+28,bw-60,13,G.xp/G.next,'#6ad0ff','#1a5aa8','');
@@ -652,7 +662,7 @@ let chestTok=0;function openChest(){G.paused=true;const tok=++chestTok;const n=M
  setTimeout(reveal,1400)}
 $('chestBtn').onclick=()=>{show('chest',0);G.paused=false;last=performance.now()};
 function confetti(){const c=['#ffcf6a','#ff6a5a','#6ad0ff','#7dff8a','#b46cff'];for(let i=0;i<70;i++){const d=document.createElement('div');d.className='conf';d.style.left=Math.random()*100+'vw';d.style.background=c[i%5];d.style.animationDuration=(1.6+Math.random()*1.8)+'s';d.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),4500)}}
-function gameOver(win){G.over=true;running=false;['lvl','chest'].forEach(id=>show(id,0));saveSkills();const b=LS.get('oss_best',{t:0,k:0});LS.set('oss_best',{t:Math.max(b.t,G.t),k:Math.max(b.k,G.kills)});
+function gameOver(win){G.over=true;running=false;clearRun();$('pauseBtn').style.display='none';['lvl','chest'].forEach(id=>show(id,0));saveSkills();const b=LS.get('oss_best',{t:0,k:0});LS.set('oss_best',{t:Math.max(b.t,G.t),k:Math.max(b.k,G.kills)});
  const id=G.cls,before=clsInfo(id),gain=Math.floor((G.t/5+G.kills*.4+G.lvl*8)*(win?1.5:1));META.cxp[id]=(META.cxp[id]||0)+gain;const after=clsInfo(id);
  const gold=Math.floor(G.gold);META.gold+=gold;saveMeta();
  $('overT').textContent=win?'You survived 30:00!':'Oh dear, you are dead!';
@@ -663,7 +673,7 @@ function gameOver(win){G.over=true;running=false;['lvl','chest'].forEach(id=>sho
  $('skillsum').textContent=Object.keys(G.runXp).map(k=>`${k} +${Math.round(G.runXp[k])}xp (Lv ${sLvl(k)})`).join(' · ');
  show('over',1);requestAnimationFrame(()=>requestAnimationFrame(()=>{const bar=$('cxpbar');if(bar){bar.style.width=(after.L>before.L?100:after.cur/after.need*100)+'%';$('cxpt').textContent=after.L>before.L?`Lv ${after.L} · ${after.cur} / ${after.need}`:`${after.cur} / ${after.need}`}}));
  if(after.L>before.L||win)confetti();G.lastGain={gain,before:before.L,after:after.L,gold}}
-function buildMenu(){const box=$('classes');box.innerHTML='';
+function buildMenu(){const box=$('classes');box.innerHTML='';const sv=hasRun();$('contBtn').style.display=sv?'block':'none';$('startBtn').className=sv?'btn sec':'btn';$('startBtn').textContent=sv?'New run':'Play';if(sv)$('contInfo').textContent=`${CLASSES[sv.cls].name} · Lv ${sv.lvl} · ${fmtT(sv.t)} · ${sv.kills} kills`;
  for(const id in CLASSES){const C=CLASSES[id],I=clsInfo(id),b=document.createElement('button');b.className='cls'+(META.cls===id?' sel':'');b.dataset.cls=id;
   b.innerHTML=`<img class="por" src="${PORTRAIT[id]}" alt=""><img class="wi" src="${ICONURL[C.start]}" alt=""><b>${C.name}</b><i>${C.tag}</i><span class="lv">Lv ${I.L}${I.L>=CL_MAX?' (max)':''}</span><div class="xpb"><div style="width:${I.L>=CL_MAX?100:I.cur/I.need*100}%"></div></div>`;
   b.onclick=()=>{META.cls=id;saveMeta();buildMenu();menuScene()};box.appendChild(b)}
@@ -679,15 +689,40 @@ function menuScene(){newGame();G.menu=true;const p=G.p;p.x=0;p.y=0;
  [['goblin',-150,-40],['chicken',-110,70],['cow',150,60],['rat',120,-70],['skeleton',190,-10],['goblin',-200,40]].forEach(([t,x,y])=>{const e=spawn(t,{x,y});if(e)e.hit=0});
  G.loot.push({x:-60,y:130,tier:4,k:'tbow'},{x:80,y:150,tier:3},{x:10,y:-150,tier:2});
  const it=items.get();if(it){it.x=40;it.y=110;it.k='chest';it.t=0}}
-function start(){newGame();['menu','over','lvl','chest','shop'].forEach(id=>show(id,0));running=true;last=performance.now()}
+function start(){newGame();clearRun();['menu','over','lvl','chest','shop','pause'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block'}
+// ---------- pause / save ----------
+const SAVE_KEY='oss_run';
+const SAVE_FIELDS=['cls','t','kills','lvl','xp','next','gold','w','pas','mega','cd','spawnT','bossNext','eliteNext','swarmNext','propT','megaGuar','megaDrops','revived','runXp','loot'];
+function saveRun(){if(!running||!G||G.over||G.menu)return false;const o={v:1,at:Date.now()};SAVE_FIELDS.forEach(k=>o[k]=JSON.parse(JSON.stringify(G[k])));
+ o.p={x:G.p.x,y:G.p.y,hp:G.p.hp,face:G.p.face,star:Math.max(0,G.p.star)};o.cannons=G.cannons.map(c=>({x:c.x,y:c.y,life:c.life}));saveSkills();LS.set(SAVE_KEY,o);return true}
+const hasRun=()=>{const r=LS.get(SAVE_KEY,null);return r&&r.v===1?r:null};
+function clearRun(){try{localStorage.removeItem(SAVE_KEY)}catch(_){}}
+function continueRun(){const r=hasRun();if(!r)return start();META.cls=r.cls;saveMeta();newGame();
+ SAVE_FIELDS.forEach(k=>{if(r[k]!==undefined)G[k]=r[k]});Object.assign(G.p,{x:r.p.x,y:r.p.y,face:r.p.face||[1,0],star:r.p.star||0});G.p.max=hpMax();G.p.hp=Math.min(G.p.max,r.p.hp);
+ G.cannons=(r.cannons||[]).map(c=>({x:c.x,y:c.y,life:c.life,ft:0,ang:0,fl:-9}));clearRun();
+ ['menu','over','lvl','chest','shop','pause'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';G.banner={txt:'Run restored · '+fmtT(G.t),life:2,col:'#ffcf6a'}}
+function pauseGame(){if(!running||!G||G.over)return;G.hold=true;$('quitConfirm').style.display='none';['quitBtn','saveQuitBtn','resumeBtn'].forEach(id=>$(id).style.display='block');
+ $('pstats').innerHTML=`<div>Time<b>${fmtT(G.t)}</b></div><div>Level<b>${G.lvl}</b></div><div>Kills<b>${G.kills}</b></div>`;$('pslots').innerHTML=slotsHtml();show('pause',1)}
+function resumeGame(){show('pause',0);if(G){G.hold=false;last=performance.now()}}
+function toMenu(){running=false;$('pauseBtn').style.display='none';['pause','lvl','chest','over'].forEach(id=>show(id,0));buildMenu();menuScene();show('menu',1)}
+$('pauseBtn').onclick=e=>{e.stopPropagation();pauseGame()};$('resumeBtn').onclick=resumeGame;
+$('saveQuitBtn').onclick=()=>{saveRun();toMenu()};
+$('quitBtn').onclick=()=>{$('quitConfirm').style.display='block';['quitBtn','saveQuitBtn','resumeBtn'].forEach(id=>$(id).style.display='none')};
+$('quitNo').onclick=()=>{$('quitConfirm').style.display='none';['quitBtn','saveQuitBtn','resumeBtn'].forEach(id=>$(id).style.display='block')};
+$('quitYes').onclick=()=>{clearRun();saveSkills();toMenu()};
+$('contBtn').onclick=continueRun;
+addEventListener('keydown',e=>{if((e.key==='Escape'||e.key==='p')&&running&&G&&!G.over){if(G.hold)resumeGame();else if(!G.paused)pauseGame()}});
+const autoSave=()=>{if(running&&G&&!G.over){saveRun();if(!G.hold&&!G.paused)pauseGame();else G.hold=true}};
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')autoSave()});
+addEventListener('pagehide',autoSave);
 $('startBtn').onclick=start;$('againBtn').onclick=start;$('menuBtn').onclick=()=>{show('over',0);buildMenu();menuScene();show('menu',1)};
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
- if(running&&!G.paused&&!G.over)update(dt);
+ if(running&&!G.paused&&!G.hold&&!G.over)update(dt);
  else if(G&&G.menu){G.p.moving=true;for(const q of parts.a)if(q.a){q.x+=q.vx*dt;q.y+=q.vy*dt;q.life-=dt;if(q.life<=0)q.a=false}for(const l of G.loot)if(l.tier&&Math.random()<dt*(2+l.tier*2))rise(l.x,l.y,GL[TIERS[l.tier].gl],3+l.tier)}
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ================= INIT =================
 menuScene();buildMenu();show('menu',1);requestAnimationFrame(loop);
-window.__game={dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG};
+window.__game={dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG,saveRun,continueRun,pauseGame,resumeGame,hasRun};
 })();
 </script></body></html>
