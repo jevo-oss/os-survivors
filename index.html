@@ -137,7 +137,7 @@ p{margin:6px 0;font-size:13px;color:#e8dcc0}
 </div></div>
 <div class="ov" id="shop"><div class="panel"><h2>Wise Old Shop</h2><p>Permanent upgrades for every class. <span class="gold" id="gold2"></span></p><div class="sv" id="shopList" style="max-height:min(62vh,560px)"></div><button class="btn sec" id="shopBack">Back</button></div></div>
 <div class="ov" id="lvl"><div class="panel"><h2>Level up!</h2><div class="slots" id="slotinfo"></div><div id="choices"></div><div class="lvtools" id="lvtools"></div></div></div>
-<div class="ov" id="chest"><div class="panel" id="chestP"><h2 id="chestT">Treasure chest</h2><div class="cstage" id="cstage"><div class="rays"></div><div class="cflash"></div><img id="chestBig" alt=""><div class="reel"><img id="reelImg" alt=""></div></div><div id="chestWon"></div><button class="btn" id="chestBtn" style="display:none">Collect</button></div><div id="coinRain"></div></div>
+<div class="ov" id="offer" style="display:none"><div class="panel"><img id="offerI" alt="" style="width:64px;height:64px"><h2 id="offerT"></h2><p id="offerD" style="font-size:13px;opacity:.85;margin:4px 0 10px"></p><div style="display:flex;gap:8px;justify-content:center"><button class="btn" id="offerYes">Take</button><button class="btn" id="offerNo" style="background:#5a4a3a;color:#e8dcc0">Decline</button></div></div></div><div class="ov" id="chest"><div class="panel" id="chestP"><h2 id="chestT">Treasure chest</h2><div class="cstage" id="cstage"><div class="rays"></div><div class="cflash"></div><img id="chestBig" alt=""><div class="reel"><img id="reelImg" alt=""></div></div><div id="chestWon"></div><button class="btn" id="chestBtn" style="display:none">Collect</button></div><div id="coinRain"></div></div>
 <button class="pbtn" id="pauseBtn" aria-label="Pause"></button>
 <div class="ov" id="pause"><div class="panel"><h2>Paused</h2><div class="stat" id="pstats"></div><div class="slots" id="pslots"></div>
  <button class="btn" id="resumeBtn">Resume</button><button class="btn sec" id="statsBtn">Stats &amp; progression</button><button class="btn sec" id="psetBtn">Settings</button><button class="btn sec" id="saveQuitBtn">Save &amp; Quit</button><button class="btn danger" id="quitBtn">Quit run</button>
@@ -539,18 +539,21 @@ function newGame(){const{b,sig,sb}=computeBonus();
  [enemies,shots,gems,items,pops,parts,fx].forEach(p=>p.clear());G.p.max=G.p.hp=hpMax()}
 function addSkillXp(k,x){const b=sLvl(k);SK[k]+=x;G.runXp[k]=(G.runXp[k]||0)+x;const d=G.drops[k];if(d){d.v+=x;d.life=1.4}else G.drops[k]={v:x,life:1.4};
  const a=sLvl(k);if(a>b){G.banner={txt:`${k} level ${a}!`,life:2.2,col:SKCOL[k]};if(k==='Hitpoints'){G.p.max=hpMax();G.p.hp+=(a-b)*2}}}
-const mg=k=>G.mega[k]||0;
+const mg=k=>G.mega[k]||0,MEGA_MAX=8;
+function mUp(k,L){const a=mstat(k,L),b=mstat(k,Math.min(MEGA_MAX,L+1)),r=v=>Math.round(v);let t=`Dmg ${r(a.dmg)} → ${r(b.dmg)}`;if(b.cd<a.cd)t+=` · Cooldown ${a.cd.toFixed(1)}s → ${b.cd.toFixed(1)}s`;if(b.area>a.area)t+=` · Area ${a.area} → ${b.area}`;if(b.proj>a.proj)t+=` · Shots ${a.proj} → ${b.proj}`;if(b.block>a.block)t+=` · Block ${r(a.block*100)}% → ${r(b.block*100)}%`;return t}
 function megaMul(sk){for(const k in MEGA)if(MEGA[k].sk===sk)return 1+mg(k);return 1}
-function grantMega(k){G.mega[k]=mg(k)+1;META.seen.mega[k]=1;buzz([50,40,90]);G.p.max=hpMax();if(k==='ely')G.p.hp=G.p.max;G.banner={col:'#ffa21a',big:1,txt:`MEGA RARE! ${MEGA[k].name}${G.mega[k]>1?' x'+G.mega[k]:''}`,life:3.5};G.shake=.45;G.flash=.35;burst(G.p.x,G.p.y,'',26,260,GL.orange)}
+function grantMega(k){G.mega[k]=Math.min(MEGA_MAX,mg(k)+1);META.seen.mega[k]=1;buzz([50,40,90]);G.p.max=hpMax();if(k==='ely')G.p.hp=G.p.max;G.banner={col:'#ffa21a',big:1,txt:`MEGA RARE! ${MEGA[k].name}${G.mega[k]>1?' Lv '+G.mega[k]:''}`,life:3.5};G.shake=.45;G.flash=.35;burst(G.p.x,G.p.y,'',26,260,GL.orange)}
 function dropMega(x,y,k){G.megaDrops++;if(G.loot.length<12)G.loot.push({x,y,tier:4,k:k||MEGAKEYS[Math.random()*4|0]})}
 // ---- pacing: rarity = levels gained (+bonus), skills climb slowly ----
 let MEGA_KILL=1/40000;const SKGAIN=[1,2,3,5],TIER_LV=[1,1,1,2],TIER_BONUS=['','','+4% might','']; // Uncommon/Rare also get extras below
 function rollTier(w){let r=Math.random()*100;if(G&&G.bon)r+=(100-r)*Math.min(.5,luck());return w?(r<45?0:r<78?1:r<94?2:3):(r<62?0:r<86?1:r<97?2:3)}
 function tierExtra(t){if(t===1){G.p.hp=Math.min(G.p.max,G.p.hp+G.p.max*.15)}if(t===2){G.might+=.04}}
 const capW=k=>WEAPONS[k].elite?WEAPONS[k].max-2:Math.min(10,WEAPONS[k].max);
-function randUpgrade(bonusLv){const up=[];for(const k in G.w)if(G.w[k]<capW(k))up.push(['w',k]);for(const k in G.pas)if(G.pas[k]<PASSIVES[k].max)up.push(['p',k]);
+function randUpgrade(bonusLv){const up=[];for(const k in G.w)if(G.w[k]<capW(k))up.push(['w',k]);for(const k in G.pas)if(G.pas[k]<PASSIVES[k].max)up.push(['p',k]);for(const k in G.mega)if(mg(k)<MEGA_MAX)up.push(['m',k]);
  if(Object.keys(G.w).length<G.ws)for(const k in WEAPONS)if(!G.w[k]&&!WEAPONS[k].elite&&avail(WEAPONS[k])&&!G.banned.includes(k))up.push(['w',k]);
- if(up.length&&Math.random()<.7){const[ty,k]=up[Math.random()*up.length|0],D=ty==='w'?WEAPONS[k]:PASSIVES[k],o=ty==='w'?G.w:G.pas,b=o[k]||0;o[k]=Math.min(ty==='w'?capW(k):D.max,b+bonusLv);if(ty==='p'&&k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}const nm=ty==='w'?wname(k):D.name;return{icon:ty==='w'?wicon(k):k,txt:b?`${nm} Lv ${b} → ${o[k]}`:`${nm} (new) Lv ${o[k]}`}}
+ if(up.length&&Math.random()<.7){const[ty,k]=up[Math.random()*up.length|0];if(ty==='m'){const b=mg(k);G.mega[k]=b+1;G.p.max=hpMax();return{icon:k,txt:`${MEGA[k].name} Lv ${b} → ${b+1}`,evo:1}}
+  if(!(ty==='w'?G.w:G.pas)[k]&&!window.__sim){(G.offerQ=G.offerQ||[]).push({ty,k,L:Math.min(ty==='w'?capW(k):PASSIVES[k].max,bonusLv)});const D=ty==='w'?WEAPONS[k]:PASSIVES[k];return{icon:ty==='w'?wicon(k):k,txt:`${ty==='w'?wname(k):D.name} offered (take or decline)`}}
+  const D=ty==='w'?WEAPONS[k]:PASSIVES[k],o=ty==='w'?G.w:G.pas,b=o[k]||0;o[k]=Math.min(ty==='w'?capW(k):D.max,b+bonusLv);if(ty==='p'&&k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}const nm=ty==='w'?wname(k):D.name;return{icon:ty==='w'?wicon(k):k,txt:b?`${nm} Lv ${b} → ${o[k]}`:`${nm} (new) Lv ${o[k]}`}}
  const k=SKILLS[Math.random()*SKILLS.length|0],L=sLvl(k),T2=Math.min(99,L+SKGAIN[Math.min(3,bonusLv)]),need=XPT[T2]-SK[k];if(need>0)addSkillXp(k,need);return{icon:k,txt:`${k} ${L} → ${T2}`}}
 function applyDrop(t){const r=randUpgrade(TIER_LV[t]);tierExtra(t);G.banner={txt:`${TIERS[t].n} drop! ${r.txt}`,life:2.6,col:TIERS[t].c}}
 const hpMax=()=>90+sLvl('Hitpoints')+15*(G.pas.hp||0)+60*mg('ely')+G.bon.hp;
@@ -614,12 +617,12 @@ function wstat0(k,L){const m=k==='wind'||k==='barrage'||k==='fire'||k==='runes'?
  case 'dbow':return{dmg:42+L*12,cd:Math.max(.9,1.7-L*.1),proj:2+pb(L),pierce:99,area:0};
  case 'sang':return{dmg:34+L*9,cd:Math.max(.8,1.5-L*.08),proj:4+L,area:Math.round(170*A),pierce:99,life:.4+L*.05};
  case 'whip':return{dmg:20+L*6,cd:Math.max(.32,.6-L*.035),proj:2+Math.floor(L/2),area:Math.round((195+L*10)*A),pierce:99}}}
-const msc=()=>1+G.t/240;
+const msc=()=>1+G.t/240,mdm=L=>enemyScale(G.t)*(1+.25*(L-1));  // mega dmg tracks the enemy HP ramp, +25%/level
 function mstat(k,L){const A=AREA();switch(k){
- case 'tbow':return{dmg:45*L*msc(),cd:Math.max(.5,1.1/L),proj:L,pierce:4+L,area:0};
- case 'shadow':return{dmg:28*L*msc(),cd:Math.max(1,2.2/L),proj:3+L,pierce:4+L,area:0};
- case 'scythe':return{dmg:26*L*msc(),cd:Math.max(.8,1.6/L),proj:3,area:Math.round((120+20*L)*A),pierce:99};
- case 'ely':return{dmg:14*L*msc(),cd:2.5,proj:0,area:Math.round(95*A),pierce:99,block:1-Math.pow(.7,L)}}}
+ case 'tbow':return{dmg:240*mdm(L),cd:Math.max(.5,1.1/L),proj:L,pierce:4+L,area:0};
+ case 'shadow':return{dmg:210*mdm(L),cd:Math.max(1,2.2/L),proj:3+L,pierce:4+L,area:0};
+ case 'scythe':return{dmg:230*mdm(L),cd:Math.max(.8,1.6/L),proj:3,area:Math.round((120+20*L)*A),pierce:99};
+ case 'ely':return{dmg:200*mdm(L),cd:2.5,proj:0,area:Math.round(95*A),pierce:99,block:1-Math.pow(.7,L)}}}
 function megaFirst(k,col){if(G.megaSeen[k])return;G.megaSeen[k]=1;G.banner={txt:`${MEGA[k].name} unleashed!`,life:2.4,col,big:1};G.tint={col,life:.6}}
 function weapons(dt){const p=G.p,w=G.w,cd=G.cd,dc=dt*(1+G.bon.cd);
  for(const k of['wind','knives','scim','cannon','prayer','barrage','darts','fire','runes','chin','halberd','smite','godsword','dbow','sang','whip','tbow','tum','scy','ely'])cd[k]=(cd[k]||0)-dc;
@@ -671,7 +674,12 @@ function collect(it){const p=G.p;it.a=false;
  else if(it.k==='bomb'){bomb();G.banner={txt:'Kaboom!',life:1.4,col:'#ffb040'}}
  else if(it.k==='star'){p.star=8;G.banner={txt:'Invulnerable for 8s!',life:1.8,col:'#ffd23a'}}
  else if(it.k==='chest')openChest(it.v,it.b)}
-function update(dt){const p=G.p;G.t+=dt;
+function showOffer(){const o=G.offerQ.shift(),D=o.ty==='w'?WEAPONS[o.k]:PASSIVES[o.k],nm=o.ty==='w'?wname(o.k):D.name,gd=Math.round(10*goldMul());G.paused=true;
+ $('offerI').src=ICONURL[o.ty==='w'?wicon(o.k):o.k];$('offerT').textContent=`Take ${nm}?`;$('offerD').textContent=`${D.desc} · fills an empty ${o.ty==='w'?'weapon':'passive'} slot (Lv ${o.L})`;$('offerNo').textContent=`Decline (+${gd} gold)`;show('offer',1);
+ const done=()=>{show('offer',0);G.paused=false;last=performance.now()};
+ $('offerYes').onclick=()=>{const T=o.ty==='w'?G.w:G.pas;if(!T[o.k]&&Object.keys(T).length<(o.ty==='w'?G.ws:G.ps)){T[o.k]=o.L;if(o.k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}}buzz(20);done()};
+ $('offerNo').onclick=()=>{G.gold+=gd;buzz(10);done()}}
+function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();return}const p=G.p;G.t+=dt;
  const[dx,dy]=inputVec(),sp=p.sp*spdMul()*(G.fleet>0?1.3:1);p.x+=dx*sp*dt;p.y+=dy*sp*dt;if(dx||dy){const l=Math.hypot(dx,dy);p.face=[dx/l,dy/l]}p.moving=!!(dx||dy);
  // waves: ~30 min structure
  G.spawnT-=dt;if(G.spawnT<=0){G.spawnT=Math.max(.14,1-G.t/300);const n=1+Math.floor(G.t/90),ty=waveTypes(G.t);for(let i=0;i<n;i++)spawn(ty[Math.random()*ty.length|0])}
@@ -886,6 +894,7 @@ function rollCards(){const opts=[];
  const ww=Math.min(1.2,6/Math.max(1,newW.length)),pw=Math.min(.8,3.2/Math.max(1,newP.length));
  for(const k in WEAPONS){if(BN.includes(k))continue;const L=G.w[k]||0,EL=!!WEAPONS[k].elite;if(L&&L<WEAPONS[k].max)opts.push({k,type:'w',L,wt:EL?2.5:3.5,el:EL});else if(!L&&nW<G.ws&&(EL?G.lvl>=8&&avail(WEAPONS[k]):newW.includes(k)))opts.push({k,type:'w',L,wt:EL?.3:ww,el:EL})}
  for(const k in PASSIVES){if(BN.includes(k))continue;const L=G.pas[k]||0;if(L&&L<PASSIVES[k].max)opts.push({k,type:'p',L,wt:3});else if(!L&&nP<G.ps&&newP.includes(k))opts.push({k,type:'p',L,wt:pw})}
+ for(const k in G.mega)if(mg(k)<MEGA_MAX)opts.push({k,type:'m',L:mg(k),wt:2});
  const owned=new Set(Object.keys(G.w).map(k=>WSKILL[k]));owned.add('Hitpoints');
  for(const k of SKILLS){const L=sLvl(k);if(L<99)opts.push({k,type:'s',L,wt:owned.has(k)?1.5:.4})}
  const pick=[];while(pick.length<3&&opts.length){let tot=opts.reduce((a,o)=>a+o.wt,0),r=Math.random()*tot,i=0;for(;i<opts.length-1;i++){r-=opts[i].wt;if(r<=0)break}const o=opts.splice(i,1)[0];if(o.wt>0)pick.push(o)}
@@ -898,7 +907,7 @@ function rollCards(){const opts=[];
   const SG=o.type==='s'?Math.min(99,o.L+SKGAIN[o.tier]):0,mx=D&&D.max?D.max:99,NL=o.type==='w'||o.type==='p'?Math.min(mx,o.L+TIER_LV[o.tier]):0,EX=o.tier===1&&o.type!=='m'?' · +15% heal':o.tier===2?' · +4% might':'';
   let pj='';if(o.type==='w'&&PROJW[o.k]){const d=wstat(o.k,NL).proj-(o.L?wstat(o.k,o.L).proj:0);if(o.L&&d>0)pj=`<em class="pj">+${d} projectile${d>1?'s':''}</em>`}
   const ev=evoHint(o.type,o.k,NL),EV=ev?`<span class="ev">${ev}</span>`:'',nm=o.type==='w'?(o.el?'<em class="elb">★ ELITE</em> ':'')+wname(o.k):D&&D.name;
-  const body=o.type==='m'?`<span style="color:#ffcf6a">${D.name}</span><br><span class="lvl">${o.L?'x'+o.L+' → x'+(o.L+1):'BONUS +1 SLOT'}</span><small>${D.desc}</small>`:o.type==='heal'?'Shark<small>Heal 50 HP</small>':
+  const body=o.type==='m'?`<span style="color:#ffcf6a">${D.name}</span><br><span class="lvl">${o.L?'Lv '+o.L+' → '+Math.min(MEGA_MAX,o.L+1):'BONUS +1 SLOT'}</span><small>${o.L?mUp(o.k,o.L):D.desc}</small>`:o.type==='heal'?'Shark<small>Heal 50 HP</small>':
    o.type==='s'?`<span style="color:${SKCOL[o.k]}">${o.k}</span><br><span class="lvl">Lv ${o.L} → ${SG}</span><small>Permanent skill boost · ${SKTIP[o.k]}${EX}</small>`:
    o.L?`${nm}<br><span class="lvl">Lv ${o.L} → ${NL}${NL>=mx?' · MAX':''}</span>${pj}<small>${o.type==='w'?upTxt(o.k,o.L,NL,!!pj):PASFX[o.k](NL)}${EX}</small>${EV}`:
    `${nm}<br><span class="lvl" style="color:#7dff8a">NEW · Lv ${NL}</span><small>${D.desc}${o.type==='w'?' · '+WSKILL[o.k]+(PROJW[o.k]?' · +1 projectile at Lv 3/6/9/12':''):' · '+PASFX[o.k](NL)}${EX}</small>${EV}`;
@@ -911,7 +920,8 @@ function rollCards(){const opts=[];
  tb('rerollBtn','reroll','Reroll',C.reroll,()=>{if(C.reroll>0){C.reroll--;G.banMode=false;buzz(10);rollCards()}});
  tb('skipBtn','skip','Skip',C.skip,()=>{if(C.skip>0){C.skip--;G.xp+=G.next*.15;G.p.hp=Math.min(G.p.max,G.p.hp+G.p.max*.1);closeLvl()}});
  const bb=tb('banishBtn','banish','Banish',C.banish,()=>{if(C.banish>0){G.banMode=!G.banMode;bb.classList.toggle('on',G.banMode);box.className=G.banMode?'ban':''}});
- T.style.display=C.reroll+C.skip+C.banish>0?'flex':'none'}
+ {const b=document.createElement('button');b.id='declineBtn';b.innerHTML='✕ Decline <b>+5 gold</b>';b.title='Take nothing: +5 gold and a small heal';b.onclick=()=>{G.gold+=5;G.p.hp=Math.min(G.p.max,G.p.hp+G.p.max*.05);buzz(10);closeLvl()};T.appendChild(b)}
+ T.style.display='flex'}
 let chestTok=0;function openChest(tier,boss){tier=Math.max(0,Math.min(3,tier|0));G.paused=true;const tok=++chestTok,CT=CHESTS[tier];let n=CT.n2;if(boss&&n<3&&Math.random()<.35)n++;
  G.chests++;if(tier>=2)G.gchests++;if(tier===3)G.lchests=(G.lchests||0)+1;const gb=Math.round([5,15,40,120][tier]*goldMul());G.gold+=gb;
  const evk=(tier>=2||boss)?evoCandidate():null,mch=tier===3?.25:tier===2?.04:0;let used=false,mu=false;
@@ -1024,7 +1034,7 @@ function wline(S,sk){const d=Math.round(S.dmg*dmgMul(sk)),o=[`<b>${d}</b> dmg`,`
 function dealt(k){const d=G.dmg[k]||0,t=G.first[k]!=null?Math.max(10,G.t-G.first[k]):10;return`<span class="dps"><b>${Math.round(d/t)}</b>DPS · ${d>=1e4?(d/1000).toFixed(1)+'k':Math.round(d)} dealt</span>`}
 function buildStats(){const p=G.p,h=[];const row=(ic,nm,sub,right,det,cls)=>`<button class="srow ${cls||''}"><div class="top"><img src="${ICONURL[ic]}"><span class="nm">${nm}<small>${sub}</small></span>${right||''}</div><div class="det">${det}</div></button>`;
  h.push('<h3>Weapons</h3>');for(const k in G.w){const L=G.w[k],S=wstat(k,L),mx=WEAPONS[k].max;const eh=evoHint('w',k,L);h.push(row(wicon(k),`${wname(k)} <span style="color:#ffcf6a">Lv ${L}/${mx}</span>`,wline(S,WSKILL[k]),dealt(k),(L>=mx?(G.evo[k]?'★ Evolved: +60% dmg, faster, +1 projectile/area.':'Max level reached.'):`Next (Lv ${L+1}): ${upTxt(k,L,L+1)}`)+(eh?'<br>'+eh:''),G.evo[k]?'mega':''))}
- if(Object.keys(G.mega).length){h.push('<h3 style="color:#ffa21a">Mega rares</h3>');for(const k in G.mega){const L=G.mega[k],S=mstat(k,L);h.push(row(k,`${MEGA[k].name} <span style="color:#ffa21a">x${L}</span>`,wline(S,MEGA[k].sk||'Prayer'),dealt(k),`${MEGA[k].desc}<br>Next stack (x${L+1}): ${wline(mstat(k,L+1),MEGA[k].sk||'Prayer')}`,'mega'))}}
+ if(Object.keys(G.mega).length){h.push('<h3 style="color:#ffa21a">Mega rares</h3>');for(const k in G.mega){const L=G.mega[k],S=mstat(k,L);h.push(row(k,`${MEGA[k].name} <span style="color:#ffa21a">Lv ${L}/${MEGA_MAX}</span>${L<MEGA_MAX?`<br><small style="color:#ffcf6a">Next: ${mUp(k,L)}</small>`:''}`,wline(S,MEGA[k].sk||'Prayer'),dealt(k),`${MEGA[k].desc}<br>Next stack (x${L+1}): ${wline(mstat(k,L+1),MEGA[k].sk||'Prayer')}`,'mega'))}}
  h.push('<h3>Passives</h3>');for(const k in G.pas){const L=G.pas[k],mx=PASSIVES[k].max;h.push(row(k,`${PASSIVES[k].name} <span style="color:#ffcf6a">Lv ${L}/${mx}</span>`,PASFX[k](L),'',L>=mx?'Max level reached.':`Next (Lv ${L+1}): ${PASFX[k](L+1)}`))}
  if(!Object.keys(G.pas).length)h.push('<p style="font-size:11px">No passives yet.</p>');
  const might=(1+.1*(G.pas.str||0)+G.might)*(1+G.bon.dmg)-1,armor=1-drMul(),cc=critCh()+(G.sig.cleave?.15:0);
