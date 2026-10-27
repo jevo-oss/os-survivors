@@ -339,6 +339,8 @@ const IC={
  tbow:g=>{glw(g,24,24,21,'rgba(255,165,40,.55)');strokeP(g,g=>{g.beginPath();g.moveTo(15,6);g.bezierCurveTo(46,12,6,30,15,42)},'#140c06',6);const q=g.createLinearGradient(0,6,0,42);q.addColorStop(0,'#3e6a2a');q.addColorStop(.5,'#9a7a44');q.addColorStop(1,'#3e6a2a');strokeP(g,g=>{g.beginPath();g.moveTo(15,6);g.bezierCurveTo(46,12,6,30,15,42)},q,3.6);strokeP(g,g=>{g.beginPath();g.moveTo(15,6);g.lineTo(15,42)},'#fff0b0',1);E(g,26,24,2.6,2.6,'#7aff8a',{spec:.6})},
  shadow:g=>{glw(g,30,13,15,'rgba(255,195,70,.85)');CAP(g,12,41,28,16,1.9,'#5a2c7a');PL(g,[23,18,30,5,37,18,30,15],PAL.gold,{hi:.55});E(g,30,11,4.6,4.6,'#ffe07a',{hi:.7,spec:.8})},
  scythe:g=>{CAP(g,13,42,32,7,1.9,'#4a2c1a');shade(g,g=>{g.beginPath();g.moveTo(31,8);g.quadraticCurveTo(8,3,5,24);g.quadraticCurveTo(14,12,32,14);g.closePath()},'#c4202a',[5,3,27,21],{hi:.55,spec:.5})},
+ obl:g=>{glw(g,30,28,18,'rgba(255,120,30,.75)');strokeP(g,g=>{g.beginPath();g.moveTo(8,8);g.quadraticCurveTo(10,26,24,24)},'#2a2420',4.5);for(let i=0;i<5;i++){const t=i/4,x=8+(24-8)*t+Math.sin(t*3)*3,y=8+(24-8)*t*1.1;E(g,x,y,2.6,1.8,'#8a929c',{hi:.5})}CAP(g,5,5,11,11,2.4,'#5a3a22');
+  for(let i=0;i<8;i++){const a=i*.785;PL(g,[31+Math.cos(a-.25)*8,29+Math.sin(a-.25)*8,31+Math.cos(a)*15,29+Math.sin(a)*15,31+Math.cos(a+.25)*8,29+Math.sin(a+.25)*8],'#b8c0c8',{hi:.5,spec:0})}E(g,31,29,9,9,'#3a3e46',{hi:.55,spec:.6});E(g,31,29,3.5,3.5,'#ff8a2a',{hi:.7});glw(g,31,29,7,'rgba(255,170,60,.9)')},
  ely:g=>{glw(g,24,24,21,'rgba(255,235,170,.6)');PL(g,[11,9,37,9,38,22,24,41,10,22],'#d6e2f6',{hi:.5,spec:.6});PL(g,[24,13,28.5,22,24,34,19.5,22],PAL.gold,{hi:.6});dot(g,24,22,2,'#fff')},
  heal:g=>{PL(g,[6,24,13,17,30,15,36,20,43,14,41,24,43,33,36,28,30,33,13,31],'#8fa3b0',{hi:.45});PL(g,[21,16,26,8,28,16],dk('#8fa3b0',.15));eye(g,13,22.5,1.2)},
  // pickups
@@ -373,7 +375,7 @@ const IC={
  sang:g=>{CAP(g,13,42,28,18,2,'#5a2a3a');glw(g,32,13,15,'rgba(255,60,60,.85)');E(g,32,13,7,7,'#d0202a',{hi:.6,spec:.7});PL(g,[25,19,28.5,14,30.5,21],PAL.gold,{spec:0});PL(g,[34,21,39,17,36.5,23],PAL.gold,{spec:0})},
  whip:g=>{glw(g,24,26,18,'rgba(140,255,200,.4)');const wp=g=>{g.beginPath();g.moveTo(12,37);g.bezierCurveTo(2,20,42,30,34,12);g.quadraticCurveTo(31,6,39,6)};g.lineCap='round';strokeP(g,wp,'#0b0806',6);strokeP(g,wp,'#6a9a5a',3.4);RR(g,7,35,10,7,2,'#3a2a1a');dot(g,12,38.5,1.7,PAL.gold)},
 };
-const MEGAKEYS=['tbow','shadow','scythe','ely'];
+const MEGAKEYS=['tbow','shadow','scythe','ely','obl'];
 const ICON={},ICONURL={};for(const k in IC){ICON[k]=mk(48,48,g=>{frame(g,MEGAKEYS.includes(k)?'rgba(255,170,40,.95)':null);g.save();IC[k](g);g.restore()});ICONURL[k]=ICON[k].c.toDataURL()}
 const ELK=['godsword','dbow','sang','whip'];const starB=(g,x,y,r,c)=>{g.fillStyle=c;g.strokeStyle='#2a0800';g.lineWidth=1.3;g.beginPath();for(let i=0;i<10;i++){const q=i%2?r*.45:r,a=i*Math.PI/5-Math.PI/2;g.lineTo(x+Math.cos(a)*q,y+Math.sin(a)*q)}g.closePath();g.fill();g.stroke()};
 for(const k of ELK){ICON[k]=mk(48,48,g=>{frame(g,'rgba(255,96,64,1)');glw(g,24,24,23,'rgba(255,120,60,.45)');g.save();IC[k](g);g.restore();starB(g,10,10,6,'#ffb03a')});ICONURL[k]=ICON[k].c.toDataURL()}
@@ -472,7 +474,8 @@ const SKCOL={Attack:'#ff6a5a',Ranged:'#7ad85a',Magic:'#6ab0ff',Prayer:'#f4eec8',
 const MEGA={tbow:{name:'Twisted bow',sk:'Ranged',desc:'Fires huge piercing arrows at the strongest foe · ALL Ranged x2 per stack'},
  shadow:{name:"Tumeken's shadow",sk:'Magic',desc:'Casts devastating shadow orbs · ALL Magic x2 per stack'},
  scythe:{name:'Scythe of vitur',sk:'Attack',desc:'Spinning 360° reap around you · ALL melee x2 per stack'},
- ely:{name:'Elysian spirit shield',sk:null,desc:'-30% dmg taken per stack, +60 HP, regen, holy pulse'}};
+ ely:{name:'Elysian spirit shield',sk:null,desc:'-30% dmg taken per stack, +60 HP, regen, holy pulse'},
+ obl:{name:'Obligator',sk:'Prayer',desc:'Hurls a spiked flail on a chain into the biggest crowd: obliterating crater, drags foes in, aftershocks · ALL Prayer x2 per stack'}};
 const CLASSES={
  warrior:{name:'Warrior',tag:'Melee bruiser',start:'scim',base:{hp:30,dr:.15},sk:'Attack',blurb:'Starts with Rune scimitar · +30 HP · 15% damage reduction',
   perks:[[2,'Rampage: every 5th melee swing hits twice as hard and 30% wider',{sig:'rampage'}],[5,'Bleed: Attack hits make foes bleed for +30% extra damage over 2s',{sig:'bleed'}],[10,'Cleave: 15% crits deal x2 and cleave nearby foes',{sig:'cleave'}],[15,'Second wind: below 35% HP you deal +30% damage and take 20% less',{sig:'wind2'}],[20,'War chest: start every run with a free Dragon halberd',{fw:'halberd:1'}],[8,'+1 reroll per run',{reroll:1}],[12,'+1 weapon slot',{wslot:1}],[18,'+1 banish per run',{banish:1}],[22,'Head start: begin every run with a free upgrade pick',{sig:'head'}],[25,'+1 passive slot',{pslot:1}],[30,'Juggernaut: +20% damage, -5% damage taken',{dmg:.2,dr:.05}]]},
@@ -545,8 +548,10 @@ function addSkillXp(k,x){const b=sLvl(k);SK[k]+=x;G.runXp[k]=(G.runXp[k]||0)+x;c
 const mg=k=>G.mega[k]||0,MEGA_MAX=8;
 function mUp(k,L){const a=mstat(k,L),b=mstat(k,Math.min(MEGA_MAX,L+1)),r=v=>Math.round(v);let t=`Dmg ${r(a.dmg)} → ${r(b.dmg)}`;if(b.cd<a.cd)t+=` · Cooldown ${a.cd.toFixed(1)}s → ${b.cd.toFixed(1)}s`;if(b.area>a.area)t+=` · Area ${a.area} → ${b.area}`;if(b.proj>a.proj)t+=` · Shots ${a.proj} → ${b.proj}`;if(b.block>a.block)t+=` · Block ${r(a.block*100)}% → ${r(b.block*100)}%`;return t}
 function megaMul(sk){for(const k in MEGA)if(MEGA[k].sk===sk)return 1+mg(k);return 1}
-function grantMega(k){G.mega[k]=Math.min(MEGA_MAX,mg(k)+1);META.seen.mega[k]=1;buzz([50,40,90]);G.p.max=hpMax();if(k==='ely')G.p.hp=G.p.max;G.banner={col:'#ffa21a',big:1,txt:`MEGA RARE! ${MEGA[k].name}${G.mega[k]>1?' Lv '+G.mega[k]:''}`,life:3.5};G.shake=.45;G.flash=.35;burst(G.p.x,G.p.y,'',26,260,GL.orange)}
-function dropMega(x,y,k){G.megaDrops++;if(G.loot.length<12)G.loot.push({x,y,tier:4,k:k||MEGAKEYS[Math.random()*4|0]})}
+let lastMega=LS.get('oss_lastmega','');
+function pickMega(){const first=!Object.keys(G.mega||{}).length;let pool=MEGAKEYS.filter(k=>!mg(k));if(!pool.length)pool=MEGAKEYS.filter(k=>mg(k)<MEGA_MAX);if(!pool.length)pool=MEGAKEYS.slice();if(first&&pool.length>1&&pool.includes(lastMega))pool=pool.filter(k=>k!==lastMega);return pool[Math.random()*pool.length|0]}
+function grantMega(k){if(!Object.keys(G.mega).length&&!G.menu){lastMega=k;LS.set('oss_lastmega',k)}G.mega[k]=Math.min(MEGA_MAX,mg(k)+1);META.seen.mega[k]=1;buzz([50,40,90]);G.p.max=hpMax();if(k==='ely')G.p.hp=G.p.max;G.banner={col:'#ffa21a',big:1,txt:`MEGA RARE! ${MEGA[k].name}${G.mega[k]>1?' Lv '+G.mega[k]:''}`,life:3.5};G.shake=.45;G.flash=.35;burst(G.p.x,G.p.y,'',26,260,GL.orange)}
+function dropMega(x,y,k){G.megaDrops++;if(G.loot.length<12)G.loot.push({x,y,tier:4,k:k||pickMega()})}
 // ---- pacing: rarity = levels gained (+bonus), skills climb slowly ----
 let MEGA_KILL=1/40000;const SKGAIN=[1,2,3,5],TIER_LV=[1,1,1,2],TIER_BONUS=['','','+4% might','']; // Uncommon/Rare also get extras below
 function rollTier(w){let r=Math.random()*100;if(G&&G.bon)r+=(100-r)*Math.min(.5,luck());return w?(r<45?0:r<78?1:r<94?2:3):(r<62?0:r<86?1:r<97?2:3)}
@@ -625,10 +630,11 @@ function mstat(k,L){const A=AREA();switch(k){
  case 'tbow':return{dmg:240*mdm(L),cd:Math.max(.5,1.1/L),proj:L,pierce:4+L,area:0};
  case 'shadow':return{dmg:210*mdm(L),cd:Math.max(1,2.2/L),proj:3+L,pierce:4+L,area:0};
  case 'scythe':return{dmg:230*mdm(L),cd:Math.max(.8,1.6/L),proj:3,area:Math.round((120+20*L)*A),pierce:99};
+ case 'obl':return{dmg:260*mdm(L),cd:Math.max(1.1,2.7-L*.2),proj:1+Math.floor(L/3),area:Math.round((110+L*14)*A),pierce:99};
  case 'ely':return{dmg:200*mdm(L),cd:2.5,proj:0,area:Math.round(95*A),pierce:99,block:1-Math.pow(.7,L)}}}
 function megaFirst(k,col){if(G.megaSeen[k])return;G.megaSeen[k]=1;G.banner={txt:`${MEGA[k].name} unleashed!`,life:2.4,col,big:1};G.tint={col,life:.6}}
 function weapons(dt){const p=G.p,w=G.w,cd=G.cd,dc=dt*(1+G.bon.cd);
- for(const k of['wind','knives','scim','cannon','prayer','barrage','darts','fire','runes','chin','halberd','smite','godsword','dbow','sang','whip','tbow','tum','scy','ely'])cd[k]=(cd[k]||0)-dc;
+ for(const k of['wind','knives','scim','cannon','prayer','barrage','darts','fire','runes','chin','halberd','smite','godsword','dbow','sang','whip','tbow','tum','scy','ely','obl'])cd[k]=(cd[k]||0)-dc;
  if(w.wind&&cd.wind<=0){SRC='wind';const S=wstat('wind',w.wind);for(let i=0;i<S.proj;i++){const e=nearest(p.x,p.y,500);if(!e)break;fire(p.x,p.y,Math.atan2(e.y-p.y,e.x-p.x)+(i-(S.proj-1)/2)*.25,380,S.dmg,6,1.6,0,'wind')}cd.wind=S.cd}
  if(w.knives&&cd.knives<=0){SRC='knives';const S=wstat('knives',w.knives),a=Math.atan2(p.face[1],p.face[0]);for(let i=0;i<S.proj;i++)fire(p.x,p.y,a+(i-(S.proj-1)/2)*.32,470,S.dmg,4,1.25,S.pierce,'knife');cd.knives=S.cd}
  if(w.scim&&cd.scim<=0){SRC='scim';const S=wstat('scim',w.scim),rm=ramp(S),a=Math.atan2(p.face[1],p.face[0]),R=S.area;addFx(p.x,p.y,R,.22,'slash',a);for(const e of enemies.a)if(e.a&&inArc(e,p,R,a))hurt(e,S.dmg,'Attack');
@@ -663,6 +669,11 @@ function weapons(dt){const p=G.p,w=G.w,cd=G.cd,dc=dt*(1+G.bon.cd);
  if(mg('scythe')&&cd.scy<=0){SRC='scythe';const L=mg('scythe'),S=mstat('scythe',L),R2=S.area;let any=false;for(const e of enemies.a)if(e.a&&!e.prop&&(e.x-p.x)**2+(e.y-p.y)**2<(R2+e.r)**2){any=true;break}
   if(any){megaFirst('scythe','#ff4a4a');addFx(p.x,p.y,R2,.45,'sweep',Math.atan2(p.face[1],p.face[0]));for(const e of enemies.a)if(e.a&&(e.x-p.x)**2+(e.y-p.y)**2<(R2+e.r)**2)hurt(e,S.dmg,'Attack');G.shake=Math.max(G.shake,.12)}cd.scy=S.cd}
  if(mg('ely')&&cd.ely<=0){SRC='ely';const L=mg('ely'),S=mstat('ely',L),R=S.area;megaFirst('ely','#ffe28a');addFx(p.x,p.y,R,.45,'holy');for(const e of enemies.a)if(e.a&&(e.x-p.x)**2+(e.y-p.y)**2<(R+e.r)**2)hurt(e,S.dmg,'Prayer');cd.ely=S.cd}
+ if(mg('obl')&&cd.obl<=0){SRC='obl';const L=mg('obl'),S=mstat('obl',L),R=S.area;let n=0;for(let i=0;i<S.proj;i++){let best=null,bc=-1;for(let t=0;t<10;t++){const e=randEnemy(p.x,p.y,380);if(!e)break;let c=0;for(const o of enemies.a)if(o.a&&(o.x-e.x)**2+(o.y-e.y)**2<R*R*2)c++;if(c>bc){bc=c;best=e}}if(!best)break;n++;megaFirst('obl','#ff8a2a');
+   const x=best.x,y=best.y,f=addFx(x,y,R,.75,'obl',Math.random()*6);if(f)f.pts=[p.x-x,p.y-y];burst(x,y,'#ff8a2a',22,R*2.8);burst(x,y,'#3a2a20',14,R*2);burst(x,y,'',10,R*2.2,GL.orange);
+   for(const o of enemies.a)if(o.a&&!o.prop){const d2=(o.x-x)**2+(o.y-y)**2;if(d2<(R+o.r)**2)hurt(o,S.dmg,'Prayer');else if(o.a&&d2<(R*1.9)**2&&!o.boss){const d=Math.sqrt(d2)||1;o.x-=(o.x-x)/d*(d-R*.6)*.6;o.y-=(o.y-y)/d*(d-R*.6)*.6}}
+   (G.obq=G.obq||[]).push({x,y,R:R*1.45,t:.22,dmg:S.dmg*.45},{x,y,R:R*1.9,t:.45,dmg:S.dmg*.3})}if(n){G.shake=Math.max(G.shake,.3);buzz(25);cd.obl=S.cd}else cd.obl=.3}
+ if(G.obq&&G.obq.length){SRC='obl';G.obq=G.obq.filter(q=>{q.t-=dt;if(q.t>0)return true;addFx(q.x,q.y,q.R,.4,'ring');burst(q.x,q.y,'#ffb060',10,q.R*2);for(const o of enemies.a)if(o.a&&!o.prop&&(o.x-q.x)**2+(o.y-q.y)**2<(q.R+o.r)**2)hurt(o,q.dmg,'Prayer');G.shake=Math.max(G.shake,.1);return false})}
  SRC=''}
 // level curve: tuned with the bot sim so ~Lv10 @5min, ~Lv25 @15min
 let XPA=8,XPB=15,XPP=1.9;
@@ -837,6 +848,9 @@ const DBG={};function render(){const now=NOW=performance.now()/1000;const p=G.p;
   else if(f.kind==='chain'&&f.pts){const P=f.pts;ctx.globalAlpha=1-t;for(let k=0;k<2;k++){ctx.lineWidth=k?2.5:9;ctx.strokeStyle=k?'rgba(255,230,230,1)':'rgba(255,40,50,.6)';ctx.beginPath();ctx.moveTo(P[0],P[1]);for(let i=2;i<P.length;i+=2){const mx=(P[i-2]+P[i])/2+Math.sin(i*7.1)*14,my=(P[i-1]+P[i+1])/2+Math.cos(i*5.3)*14;ctx.quadraticCurveTo(mx,my,P[i],P[i+1])}ctx.stroke()}for(let i=2;i<P.length;i+=2)addGlow(GL.red,P[i],P[i+1],40,.8*(1-t))}
   else if(f.kind==='lash'&&f.pts){const P=f.pts,dx=P[2]-P[0],dy=P[3]-P[1],u=Math.min(1,t*3);ctx.globalAlpha=1-t;const ex=P[0]+dx*u,ey=P[1]+dy*u,cx=P[0]+dx*.5-dy*.35*f.ang,cy=P[1]+dy*.5+dx*.35*f.ang;for(let k=0;k<2;k++){ctx.lineWidth=k?2:6;ctx.strokeStyle=k?'rgba(230,255,240,1)':'rgba(120,255,190,.55)';ctx.beginPath();ctx.moveTo(P[0],P[1]);ctx.quadraticCurveTo(cx,cy,ex,ey);ctx.stroke()}if(u>=1)addGlow(GL.green,P[2],P[3],34,.9*(1-t))}
   else if(f.kind==='burn'){const fl=.75+.25*Math.sin(now*22+f.x),a=Math.min(1,f.life*2,(f.max-f.life)*4);addGlow(GL.orange,0,0,f.r*2.3,.5*a*fl);addGlow(GL.red,0,0,f.r*1.3,.4*a);for(let i=0;i<3;i++)addGlow(GL.gold,Math.sin(now*3+i*2.1+f.x)*f.r*.5,Math.cos(now*2.6+i*1.7)*f.r*.3-6,14,.6*a*fl)}
+  else if(f.kind==='obl'&&f.pts){const P=f.pts;if(t<.28){const u=t/.28,hx=P[0]*(1-u),hy=P[1]*(1-u)-Math.sin(u*Math.PI)*90;ctx.globalAlpha=1;ctx.strokeStyle='rgba(180,190,200,1)';ctx.lineWidth=4;ctx.setLineDash([6,4]);ctx.beginPath();ctx.moveTo(P[0],P[1]);ctx.quadraticCurveTo(P[0]*.5,P[1]*.5-110*Math.sin(u*Math.PI),hx,hy);ctx.stroke();ctx.setLineDash([]);dI(ICON.obl,hx-22,hy-22,44,44);addGlow(GL.orange,hx,hy,60,.8)}
+   else{const u=(t-.28)/.72,e=1-Math.pow(1-u,3);ctx.globalAlpha=1-u;ctx.strokeStyle='rgba(255,140,40,1)';ctx.lineWidth=3;for(let i=0;i<9;i++){const a=f.ang+i*.698;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*f.r*.5*(1+e*.4),Math.sin(a)*f.r*.35*(1+e*.4));ctx.lineTo(Math.cos(a+.15)*f.r*(.8+e*.3),Math.sin(a+.15)*f.r*.55*(.8+e*.3));ctx.stroke()}
+    ctx.lineWidth=12*(1-u)+1;ctx.strokeStyle='rgba(255,200,120,1)';ctx.beginPath();ctx.ellipse(0,0,Math.max(1,f.r*(.3+e)),Math.max(1,f.r*.62*(.3+e)),0,0,6.283);ctx.stroke();addGlow(GL.orange,0,0,f.r*2.4*(1-u*.4),.95*(1-u));addGlow(GL.red,0,0,f.r*1.2,.7*(1-u));addGlow(GL.white,0,0,f.r*.6,1-u*1.5)}}
   else if(f.kind==='nova'){ctx.globalAlpha=(1-t)*.7;ctx.strokeStyle='rgba(255,200,120,1)';ctx.lineWidth=30*(1-t);ctx.beginPath();ctx.arc(0,0,f.r*t,0,6.283);ctx.stroke()}
   else{ctx.globalAlpha=(1-t)*.7;ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=2.5*(1-t)+.5;ctx.beginPath();ctx.ellipse(0,0,f.r*(.4+t*.7),f.r*(.4+t*.7)*.6,0,0,6.283);ctx.stroke()}
   ctx.restore()}
@@ -901,7 +915,7 @@ function rollCards(){const opts=[];
  const owned=new Set(Object.keys(G.w).map(k=>WSKILL[k]));owned.add('Hitpoints');
  for(const k of SKILLS){const L=sLvl(k);if(L<99)opts.push({k,type:'s',L,wt:owned.has(k)?1.5:.4})}
  const pick=[];while(pick.length<3&&opts.length){let tot=opts.reduce((a,o)=>a+o.wt,0),r=Math.random()*tot,i=0;for(;i<opts.length-1;i++){r-=opts[i].wt;if(r<=0)break}const o=opts.splice(i,1)[0];if(o.wt>0)pick.push(o)}
- if(G.lvl>=10&&Math.random()<.015)for(let i=0;i<pick.length;i++){if(i<pick.length-1&&Math.random()<.6)continue;const k=MEGAKEYS[Math.random()*4|0];pick[i]={k,type:'m',L:mg(k)};break}
+ if(G.lvl>=10&&Math.random()<.015)for(let i=0;i<pick.length;i++){if(i<pick.length-1&&Math.random()<.6)continue;const k=pickMega();pick[i]={k,type:'m',L:mg(k)};break}
  if(G.forceMegaCard)pick[0]={k:G.forceMegaCard,type:'m',L:mg(G.forceMegaCard)};
  const box=$('choices');box.innerHTML='';box.className='';$('slotinfo').innerHTML=slotsHtml();
  if(!pick.length)pick.push({k:'heal',type:'heal'});
@@ -928,7 +942,7 @@ function rollCards(){const opts=[];
 let chestTok=0;function openChest(tier,boss){tier=Math.max(0,Math.min(3,tier|0));G.paused=true;const tok=++chestTok,CT=CHESTS[tier];let n=CT.n2;if(boss&&n<3&&Math.random()<.35)n++;
  G.chests++;if(tier>=2)G.gchests++;if(tier===3)G.lchests=(G.lchests||0)+1;const gb=Math.round([5,15,40,120][tier]*goldMul());G.gold+=gb;
  const evk=(tier>=2||boss)?evoCandidate():null,mch=tier===3?.25:tier===2?.04:0;let used=false,mu=false;
- const roll=()=>{if(evk&&!used){used=true;return evolve(evk)}if(!mu&&Math.random()<mch){mu=true;const k=MEGAKEYS[Math.random()*4|0];grantMega(k);return{icon:k,txt:'MEGA RARE! '+MEGA[k].name,evo:1}}return randUpgrade(1)};
+ const roll=()=>{if(evk&&!used){used=true;return evolve(evk)}if(!mu&&Math.random()<mch){mu=true;const k=pickMega();grantMega(k);return{icon:k,txt:'MEGA RARE! '+MEGA[k].name,evo:1}}return randUpgrade(1)};
  if(window.__sim){for(let j=0;j<n;j++)roll();G.paused=false;return}
  $('chestT').innerHTML=`<span style="color:${CT.c}">${boss?'Dragon\'s ':''}${CT.n} chest</span>`;$('chestP').style.boxShadow=`inset 0 0 0 1px ${CT.c},0 0 36px ${CT.c}66,0 18px 50px rgba(0,0,0,.7)`;
  const P=$('chestP'),st=$('cstage');P.style.setProperty('--cc',CT.c);$('chestWon').innerHTML='';$('chestBtn').style.display='none';$('coinRain').innerHTML='';
@@ -989,7 +1003,7 @@ function menuScene(){newGame();G.menu=true;const p=G.p;p.x=0;p.y=0;
  G.loot.push({x:-60,y:130,tier:4,k:'tbow'},{x:80,y:150,tier:3},{x:10,y:-150,tier:2});
  const it=items.get();if(it){it.x=40;it.y=110;it.k='chest';it.v=2;it.t=0}}
 function start(){newGame();clearRun();['menu','over','lvl','chest','shop','pause','codex','settings'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';
- if(premOn()){const k=MEGAKEYS[Math.random()*MEGAKEYS.length|0];grantMega(k);G.premK=k;G.banner={txt:'★ Premium start: '+MEGA[k].name,life:3,col:'#ffd24a',big:1}}
+ if(premOn()){const k=pickMega();grantMega(k);G.premK=k;G.banner={txt:'★ Premium start: '+MEGA[k].name,life:3,col:'#ffd24a',big:1}}
  if(G.sig.head)setTimeout(()=>{if(G&&!G.over&&!G.paused&&!G.menu)levelUp()},500)}
 // ---------- pause / save ----------
 const SAVE_KEY='oss_run';
@@ -1059,6 +1073,6 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
 function renderMenu(){render()}
 // ================= INIT =================
 menuScene();buildMenu();show('menu',1);requestAnimationFrame(loop);
-window.__game={WEAPONS,set XP(v){[XPA,XPB,XPP]=v},set SKXP(v){SKXP=v},set MK(v){MEGA_KILL=v},gems,enemies,dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG,buildStats,wstat,mstat,saveRun,continueRun,pauseGame,resumeGame,hasRun,checkAch,ACH,EVO,evolve,CHESTS,rollCards,buildCodex,PASSIVES,saveMeta,PREM,items,fx,launch,CLASSES,buildShop,MEGAKEYS,closeLvl};
+window.__game={WEAPONS,set XP(v){[XPA,XPB,XPP]=v},set SKXP(v){SKXP=v},set MK(v){MEGA_KILL=v},gems,enemies,dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG,buildStats,wstat,mstat,saveRun,continueRun,pauseGame,resumeGame,hasRun,checkAch,ACH,EVO,evolve,CHESTS,rollCards,buildCodex,PASSIVES,saveMeta,PREM,pickMega,items,fx,launch,CLASSES,buildShop,MEGAKEYS,closeLvl};
 })();
 </script></body></html>
