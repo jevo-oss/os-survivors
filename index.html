@@ -856,7 +856,10 @@ function megaRoll(p){if(Math.random()<p*(G.megaN?.15:1)*(1+(G.bon.mlk||0))){G.me
 function dropMega(x,y,k){G.megaDrops++;if(G.loot.length<12)G.loot.push({x,y,tier:4,k:k||pickMega()})}
 // ---- pacing: rarity = levels gained (+bonus), skills climb slowly ----
 let MEGA_KILL=1/60000;const SKGAIN=[1,2,3,5],TIER_LV=[1,1,1,2],TIER_BONUS=['','heal 18%','+5% might','+5% might']; // Uncommon/Rare also get extras below
-function rollTier(w){let r=Math.random()*100;if(G&&G.bon)r+=(100-r)*Math.min(.5,luck());return w?(r<45?0:r<78?1:r<94?2:3):(r<62?0:r<86?1:r<97?2:3)}
+// v45: Brotato-style card rarity that ramps with player level (Lv1 62/24/11/3 = old odds -> Lv RAR_LV 45/30/18/7, clamped); Luck shift on top
+const RAR_LV=60,RAR0=[62,24,11,3],RAR1=[45,30,18,7];
+function rarOdds(lv){const f=Math.max(0,Math.min(1,((lv||1)-1)/(RAR_LV-1)));return RAR0.map((a,i)=>a+(RAR1[i]-a)*f)}
+function rollTier(w){let r=Math.random()*100;if(G&&G.bon)r+=(100-r)*Math.min(.5,luck());if(w)return r<45?0:r<78?1:r<94?2:3;const o=rarOdds(G&&G.lvl),c0=o[0],c1=c0+o[1],c2=c1+o[2];return r<c0?0:r<c1?1:r<c2?2:3}
 function tierExtra(t){if(t===1){G.p.hp=Math.min(G.p.max,G.p.hp+G.p.max*.18)}if(t===2||t===3){G.might=Math.min(.48,G.might+.05)}}
 const capW=k=>WEAPONS[k].elite?WEAPONS[k].max:Math.min(10,WEAPONS[k].max);
 function randUpgrade(bonusLv){const up=[];for(const k in G.w)if(G.w[k]<capW(k))up.push(['w',k]);for(const k in G.pas)if(G.pas[k]<PASSIVES[k].max)up.push(['p',k]);for(const k in G.mega)if(mg(k)<MEGA_MAX)up.push(['m',k]);
@@ -1607,7 +1610,7 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=44;
+const VERSION=45;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
  b64e(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)},
  b64d(b){const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(_){return bin}},
