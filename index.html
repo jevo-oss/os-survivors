@@ -552,7 +552,7 @@ function buzz(p){try{if(META.opt.hap&&navigator.vibrate)navigator.vibrate(p)}cat
 function saveMeta(){LS.set('oss_meta',META)}
 // Premium is a local DEMO flag only: no payment, no network.
 const PREM=Object.assign({u:0,on:1},LS.get('oss_premium',{}));const savePrem=()=>LS.set('oss_premium',PREM),premOn=()=>!!(PREM.u&&PREM.on);
-const CL_MAX=30,CL_NEED=L=>80+L*40;
+const CL_MAX=30,CL_NEED=L=>200+L*L*3;
 function clsInfo(id,xp){let x=xp??(META.cxp[id]||0),L=1;while(L<CL_MAX&&x>=CL_NEED(L)){x-=CL_NEED(L);L++}return{L,cur:x,need:L<CL_MAX?CL_NEED(L):1}}
 // skills 1-99 (fast OSRS-shaped curve)
 const XP_DIV=10,XPT=[0,0];(()=>{let pts=0;for(let L=1;L<99;L++){pts+=Math.floor(L+300*Math.pow(2,L/7));XPT[L+1]=Math.floor(pts/4/XP_DIV)}})();
@@ -568,7 +568,7 @@ function computeBonus(){const b={hp:0,dmg:0,sp:0,mag:0,cd:0,area:0,dr:0,regen:0,
  for(const a of ACH)if(META.ach[a.id]&&a.eff)add(a.eff);if(sig.revive)b.rev+=1;return{b,sig,sb:sb&&L>=sb.L?sb.id:'none'}}
 function newGame(){const{b,sig,sb}=computeBonus();
  G={cls:META.cls,bon:b,sig,mega:{},loot:[],runXp:{},drops:{},banner:null,t:0,kills:0,lvl:1,xp:0,next:6,gold:0,
-  p:{x:0,y:0,hp:100,max:100,sp:150,face:[1,0],inv:0,star:0,moving:false},w:{},pas:{},cd:{},cannons:[],spawnT:0,bossNext:180,eliteNext:60,swarmNext:75,propT:0,
+  p:{x:0,y:0,hp:100,max:100,sp:150,face:[1,0],inv:0,star:0,moving:false},w:{},pas:{},cd:{},cannons:[],spawnT:0,bossNext:180,eliteNext:60,swarmNext:75,seed:(Math.random()*2**31)|0,evNext:55+Math.random()*30,propT:0,
   megaGuar:1e9,megaDrops:0,bossKills:0,might:0,dmg:{},first:{},megaSeen:{},tint:null,blockFx:0,revived:false,paused:false,over:false,won:false,shake:0,flash:0,
   evo:{},ch:{reroll:3+b.reroll,skip:b.skip,banish:b.banish},banned:[],revLeft:b.rev,ws:4+b.wslot,ps:4+b.pslot,gchests:0,chests:0,sb,toastQ:[],toast:null,runeOn:0,runeA:0,achT:1};
  const st=CLASSES[META.cls].start;G.w[st]=sb==='veteran'?3:G.sig.slv2?2:1;
@@ -737,11 +737,28 @@ let XPA=8,XPB=15,XPP=1.9;
 function orangeXp(L){const k=Math.max(.75,2-1.25*(L-2)/18);let v=0,i=0;for(;i<Math.floor(k);i++)v+=needFor(L+i);v+=(k-Math.floor(k))*needFor(L+i);return Math.max(30,Math.round(v))}
 function needFor(L){const v=XPA+XPB*Math.pow(L-1,XPP+(L>13?.1*Math.min(1,(L-13)/10):0));return Math.round((L<=13?v*.7:v)*(L>=10?1+.15*Math.pow(L-9,1.3):1))}  // v23: steeper from Lv10 (x1.15@10, x1.9@13, x4.4@20, x7.9@28)  // levels 1-13 are 30% cheaper
 function gainXp(v){v*=xpMul();G.xp+=v;G.xpTot=(G.xpTot||0)+v;if(G.xp>=G.next&&!G.paused){G.xp-=G.next;G.lvl++;G.next=needFor(G.lvl);levelUp()}}
-function waveTypes(t){const m=t/60,ph=Math.floor(t/45)%3;let b=m<1?['chicken','rat']:m<3?['chicken','rat','goblin','goblin']:m<6?['rat','goblin','goblin','cow','rat','goblin','cow']:m<10?['rat','goblin','cow','cow']:m<18?['rat','goblin','goblin','cow','cow']:['goblin','goblin','cow','cow'];
- if(ph===1)b=['rat','rat'].concat(b);else if(ph===2&&m>=3)b=b.concat(['cow']);return b}
+// v26 variety: per-run seeded phase order (normal/horde/brute shuffled every 135s cycle) + a seeded 'flavor' type per 3-min block
+function srnd(n){let x=((G.seed|0)^Math.imul(n|0,0x9E3779B1))>>>0;x=Math.imul(x^x>>>16,0x45d9f3b);x=Math.imul(x^x>>>16,0x45d9f3b);return ((x^x>>>16)>>>0)/4294967296}
+function phaseAt(t){const c=Math.floor(t/135),i=Math.floor(t/45)%3,P=[[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]][srnd(c*7+3)*6|0];return c===0?i:P[i]}
+function waveTypes(t){const m=t/60,ph=phaseAt(t);let b=m<1?['chicken','rat']:m<3?['chicken','rat','goblin','goblin']:m<6?['rat','goblin','goblin','cow','rat','goblin','cow']:m<10?['rat','goblin','cow','cow']:m<18?['rat','goblin','goblin','cow','cow']:['goblin','goblin','cow','cow'];
+ if(ph===1)b=['rat','rat'].concat(b);else if(ph===2&&m>=3)b=b.concat(['cow']);
+ {const fl=['chicken','rat','goblin','cow'],bl=Math.floor(t/180),f=fl[Math.min(fl.length-1,Math.floor(srnd(bl*11+5)*(m<1?2:m<3?3:4)))];if(!b.includes(f)||srnd(bl*13+1)<.5)b=[f].concat(b)}return b}
 // big monsters (skeletons) are rare + capped: ~1/25 normal spawns (1/12 brute phase, 1/40 boss escorts), max 4 alive -> 8 late
+function spawnEvent(){const p=G.p,m=G.t/60,ty=waveTypes(G.t),R=Math.max(W,H)*.6+40,a0=Math.random()*6.283,sc=Math.min(1.6,.7+m/15);let n=0;
+ const at=(t,x,y,o)=>{const e=spawn(t,Object.assign({x:p.x+x,y:p.y+y},o||{}));if(e)n++;return e},ban=(t,c)=>{G.banner={txt:t,life:2,col:c||'#ffcf6a',big:1}};
+ const pool=['ring','column','packs','rats'];if(m>=1)pool.push('chickens');if(m>=2)pool.push('raid');if(m>=4)pool.push('stampede');if(m>=5)pool.push('undead');
+ const ev=pool[Math.random()*pool.length|0];
+ if(ev==='ring'){const N=Math.round(14*sc);for(let i=0;i<N;i++){const a=i/N*6.283;at(pickT(ty),Math.cos(a)*R,Math.sin(a)*R,{nochamp:1})}ban('Surrounded!','#ff9a6a')}
+ else if(ev==='column'){const N=Math.round(12*sc),t=ty[ty.length-1],cx=Math.cos(a0),cy=Math.sin(a0);for(let i=0;i<N;i++){const o=(i-N/2)*26;at(t,cx*R-cy*o,cy*R+cx*o,{nochamp:1})}ban('A column charges in!','#ffcf6a')}
+ else if(ev==='packs'){const k=2+(Math.random()*2|0);for(let j=0;j<k;j++){const a=a0+j*6.283/k,t=ty[Math.random()*ty.length|0],N=Math.round(6*sc);for(let i=0;i<N;i++)at(t,Math.cos(a)*R+(Math.random()-.5)*90,Math.sin(a)*R+(Math.random()-.5)*90,{nochamp:1})}}
+ else if(ev==='rats'){const N=Math.round(22*sc);for(let i=0;i<N;i++){const a=a0+(Math.random()-.5)*.9;at('rat',Math.cos(a)*(R+Math.random()*120),Math.sin(a)*(R+Math.random()*120),{nochamp:1,sw:1})}ban('Rats pour in!','#c8c0a8')}
+ else if(ev==='chickens'){const N=Math.round(26*sc);for(let i=0;i<N;i++){const a=Math.random()*6.283;at('chicken',Math.cos(a)*(R+Math.random()*100),Math.sin(a)*(R+Math.random()*100),{nochamp:1,sw:1})}ban('Chicken frenzy!','#ffffff')}
+ else if(ev==='raid'){const cx=Math.cos(a0)*R,cy=Math.sin(a0)*R,L=at('goblin',cx,cy,{nochamp:1});if(L){L.champ=1;L.max=L.hp=L.max*3;L.r*=1.25;L.xp=Math.max(12,L.xp*2)}const N=Math.round(8*sc);for(let i=0;i<N;i++)at('goblin',cx+(Math.random()-.5)*110,cy+(Math.random()-.5)*110,{nochamp:1});ban('Goblin raid!','#86c04a')}
+ else if(ev==='stampede'){const N=Math.round(10*sc),cx=Math.cos(a0),cy=Math.sin(a0);for(let i=0;i<N;i++){const o=(i-N/2)*34,e=at('cow',cx*R-cy*o,cy*R+cx*o,{nochamp:1});if(e)e.sp*=1.7}ban('Stampede!','#f0f0ea')}
+ else if(ev==='undead'){let al=0;for(const e of enemies.a)if(e.a&&e.t==='skeleton'&&!e.elite)al++;const N=Math.max(0,Math.min(3,bigCap()-al));for(let i=0;i<N;i++){const a=a0+i*2.1;at('skeleton',Math.cos(a)*R,Math.sin(a)*R,{nochamp:1})}const M=Math.round(6*sc);for(let i=0;i<M;i++){const a=Math.random()*6.283;at(ty[Math.random()*ty.length|0],Math.cos(a)*R,Math.sin(a)*R,{nochamp:1})}ban('The undead rise!','#ece7d2')}
+ G.spawnAcc=(G.spawnAcc||0)-n*.6}  // v26: event spawns replace ~60% of stream spawns so density stays about the same
 function bigCap(){return Math.round(4+4*Math.min(1,Math.max(0,G.t-180)/1440))}
-function pickT(ty,esc){if(G.t>=180){const ph=Math.floor(G.t/45)%3,pr=esc?1/40:ph===2?1/12:1/25;if(Math.random()<pr){let n=0;for(const e of enemies.a)if(e.a&&e.t==='skeleton'&&!e.elite)n++;if(n<bigCap())return 'skeleton'}}return ty[Math.random()*ty.length|0]}  // phases rotate every 45s: normal / horde-heavy / brute-heavy; strongest type last (elites)
+function pickT(ty,esc){if(G.t>=180){const ph=phaseAt(G.t),pr=esc?1/40:ph===2?1/12:1/25;if(Math.random()<pr){let n=0;for(const e of enemies.a)if(e.a&&e.t==='skeleton'&&!e.elite)n++;if(n<bigCap())return 'skeleton'}}return ty[Math.random()*ty.length|0]}  // phases rotate every 45s: normal / horde-heavy / brute-heavy; strongest type last (elites)
 function bomb(){SRC='bomb';G.flash=.5;G.shake=.4;const p=G.p;for(const e of enemies.a)if(e.a&&Math.abs(e.x-p.x)<W/2+40&&Math.abs(e.y-p.y)<H/2+40){if(e.boss)hurt(e,e.max*.1/dmgMul());else if(!e.prop)hurt(e,e.hp/dmgMul()+1)}addFx(p.x,p.y,Math.max(W,H),.5,'nova');SRC=''}
 function collect(it){const p=G.p;it.a=false;if(it.bl&&G.brk){G.brk=0;G.brkCd=3}
  if(it.k==='coin'){const v=Math.round(it.v*goldMul()*10)/10;G.gold+=v;pop(p.x,p.y-30,'+'+Math.round(v)+'g','#ffd24a')}
@@ -763,8 +780,9 @@ function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();ret
  else if(G.brkCd>0){G.brkCd-=dt;G.banner=G.brkCd>0?{txt:String(Math.ceil(G.brkCd)),life:.4,col:'#ffe28a',big:1,brk:1}:{txt:'Fight!',life:1,col:'#ff8a6a',big:1}}
  const[dx,dy]=inputVec(),sp=p.sp*spdMul()*(G.fleet>0?1.3:1);p.x+=dx*sp*dt;p.y+=dy*sp*dt;if(dx||dy){const l=Math.hypot(dx,dy);p.face=[dx/l,dy/l]}p.moving=!!(dx||dy);
  // waves: ~30 min structure
- if(!calm&&!G.fin&&!bossOn){G.spawnT-=dt;if(G.spawnT<=0){G.spawnT=Math.max(.14,1-G.t/300);const ph=Math.floor(G.t/45)%3;G.spawnAcc=(G.spawnAcc||0)+(1+G.t/90)*.65*(ph===1?1.25:ph===2&&G.t>=240?.8:1);const n=Math.floor(G.spawnAcc),ty=waveTypes(G.t);G.spawnAcc-=n;for(let i=0;i<n;i++)spawn(pickT(ty))}  // ~35% fewer stream spawns
+ if(!calm&&!G.fin&&!bossOn){G.spawnT-=dt;if(G.spawnT<=0){G.spawnT=Math.max(.14,1-G.t/300);const ph=phaseAt(G.t);G.spawnAcc=(G.spawnAcc||0)+(1+G.t/90)*.65*(ph===1?1.25:ph===2&&G.t>=240?.8:1);const n=Math.max(0,Math.floor(G.spawnAcc)),ty=waveTypes(G.t);G.spawnAcc-=n;for(let i=0;i<n;i++)spawn(pickT(ty))}  // ~35% fewer stream spawns
  if(G.t>=G.eliteNext){G.eliteNext+=90;const ty=waveTypes(G.t);spawn(G.t>=180?'skeleton':ty[ty.length-1],{elite:true});G.banner={txt:'An elite approaches!',life:1.8,col:'#ffd24a'}}
+ if(G.evNext==null)G.evNext=G.t+60;if(G.t>=G.evNext){G.evNext=G.t+40+Math.random()*50;if(G.t>=45&&Math.abs(G.t-G.swarmNext)>8)spawnEvent()}  // v26 random spawn events every 40-90s (never during boss fights/Titan)
  if(G.t>=G.swarmNext){G.swarmNext+=70;G.swPend=1.6;G.banner={txt:'A swarm approaches!',life:1.8,col:'#ff8a6a',big:1};buzz([30,30,30])}  // tiny swarm rings every 70s
  if(G.t>=G.bossNext&&G.t<1790){const B=spawn('dragon',{boss:true});if(B){G.bossE=B;G.bossT=90;G.escTot=G.escLeft=Math.round(60+60*Math.min(1,Math.max(0,G.t-180)/1620));G.escAcc=0}buzz([40,60,40]);G.bossNext+=180;G.banner={txt:'A dragon approaches!',life:2.4,col:'#ff5a4a',big:1}}
  if(G.t>=1800&&!G.won&&!G.fin){G.paused=true;show('finalOv',1);return}}
@@ -775,7 +793,8 @@ function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();ret
  if(G.fleet>0)G.fleet-=dt;if(G.bon.trail&&p.moving&&Math.random()<dt*14)rise(p.x,p.y+14,GL[['orange','ice','gold'][Math.min(3,G.bon.trail)-1]],3);if(G.sig.shark&&!G.sharkUsed&&G.p.hp>0&&G.p.hp<G.p.max*.35){G.sharkUsed=1;G.p.hp=Math.min(G.p.max,G.p.hp+50);pop(G.p.x,G.p.y-44,'Shark! +50','#7dff8a',2);buzz(20)}if(G.sig.ward)G.wardT=(G.wardT??15)-dt;
  if(G.swPend>0&&!calm){G.swPend-=dt;if(G.swPend<=0){const ty=G.t<180?'chicken':'rat',N=Math.min(64,28+Math.floor(G.t/20)),rings=G.t>=600?2:1,need=N*rings;
   let free=enemies.a.filter(e=>!e.a).length;if(free<need){const far=enemies.a.filter(e=>e.a&&!e.boss&&!e.elite&&!e.prop&&!e.champ).sort((a,b)=>((b.x-p.x)**2+(b.y-p.y)**2)-((a.x-p.x)**2+(a.y-p.y)**2));for(const e of far){if(free>=need)break;e.a=false;free++}}
-  for(let r=0;r<rings;r++)for(let i=0;i<N;i++){const a=i/N*6.283+r*.1,R=Math.max(W,H)*.55+r*80;spawn(ty,{x:p.x+Math.cos(a)*R,y:p.y+Math.sin(a)*R,nochamp:1,sw:1})}G.banner={txt:'Swarm!',life:1.2,col:'#ff5a4a',big:1}}}
+  const shp=Math.random()*4|0,a0=Math.random()*6.283,R0=Math.max(W,H)*.55;  // v26: ring / ellipse / two arcs / horseshoe
+  for(let r=0;r<rings;r++)for(let i=0;i<N;i++){let f=i/N,a,R=R0+r*80,ex=1,ey=1;if(shp===0)a=f*6.283+r*.1;else if(shp===1){a=f*6.283+r*.1;ex=1.35;ey=.8}else if(shp===2)a=a0+(f<.5?f*2*1.9-.95:Math.PI+(f-.5)*2*1.9-.95)+r*.1;else a=a0+f*4.4-2.2+r*.1;const ca=Math.cos(a0*(shp===1?1:0)),sa=Math.sin(a0*(shp===1?1:0)),lx=Math.cos(a)*R*ex,ly=Math.sin(a)*R*ey;spawn(ty,{x:p.x+lx*ca-ly*sa,y:p.y+lx*sa+ly*ca,nochamp:1,sw:1})}G.banner={txt:'Swarm!',life:1.2,col:'#ff5a4a',big:1}}}
  if(G.fin)titanAI(dt,p);
  let hit=0;const live=[];
  for(const e of enemies.a){if(!e.a)continue;e.hit-=dt;e.slow-=dt;if(e.prop){live.push(e);continue}if(e.bleed>0){e.bleed-=dt;e.btk-=dt;if(e.btk<=0){e.btk=.5;hurt(e,e.bdps*.5,'Attack',true);if(Math.random()<.5)burst(e.x,e.y,'#c01818',2,50);if(!e.a)continue}}live.push(e);const ex=p.x-e.x,ey=p.y-e.y,d=Math.hypot(ex,ey)||1;
@@ -1045,7 +1064,7 @@ function gameOver(win){if(G.sandbox)queueMicrotask(gameOverSB);G.over=true;runni
  const nmOf=k=>WEAPONS[k]?wname(k):MEGA[k]?MEGA[k].name:k==='bomb'?'Bombs':k,icOf=k=>WEAPONS[k]?wicon(k):ICONURL[k]?k:'bomb';
  $('runsum').innerHTML=ent.length?`<p style="font-size:10px;letter-spacing:2px;color:#c9b58a;margin:8px 0 2px">DAMAGE BY WEAPON · ${fm(tot)} TOTAL</p>`+ent.slice(0,8).map(([k,v])=>`<div class="dbar"><img src="${ICONURL[icOf(k)]}"><div class="bt">${nmOf(k)} <span style="color:#a8977a">${Math.round(v/tot*100)}% · ${Math.round(v/Math.max(10,G.t-(G.first[k]||0)))} dps</span><div style="width:${v/mx*100}%"></div></div><b>${fm(v)}</b></div>`).join(''):'';
  const ar=G.achRun||[];if(ar.length)$('newrec').innerHTML+=ar.map(a=>`<p style="font-size:12px;color:#ffcf6a;margin:2px 0">🏆 ${a.n} — ${a.r}</p>`).join('');
- const id=G.cls,before=clsInfo(id),gain=Math.floor((G.t/5+G.kills*.4+G.lvl*8)*(win?1.5:1));META.cxp[id]=(META.cxp[id]||0)+gain;const after=clsInfo(id);
+ const id=G.cls,before=clsInfo(id),gain=Math.floor((G.t/5+Math.sqrt(G.kills)*6+G.lvl*8)*(win?1.5:1));META.cxp[id]=(META.cxp[id]||0)+gain;const after=clsInfo(id);
  if(!win&&G.fin){const pen=Math.floor(G.gold*.25);G.gold-=pen;queueMicrotask(()=>$('newrec').insertAdjacentHTML('afterbegin',`<p style="color:#ff6a4a;font-weight:bold">The Titan claimed 25% of your loot: -${pen} gold</p>`))}
  const gold=Math.floor(G.gold);META.gold+=gold;saveMeta();
  $('overT').textContent=win?'You survived 30:00!':'Oh dear, you are dead!';
@@ -1104,7 +1123,7 @@ function start(){newGame();if(bustOn()){bustedBuild()}else G.pots=Object.keys(ME
  if(G.sig.head)setTimeout(()=>{if(G&&!G.over&&!G.paused&&!G.menu)levelUp()},500)}
 // ---------- pause / save ----------
 const SAVE_KEY='oss_run';
-const SAVE_FIELDS=['bossKills','might','dmg','first','megaSeen','cls','t','kills','lvl','xp','next','gold','w','pas','mega','cd','spawnT','bossNext','eliteNext','swarmNext','propT','megaGuar','megaDrops','xpTot','revived','runXp','loot','evo','ch','banned','revLeft','gchests','chests','sb','achRun','lchests','ws','ps','megaSeen','sharkUsed','brk','brkCd','megaN','lastEvo','pots','swPend'];
+const SAVE_FIELDS=['bossKills','might','dmg','first','megaSeen','cls','t','kills','lvl','xp','next','gold','w','pas','mega','cd','spawnT','bossNext','eliteNext','swarmNext','propT','megaGuar','megaDrops','xpTot','revived','runXp','loot','evo','ch','banned','revLeft','gchests','chests','sb','achRun','lchests','ws','ps','megaSeen','sharkUsed','brk','brkCd','megaN','lastEvo','pots','swPend','seed','evNext'];
 function saveRun(auto){if(!running||!G||G.over||G.menu)return false;const o={v:1,at:Date.now(),auto:auto?1:0};
  const vis=id=>$(id).style.display==='flex';o.pendLvl=vis('lvl')&&G.curCards?JSON.parse(JSON.stringify(G.curCards)):null;o.offerQ=JSON.parse(JSON.stringify((G.curOffer&&vis('offer')?[G.curOffer]:[]).concat(G.offerQ||[])));SAVE_FIELDS.forEach(k=>{if(G[k]!==undefined)o[k]=JSON.parse(JSON.stringify(G[k]))});
  o.p={x:G.p.x,y:G.p.y,hp:G.p.hp,face:G.p.face,star:Math.max(0,G.p.star)};o.cannons=G.cannons.map(c=>({x:c.x,y:c.y,life:c.life}));saveSkills();LS.set(SAVE_KEY,o);return true}
