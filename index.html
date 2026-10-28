@@ -991,7 +991,7 @@ function dragonAI(dt,p){const B=G.bossE,on=B&&B.a&&B.boss&&!B.fin&&G.bossT>0;G.t
 function finalWin(e){const bonus=Math.round(5000*goldMul());G.gold+=bonus;burst(e.x,e.y,'#ff7a1a',60,300);for(let i=0;i<20;i++)dropItem(e.x,e.y,'coin',50);G.fin=0;G.won=true;G.titanRef=null;gameOver(true);
  try{$('overT').textContent='The Ember Titan falls! Victory!';$('newrec').insertAdjacentHTML('afterbegin',`<p style="color:#ffd24a">Titan reward: +${bonus} gold</p>`)}catch(_){}}
 function megaFirst(k,col){if(G.megaSeen[k])return;G.megaSeen[k]=1;G.banner={txt:`${MEGA[k].name} unleashed!`,life:2.4,col,big:1};G.tint={col,life:.6}}
-function drawClassW(p){const w=G.w;ctx.save();
+function drawClassW(p){const w=G.w,now=NOW;ctx.save();
  if(w.axes){const S=wstat('axes',w.axes),R=S.area;for(let i=0;i<S.proj;i++){const an=(G.axA||0)+i*6.283/S.proj,x=p.x+Math.cos(an)*R,y=p.y+Math.sin(an)*R;ctx.save();ctx.translate(x,y);ctx.rotate(an*3);dI(ICON.axes,-16,-16,32,32);ctx.restore()}}
  const fnow=performance.now()/1000;if(G.mkd)for(const e of G.mkd){if(!e.a)continue;ctx.globalAlpha=Math.min(1,e.mk*2)*.85;ctx.strokeStyle='#ff4a3a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y,e.r+6,0,6.283);ctx.stroke();for(let q=0;q<4;q++){const a=q*1.5708+fnow*1.5;ctx.beginPath();ctx.moveTo(e.x+Math.cos(a)*(e.r+3),e.y+Math.sin(a)*(e.r+3));ctx.lineTo(e.x+Math.cos(a)*(e.r+11),e.y+Math.sin(a)*(e.r+11));ctx.stroke()}}ctx.globalAlpha=1;
  if(w.falcon&&G.fal)for(const f of G.fal){const fr=SPR[G.evo&&G.evo.falcon?'falconD':'falcon'][(Math.floor(fnow*(f.st===1?4:9)+f.a)&1)];ctx.save();ctx.translate(f.x,f.y);if(f.st===1)ctx.rotate(Math.atan2(f.vy,f.vx)-Math.PI/2);else if(f.vx<0)ctx.scale(-1,1);dI(fr,-fr.w/2,-fr.h/2,fr.w,fr.h);ctx.restore()}
@@ -1607,7 +1607,7 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=42;
+const VERSION=43;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
  exp(){const d={};for(const k of this.keys())d[k]=localStorage.getItem(k);return this.pre+btoa(unescape(encodeURIComponent(JSON.stringify({v:VERSION,t:Date.now(),d}))))},
  parse(c){c=(c||'').replace(/\s+/g,'');if(!c.startsWith(this.pre))throw new Error('Not a save code');const o=JSON.parse(decodeURIComponent(escape(atob(c.slice(this.pre.length)))));if(!o||typeof o.d!=='object'||!o.d.oss_meta)throw new Error('Code has no progress in it');JSON.parse(o.d.oss_meta);for(const k in o.d)if(!k.startsWith('oss_')||typeof o.d[k]!=='string')throw new Error('Bad entry');return o},
