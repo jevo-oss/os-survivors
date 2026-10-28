@@ -66,6 +66,7 @@ p{margin:6px 0;font-size:13px;color:#e8dcc0}
 @keyframes pulse{to{box-shadow:0 0 22px rgba(255,200,80,.7)}}
 .conf{position:fixed;top:-12px;width:8px;height:12px;z-index:9;pointer-events:none;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+#potHud span{display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.45);border-radius:8px;padding:1px 6px 1px 2px}#potHud img{width:20px;height:20px}
 .shopi{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.28);border-radius:10px;padding:6px;margin:6px 0;text-align:left;font-size:13px}.shopi img{width:34px;height:34px}.shopi .t{flex:1}.shopi small{display:block;color:#c9b58a;font-size:11px}
 .shopi button{border:2px solid var(--ink);border-radius:8px;background:linear-gradient(#ffcf6a,#b8700a);font:900 12px system-ui;padding:7px 8px;color:#2a1400;min-width:64px}.shopi button:disabled{filter:grayscale(1) brightness(.6)}
 .pbtn{position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:10px;width:50px;height:50px;z-index:4;display:none;border-radius:14px;border:2px solid var(--ink);background:linear-gradient(#4a3b29,#21180f);box-shadow:inset 0 0 0 1px rgba(214,170,90,.7),0 6px 14px rgba(0,0,0,.5);padding:0;touch-action:manipulation}
@@ -141,12 +142,12 @@ p{margin:6px 0;font-size:13px;color:#e8dcc0}
 <div class="ov" id="shop"><div class="panel"><h2>Wise Old Shop</h2><p>Permanent upgrades for every class. <span class="gold" id="gold2"></span></p><div class="sv" id="shopList" style="max-height:min(62vh,560px)"></div><button class="btn sec" id="shopBack">Back</button></div></div>
 <div class="ov" id="lvl"><div class="panel"><h2>Level up!</h2><div class="slots" id="slotinfo"></div><div id="choices"></div><div class="lvtools" id="lvtools"></div></div></div>
 <div class="ov" id="offer" style="display:none"><div class="panel"><img id="offerI" alt="" style="width:64px;height:64px"><h2 id="offerT"></h2><p id="offerD" style="font-size:13px;opacity:.85;margin:4px 0 10px"></p><div style="display:flex;gap:8px;justify-content:center"><button class="btn" id="offerYes">Take</button><button class="btn" id="offerNo" style="background:#5a4a3a;color:#e8dcc0">Decline</button></div></div></div><div class="ov" id="chest"><div class="panel" id="chestP"><h2 id="chestT">Treasure chest</h2><div class="cstage" id="cstage"><div class="rays"></div><div class="cflash"></div><img id="chestBig" alt=""><div class="reel"><img id="reelImg" alt=""></div></div><div id="chestWon"></div><button class="btn" id="chestBtn" style="display:none">Collect</button></div><div id="coinRain"></div></div>
-<button class="pbtn" id="pauseBtn" aria-label="Pause"></button>
+<button class="pbtn" id="pauseBtn" aria-label="Pause"></button><div id="potHud" style="display:none;position:fixed;left:8px;top:calc(env(safe-area-inset-top) + 74px);flex-direction:column;gap:3px;pointer-events:none;z-index:5;font:600 11px system-ui;color:#ffe9b0;text-shadow:0 1px 2px #000"></div>
 <div class="ov" id="pause"><div class="panel"><h2>Paused</h2><div class="stat" id="pstats"></div><div class="slots" id="pslots"></div>
  <button class="btn" id="resumeBtn">Resume</button><button class="btn sec" id="statsBtn">Stats &amp; progression</button><button class="btn sec" id="psetBtn">Settings</button><button class="btn sec" id="saveQuitBtn">Save &amp; Quit</button><button class="btn danger" id="quitBtn">Quit run</button>
  <div id="quitConfirm" style="display:none"><p>Abandon this run? Progress, class XP and gold from it are lost.</p><div class="row"><button class="btn sec" id="quitNo">Keep playing</button><button class="btn danger" id="quitYes">Abandon</button></div></div></div></div>
 <div class="ov" id="statsOv"><div class="panel"><h2>Stats &amp; progression</h2><div class="sv" id="statsList"></div><button class="btn" id="statsBack">Back</button></div></div>
-<div class="ov" id="finalOv"><div class="panel"><h2 style="color:#ff8a3a">30:00 — The Ember Titan wakes</h2><p>The ground splits and a colossus of obsidian and lava rises. Fight it for a huge reward, or cash out now as a victory and keep everything.</p><div class="row"><button class="btn sec" id="finalQuit">Cash out (victory)</button><button class="btn danger" id="finalFight" style="background:#b03a10;color:#fff">Fight!</button></div></div></div>
+<div class="ov" id="finalOv"><div class="panel"><h2 style="color:#ff8a3a">30:00 — The Ember Titan wakes</h2><p>The ground splits and a colossus of obsidian and lava rises. Fight it for a huge reward, or cash out now as a victory and keep everything.</p><p style="color:#ff8a6a;font-size:13px">⚠ Fall and lose 25% of this run's gold.</p><div class="row"><button class="btn sec" id="finalQuit">Cash out (victory)</button><button class="btn danger" id="finalFight" style="background:#b03a10;color:#fff">Fight!</button></div></div></div>
 <div class="ov" id="over"><div class="panel"><h2 id="overT">Oh dear, you are dead!</h2><div class="stat" id="stats"></div><div id="newrec"></div><div id="runsum"></div><div id="cxp"></div><p id="skillsum" style="font-size:11px;color:#c9b58a"></p><div class="row"><button class="btn sec" id="menuBtn">Menu</button><button class="btn" id="againBtn">Play again</button></div></div></div>
 <div class="ov" id="codex"><div class="panel"><h2>Codex</h2><div class="sv" id="codexList"></div><button class="btn" id="codexBack">Back</button></div></div>
 <div class="ov" id="settings"><div class="panel" style="max-height:88vh;overflow-y:auto"><h2>Settings</h2><div id="setList"></div><button class="btn danger" id="wipeBtn" style="margin-top:14px;background:linear-gradient(#b02a1a,#6e140a);color:#fff">Delete all progress</button><div id="wipeConfirm" style="display:none"><p style="color:#ffb0a0">Are you sure? This wipes gold, class levels, shop upgrades, unlocks, records and saved run.</p><div class="row"><button class="btn sec" id="wipeNo">Cancel</button><button class="btn danger" id="wipeYes" style="background:#b02a1a;color:#fff">Yes, delete everything</button></div></div><button class="btn" id="setBack">Back</button></div></div>
@@ -505,7 +506,25 @@ const SHOP={might:{name:'Might',desc:'+5% damage',icon:'Attack',max:5,eff:{dmg:.
  luck:{name:'Luck',desc:'+6% luck',icon:'luck',max:3,eff:{luck:.06}},growth:{name:'Growth',desc:'+5% XP gained',icon:'xp',max:5,eff:{xp:.05}},
  haste:{name:'Haste',desc:'3% faster cooldowns',icon:'cd',max:3,eff:{cd:.03}},revival:{name:'Revival',desc:'Revive once per run at 50% HP',icon:'rev',max:1,eff:{rev:1},base:600},
  reroll:{name:'Reroll',desc:'+1 level-up reroll per run',icon:'reroll',max:3,eff:{reroll:1},base:80},skip:{name:'Skip',desc:'+1 level-up skip per run (+XP)',icon:'skip',max:3,eff:{skip:1},base:60},
- banish:{name:'Banish',desc:'+1 banish per run (remove a card for the run)',icon:'banish',max:3,eff:{banish:1},base:100}};
+ banish:{name:'Banish',desc:'+1 banish per run (remove a card for the run)',icon:'banish',max:3,eff:{banish:1},base:100},
+ fortune:{name:'Fortune',desc:'+4% luck and +10% mega rare odds',icon:'luck',max:3,eff:{luck:.04,mlk:.1},base:400},
+ treasure:{name:'Treasure hunter',desc:'+8% chance a Wooden chest upgrades to Silver',icon:'chest',max:3,eff:{cup:.08},base:300},
+ arsenal:{name:'Arsenal',desc:'Start every run with a random 2nd weapon (Lv 1)',icon:'knives',max:1,eff:{sig:'arsenal'},base:1500},
+ blessing:{name:'Blessing',desc:'Start every run with a random passive at Lv 2 (an extra one if your class already has this perk)',icon:'xp',max:1,eff:{sig:'blessed2'},base:1200},
+ second:{name:'Second wind',desc:'+1 extra revive per run (stacks with Revival)',icon:'rev',max:1,eff:{rev:1},base:2500},
+ trail:{name:'Hero trail',desc:'Cosmetic: glowing footstep trail (Ember → Frost → Gilded)',icon:'star',max:3,eff:{trail:1},base:500}};
+const POTS={sattack:{name:'Super attack potion',desc:'+15% damage this run',cost:300,col:'#5aa0ff',eff:{dmg:.15}},
+ prayer:{name:'Prayer potion',desc:'-15% damage taken this run',cost:350,col:'#4fd6c8',eff:{dr:.15}},
+ stamina:{name:'Stamina potion',desc:'+15% move speed this run',cost:150,col:'#c88a4a',eff:{sp:.15}},
+ row:{name:'Ring of wealth charge',desc:'+25% gold this run',cost:200,col:'#e8c040',eff:{greed:.25},ring:1},
+ wise:{name:"Wise Old Man's blessing",desc:'+20% XP this run',cost:400,col:'#d8d0ff',eff:{xp:.2},ring:2}};
+let CONT=0;const POTICON={};
+function potIcon(k){if(POTICON[k])return POTICON[k];const P=POTS[k];const c=mk(48,48,g=>{if(P.ring===1){g.lineWidth=6;g.strokeStyle='#7a5a20';g.beginPath();g.arc(24,27,12,0,6.283);g.stroke();g.lineWidth=3.5;g.strokeStyle=P.col;g.stroke();g.fillStyle='#ff4a6a';g.beginPath();g.arc(24,14,5,0,6.283);g.fill();g.fillStyle='rgba(255,255,255,.7)';g.beginPath();g.arc(22.5,12.5,1.6,0,6.283);g.fill();return}
+ if(P.ring===2){g.fillStyle='#6a4a8a';g.beginPath();g.moveTo(24,6);g.lineTo(38,40);g.lineTo(10,40);g.closePath();g.fill();g.fillStyle='#f4f0ff';g.beginPath();g.moveTo(24,22);g.lineTo(32,42);g.lineTo(16,42);g.closePath();g.fill();g.fillStyle='#ffe07a';for(const[x,y]of[[24,14],[19,28],[29,30]]){g.beginPath();g.arc(x,y,2,0,6.283);g.fill()}return}
+ g.fillStyle='#8a6a40';g.fillRect(19,6,10,6);g.fillStyle='rgba(220,230,240,.55)';g.beginPath();g.moveTo(20,12);g.lineTo(28,12);g.lineTo(28,18);g.quadraticCurveTo(40,24,38,34);g.quadraticCurveTo(36,44,24,44);g.quadraticCurveTo(12,44,10,34);g.quadraticCurveTo(8,24,20,18);g.closePath();g.fill();
+ g.fillStyle=P.col;g.beginPath();g.moveTo(11,30);g.quadraticCurveTo(24,26,37,30);g.quadraticCurveTo(36,43,24,43);g.quadraticCurveTo(12,43,11,30);g.fill();g.fillStyle='rgba(255,255,255,.6)';g.beginPath();g.ellipse(17,24,2,4,.4,0,6.283);g.fill()});return POTICON[k]=c.c.toDataURL()}
+function applyPots(){for(const k of G.pots||[])if(POTS[k])for(const e in POTS[k].eff)G.bon[e]=(G.bon[e]||0)+POTS[k].eff[e];updPotHud()}
+function updPotHud(){const h=$('potHud');if(!h)return;const L=(G&&!G.menu&&G.pots)||[];h.innerHTML=L.map(k=>`<span title="${POTS[k].name}"><img src="${potIcon(k)}" alt="">${POTS[k].desc.replace(' this run','')}</span>`).join('');h.style.display=L.length&&running?'flex':'none'}
 const shopCost=(r,k)=>Math.round(((k&&SHOP[k].base)||50)*Math.pow(2,r));
 const START_BONUS=[{id:'none',n:'None',d:'No starting bonus',L:1},{id:'hardy',n:'Hardy',d:'+20 max HP',L:3,eff:{hp:20}},{id:'scholar',n:'Scholar',d:'+10% XP gained',L:6,eff:{xp:.1}},
  {id:'armed',n:'Armed',d:'Start with a random 2nd weapon',L:9},{id:'lucky',n:'Lucky',d:'+15% luck & +1 reroll',L:13,eff:{luck:.15,reroll:1}},{id:'prospector',n:'Prospector',d:'+30% gold found',L:17,eff:{greed:.3}},{id:'veteran',n:'Veteran',d:'Starting weapon begins at Lv 3',L:22}];
@@ -539,7 +558,7 @@ const SK=LS.get('oss_skills',{});SKILLS.forEach(k=>{if(typeof SK[k]!=='number')S
 let skSaveT=0;const saveSkills=()=>LS.set('oss_skills',SK);const sLvl=k=>lvlFor(SK[k]);
 // ---------- run state ----------
 let G;
-function computeBonus(){const b={hp:0,dmg:0,sp:0,mag:0,cd:0,area:0,dr:0,regen:0,greed:0,xp:0,luck:0,rev:0,reroll:0,skip:0,banish:0,wslot:0,pslot:0,proj:0,crit:0},sig={};const C=CLASSES[META.cls];
+function computeBonus(){const b={hp:0,dmg:0,sp:0,mag:0,cd:0,area:0,dr:0,regen:0,greed:0,xp:0,luck:0,rev:0,reroll:0,skip:0,banish:0,wslot:0,pslot:0,proj:0,crit:0,mlk:0,cup:0,trail:0},sig={};const C=CLASSES[META.cls];
  const add=e=>{for(const k in e){if(k==='sig')sig[e[k]]=1;else if(k==='fw')sig.fw=e[k];else b[k]+=e[k]}};add(C.base);const L=clsInfo(META.cls).L;C.perks.forEach(p=>{if(L>=p[0])add(p[2])});
  for(const k in SHOP){const r=Math.min(SHOP[k].max,META.shop[k]||0);for(let i=0;i<r;i++)add(SHOP[k].eff)}
  const sb=START_BONUS.find(x=>x.id===META.sb[META.cls]);if(sb&&L>=sb.L&&sb.eff)add(sb.eff);
@@ -553,7 +572,9 @@ function newGame(){const{b,sig,sb}=computeBonus();
  if(sb==='armed'){const ks=Object.keys(WEAPONS).filter(k=>k!==st&&!WEAPONS[k].elite&&avail(WEAPONS[k]));G.w[ks[Math.random()*ks.length|0]]=1}
  {const sk=SKINS.find(x=>x.id===META.skin[META.cls]);G.pspr=sk&&skinOk(META.cls,sk)?skinFor(META.cls,sk.id):PLAYER[META.cls]}
  if(G.sig.fw){const[k,l]=G.sig.fw.split(':');if(WEAPONS[k]&&!G.w[k])G.w[k]=+l||1}
- if(G.sig.blessed){const ks=Object.keys(PASSIVES).filter(k=>!G.pas[k]&&avail(PASSIVES[k]));if(ks.length)G.pas[ks[Math.random()*ks.length|0]]=2}
+ if(G.sig.arsenal){const ks=Object.keys(WEAPONS).filter(k=>!G.w[k]&&!WEAPONS[k].elite&&avail(WEAPONS[k]));if(ks.length)G.w[ks[Math.random()*ks.length|0]]=1}
+ for(let bi=(G.sig.blessed?1:0)+(G.sig.blessed2?1:0);bi>0;bi--){const ks=Object.keys(PASSIVES).filter(k=>!G.pas[k]&&avail(PASSIVES[k]));if(ks.length)G.pas[ks[Math.random()*ks.length|0]]=2}
+ G.pots=[];
  [enemies,shots,gems,items,pops,parts,fx].forEach(p=>p.clear());G.p.max=G.p.hp=hpMax()}
 function addSkillXp(k,x){const b=sLvl(k);SK[k]+=x;G.runXp[k]=(G.runXp[k]||0)+x;const d=G.drops[k];if(d){d.v+=x;d.life=1.4}else G.drops[k]={v:x,life:1.4};
  const a=sLvl(k);if(a>b){G.banner={txt:`${k} level ${a}!`,life:2.2,col:SKCOL[k]};if(k==='Hitpoints'){G.p.max=hpMax();G.p.hp+=(a-b)*2}}}
@@ -564,7 +585,7 @@ let lastMega=LS.get('oss_lastmega','');
 function pickMega(){const first=!Object.keys(G.mega||{}).length;let pool=MEGAKEYS.filter(k=>!mg(k));if(!pool.length)pool=MEGAKEYS.filter(k=>mg(k)<MEGA_MAX);if(!pool.length)pool=MEGAKEYS.slice();if(first&&pool.length>1&&pool.includes(lastMega))pool=pool.filter(k=>k!==lastMega);return pool[Math.random()*pool.length|0]}
 function grantMega(k){if(!Object.keys(G.mega).length&&!G.menu){lastMega=k;LS.set('oss_lastmega',k)}G.mega[k]=Math.min(MEGA_MAX,mg(k)+1);META.seen.mega[k]=1;buzz([50,40,90]);G.p.max=hpMax();if(k==='ely')G.p.hp=G.p.max;G.banner={col:'#ffa21a',big:1,txt:`MEGA RARE! ${MEGA[k].name}${G.mega[k]>1?' Lv '+G.mega[k]:''}`,life:3.5};G.shake=.45;G.flash=.35;burst(G.p.x,G.p.y,'',26,260,GL.orange)}
 const MEGA_RATES={kill:1/60000,elite:1/150,boss1:.05,boss:.03,chest3:.10,chest2:.02,card:.002};
-function megaRoll(p){if(Math.random()<p*(G.megaN?.15:1)){G.megaN=(G.megaN||0)+1;return true}return false}
+function megaRoll(p){if(Math.random()<p*(G.megaN?.15:1)*(1+(G.bon.mlk||0))){G.megaN=(G.megaN||0)+1;return true}return false}
 function dropMega(x,y,k){G.megaDrops++;if(G.loot.length<12)G.loot.push({x,y,tier:4,k:k||pickMega()})}
 // ---- pacing: rarity = levels gained (+bonus), skills climb slowly ----
 let MEGA_KILL=1/60000;const SKGAIN=[1,2,3,5],TIER_LV=[1,1,1,2],TIER_BONUS=['','','+4% might','']; // Uncommon/Rare also get extras below
@@ -582,7 +603,7 @@ const hpMax=()=>90+sLvl('Hitpoints')+15*(G.pas.hp||0)+60*mg('ely')+G.bon.hp;
 const critCh=()=>.05*(G.pas.crit||0)+G.bon.crit,xpMul=()=>(1+.08*(G.pas.xp||0))*(1+G.bon.xp),goldMul=()=>(1+G.bon.greed)*(1+.2*(G.pas.gold||0)),
  drMul=()=>Math.pow(.7,mg('ely'))*(1-G.bon.dr)*(1-.04*(G.pas.armor||0)),durMul=()=>1+.1*(G.pas.dur||0),luck=()=>.08*(G.pas.luck||0)+G.bon.luck;
 const wname=k=>G.evo&&G.evo[k]?EVO[k].name:WEAPONS[k].name,wicon=k=>G.evo&&G.evo[k]?'evo_'+k:k;
-function chestTier(boss){let r=Math.random();r+=(1-r)*Math.min(.4,luck());return boss?(r<.1?0:r<.55?1:r<.95?2:3):(r<.7?0:r<.96?1:2)}
+function chestTier(boss){let r=Math.random();r+=(1-r)*Math.min(.4,luck());const t=boss?(r<.1?0:r<.55?1:r<.95?2:3):(r<.7?0:r<.96?1:2);return t===0&&!boss&&Math.random()<(G.bon.cup||0)?1:t}
 function evoCandidate(){if(G.lastEvo!=null&&G.t-G.lastEvo<240)return null;for(const k in G.w)if(G.w[k]>=WEAPONS[k].max&&!G.evo[k]&&EVO[k]&&G.pas[EVO[k].p])return k;return null}
 function evolve(k){G.evo[k]=1;G.lastEvo=G.t;META.seen.evo[k]=1;saveMeta();G.banner={txt:`EVOLVED! ${EVO[k].name}`,life:3.2,col:'#ffe07a',big:1};G.flash=.3;G.shake=.3;buzz([40,30,80]);burst(G.p.x,G.p.y,'',24,240,GL.gold);return{icon:'evo_'+k,txt:`★ ${WEAPONS[k].name} evolved into ${EVO[k].name}!`,evo:1}}
 function checkAch(){if(!G||G.menu)return;for(const a of ACH)if(!META.ach[a.id]&&a.t(G)){META.ach[a.id]=Date.now();if(a.gold)META.gold+=a.gold;saveMeta();G.toastQ.push(a);(G.achRun=G.achRun||[]).push(a);buzz([20,30,20])}}
@@ -739,7 +760,7 @@ function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();ret
  G.propT-=dt;if(G.propT<=0){G.propT=3;let n=0;for(const e of enemies.a)if(e.a&&e.prop){if(Math.abs(e.x-p.x)>1000||Math.abs(e.y-p.y)>1000)e.a=false;else n++}
   if(n<5){const a=Math.random()*6.283,d=260+Math.random()*260;spawn(Math.random()<.5?'crate':'torch',{x:p.x+Math.cos(a)*d,y:p.y+Math.sin(a)*d})}}
  for(const f of fx.a)if(f.a&&f.kind==='burn'){f.tk-=dt;if(f.tk<=0){f.tk=.5;for(const o of enemies.a)if(o.a&&!o.prop&&(o.x-f.x)**2+(o.y-f.y)**2<(f.r+o.r)**2)hurt(o,f.dmg,'Magic',true)}}
- if(G.fleet>0)G.fleet-=dt;if(G.sig.shark&&!G.sharkUsed&&G.p.hp>0&&G.p.hp<G.p.max*.35){G.sharkUsed=1;G.p.hp=Math.min(G.p.max,G.p.hp+50);pop(G.p.x,G.p.y-44,'Shark! +50','#7dff8a',2);buzz(20)}if(G.sig.ward)G.wardT=(G.wardT??15)-dt;
+ if(G.fleet>0)G.fleet-=dt;if(G.bon.trail&&p.moving&&Math.random()<dt*14)rise(p.x,p.y+14,GL[['orange','ice','gold'][Math.min(3,G.bon.trail)-1]],3);if(G.sig.shark&&!G.sharkUsed&&G.p.hp>0&&G.p.hp<G.p.max*.35){G.sharkUsed=1;G.p.hp=Math.min(G.p.max,G.p.hp+50);pop(G.p.x,G.p.y-44,'Shark! +50','#7dff8a',2);buzz(20)}if(G.sig.ward)G.wardT=(G.wardT??15)-dt;
  if(G.fin)titanAI(dt,p);
  let hit=0;const live=[];
  for(const e of enemies.a){if(!e.a)continue;e.hit-=dt;e.slow-=dt;if(e.prop){live.push(e);continue}if(e.bleed>0){e.bleed-=dt;e.btk-=dt;if(e.btk<=0){e.btk=.5;hurt(e,e.bdps*.5,'Attack',true);if(Math.random()<.5)burst(e.x,e.y,'#c01818',2,50);if(!e.a)continue}}live.push(e);const ex=p.x-e.x,ey=p.y-e.y,d=Math.hypot(ex,ey)||1;
@@ -999,7 +1020,7 @@ let chestTok=0;function openChest(tier,boss){tier=Math.max(0,Math.min(3,tier|0))
 function coinShower(n){const R=$('coinRain');R.innerHTML='';for(let i=0;i<n;i++){const c=document.createElement('img');c.src=ICONURL.coin;const z=14+Math.random()*16;c.style.cssText=`left:${Math.random()*100}%;width:${z}px;height:${z}px;animation-duration:${1.1+Math.random()*1.3}s;animation-delay:${Math.random()*.6}s;--dy:${innerHeight+80}px;--dx:${(Math.random()-.5)*120}px`;R.appendChild(c)}}
 $('chestBtn').onclick=()=>{show('chest',0);$('coinRain').innerHTML='';$('chestP').classList.remove('quake');G.paused=false;last=performance.now()};
 function confetti(){const c=['#ffcf6a','#ff6a5a','#6ad0ff','#7dff8a','#b46cff'];for(let i=0;i<70;i++){const d=document.createElement('div');d.className='conf';d.style.left=Math.random()*100+'vw';d.style.background=c[i%5];d.style.animationDuration=(1.6+Math.random()*1.8)+'s';d.style.animationDelay=Math.random()*.6+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),4500)}}
-function gameOver(win){G.over=true;running=false;clearRun();$('pauseBtn').style.display='none';['lvl','chest'].forEach(id=>show(id,0));saveSkills();const b=LS.get('oss_best',{t:0,k:0});LS.set('oss_best',{t:Math.max(b.t,G.t),k:Math.max(b.k,G.kills)});
+function gameOver(win){G.over=true;running=false;$('potHud').style.display='none';clearRun();$('pauseBtn').style.display='none';['lvl','chest'].forEach(id=>show(id,0));saveSkills();const b=LS.get('oss_best',{t:0,k:0});LS.set('oss_best',{t:Math.max(b.t,G.t),k:Math.max(b.k,G.kills)});
  G.menu=false;checkAch();buzz(win?[60,40,60,40,120]:200);const ST=META.stats;ST.kills=(ST.kills||0)+G.kills;ST.runs=(ST.runs||0)+1;ST.played=ST.played||{};ST.played[G.cls]=1;
  const tot=Object.values(G.dmg).reduce((a,v)=>a+v,0),R0=META.rec[G.cls]||{t:0,k:0,lvl:0,dmg:0},nr=[];[['t','Longest survival'],['k','Most kills'],['lvl','Highest level'],['dmg','Most damage']].forEach(([f,n])=>{const v=f==='t'?G.t:f==='k'?G.kills:f==='lvl'?G.lvl:tot;if(v>(R0[f]||0)&&(R0.t||0)>0)nr.push(n);if(v>(R0[f]||0))R0[f]=v});META.rec[G.cls]=R0;
  $('newrec').innerHTML=nr.length?`<p class="rec">★ New ${CLASSES[G.cls].name} record: ${nr.join(' · ')}</p>`:'';
@@ -1008,6 +1029,7 @@ function gameOver(win){G.over=true;running=false;clearRun();$('pauseBtn').style.
  $('runsum').innerHTML=ent.length?`<p style="font-size:10px;letter-spacing:2px;color:#c9b58a;margin:8px 0 2px">DAMAGE BY WEAPON · ${fm(tot)} TOTAL</p>`+ent.slice(0,8).map(([k,v])=>`<div class="dbar"><img src="${ICONURL[icOf(k)]}"><div class="bt">${nmOf(k)} <span style="color:#a8977a">${Math.round(v/tot*100)}% · ${Math.round(v/Math.max(10,G.t-(G.first[k]||0)))} dps</span><div style="width:${v/mx*100}%"></div></div><b>${fm(v)}</b></div>`).join(''):'';
  const ar=G.achRun||[];if(ar.length)$('newrec').innerHTML+=ar.map(a=>`<p style="font-size:12px;color:#ffcf6a;margin:2px 0">🏆 ${a.n} — ${a.r}</p>`).join('');
  const id=G.cls,before=clsInfo(id),gain=Math.floor((G.t/5+G.kills*.4+G.lvl*8)*(win?1.5:1));META.cxp[id]=(META.cxp[id]||0)+gain;const after=clsInfo(id);
+ if(!win&&G.fin){const pen=Math.floor(G.gold*.25);G.gold-=pen;queueMicrotask(()=>$('newrec').insertAdjacentHTML('afterbegin',`<p style="color:#ff6a4a;font-weight:bold">The Titan claimed 25% of your loot: -${pen} gold</p>`))}
  const gold=Math.floor(G.gold);META.gold+=gold;saveMeta();
  $('overT').textContent=win?'You survived 30:00!':'Oh dear, you are dead!';
  $('stats').innerHTML=`<div>Time<b>${fmtT(G.t)}</b></div><div>Kills<b>${G.kills}</b></div><div>Level<b>${G.lvl}</b></div>`;
@@ -1037,6 +1059,10 @@ function buildShop(){$('gold2').textContent=Math.floor(META.gold)+' gold';$('sho
  {const d=document.createElement('div');d.className='shopi prem';d.innerHTML=`<img src="${ICONURL.star}"><span class="t">Premium <span class="pbadge">★ PREMIUM</span><small>${PREM.u?'Unlocked · start every run with a random mega rare'+(PREM.on?'':' · currently OFF'):'Start every run with a random mega rare · demo unlock, no real payment'}</small></span>`;
   const bt=document.createElement('button');bt.id='premBtn';if(!PREM.u){bt.textContent='$9.99';bt.className='pbuy';bt.onclick=()=>{if(confirm('Unlock Premium (demo, no real charge)?')){PREM.u=1;PREM.on=1;savePrem();buzz([30,30,60]);buildShop();buildMenu()}}}
   else{bt.textContent=PREM.on?'ON':'OFF';bt.className=PREM.on?'pon':'poff';bt.onclick=()=>{PREM.on=PREM.on?0:1;savePrem();buildShop();buildMenu()}}d.appendChild(bt);$('shopList').appendChild(d)}
+ {const h=document.createElement('h3');h.textContent='Potions · this run only';h.style.cssText='margin:10px 0 2px;font-size:14px;color:#ffcf6a';$('shopList').appendChild(h);META.pots=META.pots||{};
+  for(const k in POTS){const P=POTS[k],own=!!META.pots[k],d=document.createElement('div');d.className='shopi';d.innerHTML=`<img src="${potIcon(k)}"><span class="t">${P.name}<small>${P.desc} · used up when your next run starts</small></span>`;
+   const bt=document.createElement('button');bt.textContent=own?'READY':P.cost+'g';bt.disabled=own||META.gold<P.cost;bt.onclick=()=>{if(!META.pots[k]&&META.gold>=P.cost){META.gold-=P.cost;META.pots[k]=1;saveMeta();buzz(15);buildShop();buildMenu()}};d.appendChild(bt);$('shopList').appendChild(d)}
+  const h2=document.createElement('h3');h2.textContent='Permanent upgrades';h2.style.cssText='margin:10px 0 2px;font-size:14px;color:#ffcf6a';$('shopList').appendChild(h2)}
  for(const k in SHOP){const S=SHOP[k],r=Math.min(S.max,META.shop[k]||0),c=shopCost(r,k),d=document.createElement('div');d.className='shopi';
  d.innerHTML=`<img src="${ICONURL[S.icon]}"><span class="t">${S.name} <span class="pips">${'◆'.repeat(r)}${'◇'.repeat(S.max-r)}</span><small>${S.desc}${S.max>1?' per rank':''}</small></span>`;const bt=document.createElement('button');bt.textContent=r>=S.max?'MAX':c+'g';bt.disabled=r>=S.max||META.gold<c;
  bt.onclick=()=>{if(META.gold>=c&&r<S.max){META.gold-=c;META.shop[k]=r+1;saveMeta();buildShop();buildMenu()}};d.appendChild(bt);$('shopList').appendChild(d)}}
@@ -1046,31 +1072,31 @@ function menuScene(){newGame();G.menu=true;const p=G.p;p.x=0;p.y=0;
  [['goblin',-150,-40],['chicken',-110,70],['cow',150,60],['rat',120,-70],['skeleton',190,-10],['goblin',-200,40]].forEach(([t,x,y])=>{const e=spawn(t,{x,y});if(e)e.hit=0});
  G.loot.push({x:-60,y:130,tier:4,k:'tbow'},{x:80,y:150,tier:3},{x:10,y:-150,tier:2});
  const it=items.get();if(it){it.x=40;it.y=110;it.k='chest';it.v=2;it.t=0}}
-function start(){newGame();clearRun();['menu','over','lvl','chest','shop','pause','codex','settings'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';
+function start(){newGame();G.pots=Object.keys(META.pots||{}).filter(k=>POTS[k]);if(G.pots.length){META.pots={};saveMeta();applyPots();G.banner={txt:'Potions active: '+G.pots.map(k=>POTS[k].name).join(', '),life:3,col:'#9fe0ff'}}clearRun();['menu','over','lvl','chest','shop','pause','codex','settings'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';setTimeout(updPotHud,0);
  if(premOn()){const k=pickMega();grantMega(k);G.premK=k;G.banner={txt:'★ Premium start: '+MEGA[k].name,life:3,col:'#ffd24a',big:1}}
  if(G.sig.head)setTimeout(()=>{if(G&&!G.over&&!G.paused&&!G.menu)levelUp()},500)}
 // ---------- pause / save ----------
 const SAVE_KEY='oss_run';
-const SAVE_FIELDS=['bossKills','might','dmg','first','megaSeen','cls','t','kills','lvl','xp','next','gold','w','pas','mega','cd','spawnT','bossNext','eliteNext','swarmNext','propT','megaGuar','megaDrops','xpTot','revived','runXp','loot','evo','ch','banned','revLeft','gchests','chests','sb','achRun','lchests','ws','ps','megaSeen','sharkUsed','brk','brkCd','megaN','lastEvo'];
+const SAVE_FIELDS=['bossKills','might','dmg','first','megaSeen','cls','t','kills','lvl','xp','next','gold','w','pas','mega','cd','spawnT','bossNext','eliteNext','swarmNext','propT','megaGuar','megaDrops','xpTot','revived','runXp','loot','evo','ch','banned','revLeft','gchests','chests','sb','achRun','lchests','ws','ps','megaSeen','sharkUsed','brk','brkCd','megaN','lastEvo','pots'];
 function saveRun(auto){if(!running||!G||G.over||G.menu)return false;const o={v:1,at:Date.now(),auto:auto?1:0};
  const vis=id=>$(id).style.display==='flex';o.pendLvl=vis('lvl')&&G.curCards?JSON.parse(JSON.stringify(G.curCards)):null;o.offerQ=JSON.parse(JSON.stringify((G.curOffer&&vis('offer')?[G.curOffer]:[]).concat(G.offerQ||[])));SAVE_FIELDS.forEach(k=>{if(G[k]!==undefined)o[k]=JSON.parse(JSON.stringify(G[k]))});
  o.p={x:G.p.x,y:G.p.y,hp:G.p.hp,face:G.p.face,star:Math.max(0,G.p.star)};o.cannons=G.cannons.map(c=>({x:c.x,y:c.y,life:c.life}));saveSkills();LS.set(SAVE_KEY,o);return true}
 const hasRun=()=>{const r=LS.get(SAVE_KEY,null);return r&&r.v===1?r:null};
 function clearRun(){try{localStorage.removeItem(SAVE_KEY)}catch(_){}}
-function continueRun(){const r=hasRun();if(!r)return start();META.cls=r.cls;saveMeta();newGame();
- const rl=G.revLeft;SAVE_FIELDS.forEach(k=>{if(r[k]!==undefined&&r[k]!==null)G[k]=r[k]});
+function continueRun(){const r=hasRun();if(!r)return start();META.cls=r.cls;saveMeta();CONT=1;try{newGame()}finally{CONT=0}
+ const rl=G.revLeft;SAVE_FIELDS.forEach(k=>{if(r[k]!==undefined&&r[k]!==null)G[k]=r[k]});if(Array.isArray(r.pots)){G.pots=r.pots;applyPots()}
  // migrate older saves: drop unknown keys, default new systems
  for(const k in G.w)if(!WEAPONS[k])delete G.w[k];for(const k in G.pas)if(!PASSIVES[k])delete G.pas[k];for(const k in G.mega)if(!MEGA[k])delete G.mega[k];
  if(r.revLeft===undefined)G.revLeft=Math.max(0,rl-(r.revived?1:0));if(!G.ch||typeof G.ch!=='object')G.ch={reroll:0,skip:0,banish:0};if(!Array.isArray(G.banned))G.banned=[];if(!G.evo||typeof G.evo!=='object')G.evo={};
  G.ws=Math.max(G.ws,Object.keys(G.w).length);G.ps=Math.max(G.ps,Object.keys(G.pas).length);if(!Array.isArray(G.loot))G.loot=[];G.loot=G.loot.filter(l=>l&&TIERS[l.tier]);Object.assign(G.p,{x:r.p.x,y:r.p.y,face:r.p.face||[1,0],star:r.p.star||0});G.p.max=hpMax();G.p.hp=Math.min(G.p.max,r.p.hp);
  G.cannons=(r.cannons||[]).map(c=>({x:c.x,y:c.y,life:c.life,ft:0,ang:0,fl:-9}));clearRun();
- ['menu','over','lvl','chest','shop','pause'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';G.banner={txt:'Run restored · '+fmtT(G.t),life:2,col:'#ffcf6a'};
+ ['menu','over','lvl','chest','shop','pause'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';setTimeout(updPotHud,0);G.banner={txt:'Run restored · '+fmtT(G.t),life:2,col:'#ffcf6a'};
  G.offerQ=Array.isArray(r.offerQ)?r.offerQ.filter(o=>o&&(o.ty==='w'?WEAPONS[o.k]:PASSIVES[o.k])):[];G.hold=false;
  if(Array.isArray(r.pendLvl)&&r.pendLvl.length){const ok=r.pendLvl.filter(o=>o&&(o.type==='heal'||o.type==='s'||(o.type==='w'?WEAPONS[o.k]:o.type==='p'?PASSIVES[o.k]:MEGA[o.k])));G.paused=true;G.banMode=false;rollCards(ok);show('lvl',1)}else if(G.xp>=G.next)gainXp(0)}
 function pauseGame(){if(!running||!G||G.over)return;G.hold=true;$('quitConfirm').style.display='none';['quitBtn','saveQuitBtn','resumeBtn'].forEach(id=>$(id).style.display='block');
  $('pstats').innerHTML=`<div>Time<b>${fmtT(G.t)}</b></div><div>Level<b>${G.lvl}</b></div><div>Kills<b>${G.kills}</b></div>`;$('pslots').innerHTML=slotsHtml();show('pause',1)}
 function resumeGame(){show('pause',0);if(G){G.hold=false;last=performance.now()}}
-function toMenu(){running=false;$('pauseBtn').style.display='none';['statsOv','pause','lvl','chest','over','settings','codex'].forEach(id=>show(id,0));buildMenu();menuScene();show('menu',1)}
+function toMenu(){running=false;$('potHud').style.display='none';$('pauseBtn').style.display='none';['statsOv','pause','lvl','chest','over','settings','codex'].forEach(id=>show(id,0));buildMenu();menuScene();show('menu',1)}
 $('pauseBtn').onclick=e=>{e.stopPropagation();pauseGame()};$('resumeBtn').onclick=resumeGame;
 $('saveQuitBtn').onclick=()=>{saveRun();toMenu()};
 $('quitBtn').onclick=()=>{$('quitConfirm').style.display='block';['quitBtn','saveQuitBtn','resumeBtn'].forEach(id=>$(id).style.display='none')};
