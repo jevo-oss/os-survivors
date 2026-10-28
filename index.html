@@ -1607,16 +1607,29 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=43;
+const VERSION=44;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
- exp(){const d={};for(const k of this.keys())d[k]=localStorage.getItem(k);return this.pre+btoa(unescape(encodeURIComponent(JSON.stringify({v:VERSION,t:Date.now(),d}))))},
- parse(c){c=(c||'').replace(/\s+/g,'');if(!c.startsWith(this.pre))throw new Error('Not a save code');const o=JSON.parse(decodeURIComponent(escape(atob(c.slice(this.pre.length)))));if(!o||typeof o.d!=='object'||!o.d.oss_meta)throw new Error('Code has no progress in it');JSON.parse(o.d.oss_meta);for(const k in o.d)if(!k.startsWith('oss_')||typeof o.d[k]!=='string')throw new Error('Bad entry');return o},
+ b64e(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)},
+ b64d(b){const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(_){return bin}},
+ exp(){const d={};for(const k of this.keys())d[k]=localStorage.getItem(k);return this.pre+this.b64e(JSON.stringify({v:VERSION,t:Date.now(),d}))},
+ parse(raw){let c=String(raw||'').normalize?String(raw||'').normalize('NFKC'):String(raw||'');
+  // keep only base64/base64url chars and the prefix colon: drops spaces, newlines, NBSP, zero-width chars, smart quotes
+  c=c.replace(/[^A-Za-z0-9+\/=_\-:]/g,'');if(!c)throw new Error('Nothing to import: paste the whole code');
+  const parts=c.split(/OSS\d*:/i).filter(x=>x.length>8);const cands=parts.length?parts.sort((x,y)=>y.length-x.length):[c.replace(/:/g,'')];
+  let lastErr='';for(let body of cands){body=body.replace(/:/g,'').replace(/-/g,'+').replace(/_/g,'/').replace(/=+$/,'');if(body.length%4===1){lastErr='Code looks cut off ('+body.length+' chars). Copy it again in full';continue}body+='==='.slice((body.length+3)%4);
+   let txt;try{txt=this.b64d(body)}catch(_){lastErr='Code has invalid characters';continue}
+   let o;try{o=JSON.parse(txt)}catch(_){lastErr=txt.trim().startsWith('{')?'Code looks cut off ('+body.length+' chars). Copy it again in full':'This isn’t an Old School Survivors save code';continue}
+   if(o&&!o.d&&o.oss_meta)o={d:o};if(!o||typeof o.d!=='object'||!o.d){lastErr='Code has no save data in it';continue}
+   const d={};for(const k in o.d){if(!k.startsWith('oss_'))continue;const v=o.d[k];d[k]=typeof v==='string'?v:JSON.stringify(v)}
+   if(!d.oss_meta){lastErr='Code has no progress in it';continue}try{JSON.parse(d.oss_meta)}catch(_){lastErr='Progress data in the code is damaged';continue}
+   o.d=d;return o}
+  throw new Error(lastErr||'Not a save code')},
  imp(o){for(const k of this.keys())localStorage.removeItem(k);for(const k in o.d)localStorage.setItem(k,o.d[k])}};
 {const msg=t=>$('saveMsg').textContent=t;
  $('saveBtn').onclick=()=>{try{saveMeta();saveSkills()}catch(_){}$('saveTxt').value='';msg('');show('menu',0);show('saveOv',1)};
  $('saveBack').onclick=()=>{show('saveOv',0);show('menu',1)};
  $('saveExp').onclick=async()=>{try{saveMeta();saveSkills()}catch(_){}const c=SAVEIO.exp(),ta=$('saveTxt');ta.value=c;let ok=false;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(c);ok=true}}catch(_){}if(!ok){try{ta.focus();ta.select();ta.setSelectionRange(0,c.length);ok=document.execCommand('copy')}catch(_){}}msg(ok?'Copied! Keep the code somewhere safe ('+Math.round(c.length/1024*10)/10+' KB)':'Select the code above and copy it')};
- $('saveImp').onclick=()=>{const c=$('saveTxt').value.trim();if(!c){msg('Paste a save code first');return}let o;try{o=SAVEIO.parse(c)}catch(e){msg('Invalid code: '+e.message);return}let M={};try{M=JSON.parse(o.d.oss_meta)}catch(_){}const n=Object.keys(o.d).length;if(!confirm('Replace ALL progress on this device with this save?'+(M.gold!=null?'\nGold: '+Math.round(M.gold):'')+'\n('+n+' entries, saved '+new Date(o.t||0).toLocaleDateString()+')'))return;SAVEIO.imp(o);running=false;location.reload()}}
+ $('saveImp').onclick=async()=>{let c=$('saveTxt').value.trim();if(!c){try{if(navigator.clipboard&&navigator.clipboard.readText){c=(await navigator.clipboard.readText()||'').trim();$('saveTxt').value=c}}catch(_){}}if(!c){msg('Paste a save code first');return}let o;try{o=SAVEIO.parse(c)}catch(e){msg('Import failed: '+e.message);return}let M={};try{M=JSON.parse(o.d.oss_meta)}catch(_){}const n=Object.keys(o.d).length;if(!confirm('Replace ALL progress on this device with this save?'+(M.gold!=null?'\nGold: '+Math.round(M.gold):'')+'\n('+n+' entries'+(o.t?', saved '+new Date(o.t).toLocaleDateString():'')+')'))return;SAVEIO.imp(o);running=false;location.reload()}}
 // auto-update: same-origin fetch, compare VERSION, hop to ?v=N (localStorage is per-origin so progress stays)
 function checkUpdate(){try{if(!window.fetch||location.protocol==='file:')return;const u=location.pathname+'?vc='+Date.now();fetch(u,{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t&&t.match(/const VERSION=(\d+);/);const nv=m?+m[1]:0;if(nv>VERSION){const key='oss_updtry';let tried=0;try{tried=+sessionStorage.getItem(key)||0}catch(_){}if(tried>=nv)return;try{sessionStorage.setItem(key,nv)}catch(_){}if(running&&G&&!G.over)return;location.replace(location.pathname+'?v='+nv)}}).catch(()=>{})}catch(_){}}
 setTimeout(checkUpdate,1500);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!(running&&G&&!G.over))checkUpdate()});
