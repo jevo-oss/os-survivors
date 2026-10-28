@@ -597,10 +597,11 @@ function tierExtra(t){if(t===1){G.p.hp=Math.min(G.p.max,G.p.hp+G.p.max*.15)}if(t
 const capW=k=>WEAPONS[k].elite?WEAPONS[k].max-2:Math.min(10,WEAPONS[k].max);
 function randUpgrade(bonusLv){const up=[];for(const k in G.w)if(G.w[k]<capW(k))up.push(['w',k]);for(const k in G.pas)if(G.pas[k]<PASSIVES[k].max)up.push(['p',k]);for(const k in G.mega)if(mg(k)<MEGA_MAX)up.push(['m',k]);
  if(Object.keys(G.w).length<G.ws)for(const k in WEAPONS)if(!G.w[k]&&!WEAPONS[k].elite&&avail(WEAPONS[k])&&!G.banned.includes(k))up.push(['w',k]);
- if(up.length&&Math.random()<.95){const[ty,k]=up[Math.random()*up.length|0];if(ty==='m'){const b=mg(k);G.mega[k]=b+1;G.p.max=hpMax();return{icon:k,txt:`${MEGA[k].name} Lv ${b} → ${b+1}`,evo:1}}
+ const own=Object.keys(G.w).length+Object.keys(G.pas).length+Object.keys(G.mega).length,upO=up.filter(([t,k])=>t==='w'?G.w[k]:t==='p'?G.pas[k]:1).length,upP=.75*Math.min(1,.4+(own?upO/own:1));  // v23: 75% max, less when most owned items are maxed
+ if(up.length&&Math.random()<upP){const[ty,k]=up[Math.random()*up.length|0];if(ty==='m'){const b=mg(k);G.mega[k]=b+1;G.p.max=hpMax();return{icon:k,txt:`${MEGA[k].name} Lv ${b} → ${b+1}`,evo:1}}
   if(!(ty==='w'?G.w:G.pas)[k]&&!window.__sim){(G.offerQ=G.offerQ||[]).push({ty,k,L:Math.min(ty==='w'?capW(k):PASSIVES[k].max,bonusLv)});const D=ty==='w'?WEAPONS[k]:PASSIVES[k];return{icon:ty==='w'?wicon(k):k,txt:`${ty==='w'?wname(k):D.name} offered (take or decline)`}}
   const D=ty==='w'?WEAPONS[k]:PASSIVES[k],o=ty==='w'?G.w:G.pas,b=o[k]||0;o[k]=Math.min(ty==='w'?capW(k):D.max,b+bonusLv);if(ty==='p'&&k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}const nm=ty==='w'?wname(k):D.name;return{icon:ty==='w'?wicon(k):k,txt:b?`${nm} Lv ${b} → ${o[k]}`:`${nm} (new) Lv ${o[k]}`}}
- const k=SKILLS[Math.random()*SKILLS.length|0],L=sLvl(k),T2=Math.min(99,L+1),need=XPT[T2]-SK[k];if(need>0)addSkillXp(k,need);return{icon:k,txt:`${k} ${L} → ${T2}`}}
+ const r=Math.random();if(r<.6||!G.ch){const g=Math.round(25*(1+(bonusLv||1))*(1+G.t/600)*goldMul());G.gold+=g;return{icon:'coin',txt:`+${g} gold`}}if(r<.8){G.ch.reroll=(G.ch.reroll||0)+1;return{icon:'reroll',txt:'+1 Reroll'}}const h=Math.round(G.p.max*.3);G.p.hp=Math.min(G.p.max,G.p.hp+h);return{icon:'food',txt:`Food: +${h} HP`}}  // v23: gold-heavy fallback, no permanent boosts
 function applyDrop(t){const r=randUpgrade(TIER_LV[t]);tierExtra(t);G.banner={txt:`${TIERS[t].n} drop! ${r.txt}`,life:2.6,col:TIERS[t].c}}
 const hpMax=()=>90+sLvl('Hitpoints')+15*(G.pas.hp||0)+60*mg('ely')+G.bon.hp;
 const critCh=()=>.05*(G.pas.crit||0)+G.bon.crit,xpMul=()=>(1+.08*(G.pas.xp||0))*(1+G.bon.xp),goldMul=()=>(1+G.bon.greed)*(1+.2*(G.pas.gold||0)),
@@ -615,10 +616,11 @@ const dmgMul=sk=>(1+.1*(G.pas.str||0)+G.might)*skMul(sk)*megaMul(sk||'Attack')*(
 const AREA=()=>1+G.bon.area;
 const spdMul=()=>(1+.08*(G.pas.spd||0))*(1+G.bon.sp);
 const magR=()=>70*(1+.3*(G.pas.mag||0))*(1+G.bon.mag);
-const enemyScale=t=>1+t/120+Math.pow(t/400,2);  // HP ramp keeps pace with weapon growth
+const enemyScale=t=>1+t/120+Math.pow(t/400,2);
+const lateHp=t=>t<=600?1:t<=1200?1+(t-600)/600:Math.min(3,2+(t-1200)/480);  // v23: non-boss HP x1 to 10:00, x2 @20:00, x3 @28:00  // HP ramp keeps pace with weapon growth
 function pop(x,y,txt,col,kind){const o=pops.get();if(o){o.x=x+(Math.random()-.5)*8;o.y=y;o.txt=txt;o.life=kind?.75:1.1;o.col=col||'#fff';o.kind=kind||0}}
 function spawn(t,opt){opt=opt||{};const e=enemies.get();if(!e)return null;const T=ETYPES[t],a=Math.random()*6.283,d=Math.max(W,H)*.62+40;
- const sc=enemyScale(G.t);e.x=opt.x??G.p.x+Math.cos(a)*d;e.y=opt.y??G.p.y+Math.sin(a)*d;e.t=t;e.boss=!!opt.boss;e.elite=!!opt.elite;e.prop=!T.sp&&!e.boss;
+ const sc=enemyScale(G.t)*lateHp(G.t);e.x=opt.x??G.p.x+Math.cos(a)*d;e.y=opt.y??G.p.y+Math.sin(a)*d;e.t=t;e.boss=!!opt.boss;e.elite=!!opt.elite;e.prop=!T.sp&&!e.boss;
  e.max=e.hp=e.prop?T.hp:T.hp*(e.boss?(t==='titan'?1.5*(1+G.t/240):3.5*Math.pow(Math.max(1,G.t/180),1.5)):sc)*(e.elite?8:1);e.sp=T.sp*(1+Math.min(G.t/600,.5))*(e.elite?.9:1);e.r=T.r*(e.elite?1.35:1);e.dmg=T.dmg*(1+G.t/400)*(e.elite?1.5:1);e.xp=T.xp*(e.elite?10:1);e.hit=0;e.slow=0;e.rt=0;e.bleed=0;e.bdps=0;e.btk=0;e.ph=Math.random()*6;e.champ=0;e.sw=!!opt.sw;if(e.sw){e.max=e.hp=T.hp*.5*(1+G.t/300);e.sp*=1.35;e.r*=.75}if(!e.boss&&!e.elite&&!e.prop&&!opt.nochamp){const r=Math.random();e.champ=r<.002?2:r<.042?1:0}
  if(e.champ){const m=e.champ===2?3:2.5;e.max=e.hp=e.hp*m;e.xp=e.champ===2?e.xp:Math.max(12,e.xp*2);e.r*=1.12}return e}  // champions: yellow (~4%) / orange (~1%) XP tiers
 let SRC='',SKXP=.25;
@@ -647,7 +649,8 @@ function fire(x,y,ang,sp,dmg,r,life,pierce,kind,nx){const s=shots.get();if(!s)re
 function addFx(x,y,r,life,kind,ang){const f=fx.get();if(f){f.x=x;f.y=y;f.r=r;f.life=f.max=life;f.kind=kind;f.ang=ang||0;f.pts=null;f.tk=0;f.dmg=0}return f}
 function inArc(e,p,R,a,hw){const dx=e.x-p.x,dy=e.y-p.y;if(dx*dx+dy*dy>(R+e.r)**2)return false;return Math.abs(((Math.atan2(dy,dx)-a+9.4248)%6.2832)-3.1416)<(hw||1.1)}
 // ---- single source of truth for weapon stats (used by combat AND the stats screen) ----
-function wstat(k,L){const S=wstat0(k,L);if(PROJW[k]&&G.bon.proj)S.proj+=G.bon.proj;if(G.evo&&G.evo[k]){S.dmg*=1.25;S.cd*=.92;if(PROJW[k])S.proj+=1;if(S.area)S.area=Math.round(S.area*1.1);if(S.pierce<99)S.pierce+=2;S.evo=1}return S}
+function wstat(k,L){const S=wstat0(k,L);if(L>8)S.dmg=wstat0(k,8+(L-8)*.5).dmg;  // v23: Lv9-12 dmg gains halved
+ if(PROJW[k]&&G.bon.proj)S.proj+=G.bon.proj;if(G.evo&&G.evo[k]){S.dmg*=1.25;S.cd*=.92;if(PROJW[k])S.proj+=1;if(S.area)S.area=Math.round(S.area*1.1);if(S.pierce<99)S.pierce+=2;S.evo=1}return S}
 function wstat0(k,L){const m=k==='wind'||k==='barrage'||k==='fire'||k==='runes'?mg('shadow'):k==='knives'||k==='cannon'||k==='darts'||k==='chin'?mg('tbow'):k==='scim'||k==='halberd'?mg('scythe'):0,A=AREA(),D=durMul();switch(k){
  case 'wind':return{dmg:11+L*2,cd:Math.max(.45,1.15-L*.06)/(1+.3*m),proj:1+pb(L)+m,area:0,pierce:0};
  case 'knives':return{dmg:7+L*1.5,cd:Math.max(.35,.85-L*.04),proj:1+pb(L)+2*m,pierce:Math.floor(L/5)+m,area:0};
@@ -732,7 +735,7 @@ function weapons(dt){const p=G.p,w=G.w,cd=G.cd,dc=dt*(1+G.bon.cd);
 let XPA=8,XPB=15,XPP=1.9;
 // orange gems (rare: orange champions, elites, bosses) are worth ~2 levels early, tapering to ~0.75 level by Lv20+
 function orangeXp(L){const k=Math.max(.75,2-1.25*(L-2)/18);let v=0,i=0;for(;i<Math.floor(k);i++)v+=needFor(L+i);v+=(k-Math.floor(k))*needFor(L+i);return Math.max(30,Math.round(v))}
-function needFor(L){const v=XPA+XPB*Math.pow(L-1,XPP+(L>13?.1*Math.min(1,(L-13)/10):0));return Math.round(L<=13?v*.7:v)}  // levels 1-13 are 30% cheaper
+function needFor(L){const v=XPA+XPB*Math.pow(L-1,XPP+(L>13?.1*Math.min(1,(L-13)/10):0));return Math.round((L<=13?v*.7:v)*(L>=10?1+.15*Math.pow(L-9,1.3):1))}  // v23: steeper from Lv10 (x1.15@10, x1.9@13, x4.4@20, x7.9@28)  // levels 1-13 are 30% cheaper
 function gainXp(v){v*=xpMul();G.xp+=v;G.xpTot=(G.xpTot||0)+v;if(G.xp>=G.next&&!G.paused){G.xp-=G.next;G.lvl++;G.next=needFor(G.lvl);levelUp()}}
 function waveTypes(t){const m=t/60,ph=Math.floor(t/45)%3;let b=m<1?['chicken','rat']:m<3?['chicken','rat','goblin','goblin']:m<6?['rat','goblin','goblin','cow','rat','goblin','cow']:m<10?['rat','goblin','cow','cow']:m<18?['rat','goblin','goblin','cow','cow']:['goblin','goblin','cow','cow'];
  if(ph===1)b=['rat','rat'].concat(b);else if(ph===2&&m>=3)b=b.concat(['cow']);return b}
