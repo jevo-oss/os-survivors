@@ -597,7 +597,7 @@ function tierExtra(t){if(t===1){G.p.hp=Math.min(G.p.max,G.p.hp+G.p.max*.15)}if(t
 const capW=k=>WEAPONS[k].elite?WEAPONS[k].max-2:Math.min(10,WEAPONS[k].max);
 function randUpgrade(bonusLv){const up=[];for(const k in G.w)if(G.w[k]<capW(k))up.push(['w',k]);for(const k in G.pas)if(G.pas[k]<PASSIVES[k].max)up.push(['p',k]);for(const k in G.mega)if(mg(k)<MEGA_MAX)up.push(['m',k]);
  if(Object.keys(G.w).length<G.ws)for(const k in WEAPONS)if(!G.w[k]&&!WEAPONS[k].elite&&avail(WEAPONS[k])&&!G.banned.includes(k))up.push(['w',k]);
- if(up.length&&Math.random()<.7){const[ty,k]=up[Math.random()*up.length|0];if(ty==='m'){const b=mg(k);G.mega[k]=b+1;G.p.max=hpMax();return{icon:k,txt:`${MEGA[k].name} Lv ${b} → ${b+1}`,evo:1}}
+ if(up.length&&Math.random()<.95){const[ty,k]=up[Math.random()*up.length|0];if(ty==='m'){const b=mg(k);G.mega[k]=b+1;G.p.max=hpMax();return{icon:k,txt:`${MEGA[k].name} Lv ${b} → ${b+1}`,evo:1}}
   if(!(ty==='w'?G.w:G.pas)[k]&&!window.__sim){(G.offerQ=G.offerQ||[]).push({ty,k,L:Math.min(ty==='w'?capW(k):PASSIVES[k].max,bonusLv)});const D=ty==='w'?WEAPONS[k]:PASSIVES[k];return{icon:ty==='w'?wicon(k):k,txt:`${ty==='w'?wname(k):D.name} offered (take or decline)`}}
   const D=ty==='w'?WEAPONS[k]:PASSIVES[k],o=ty==='w'?G.w:G.pas,b=o[k]||0;o[k]=Math.min(ty==='w'?capW(k):D.max,b+bonusLv);if(ty==='p'&&k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}const nm=ty==='w'?wname(k):D.name;return{icon:ty==='w'?wicon(k):k,txt:b?`${nm} Lv ${b} → ${o[k]}`:`${nm} (new) Lv ${o[k]}`}}
  const k=SKILLS[Math.random()*SKILLS.length|0],L=sLvl(k),T2=Math.min(99,L+1),need=XPT[T2]-SK[k];if(need>0)addSkillXp(k,need);return{icon:k,txt:`${k} ${L} → ${T2}`}}
@@ -989,7 +989,8 @@ function rollCards(forced){const opts=[];
  for(const k in G.mega)if(mg(k)<MEGA_MAX)opts.push({k,type:'m',L:mg(k),wt:2});
  const owned=new Set(Object.keys(G.w).map(k=>WSKILL[k]));owned.add('Hitpoints');
  for(const k of SKILLS){const L=sLvl(k);if(L<99)opts.push({k,type:'s',L,wt:owned.has(k)?1.5:.4})}
- const pick=[];while(pick.length<3&&opts.length){let tot=opts.reduce((a,o)=>a+o.wt,0),r=Math.random()*tot,i=0;for(;i<opts.length-1;i++){r-=opts[i].wt;if(r<=0)break}const o=opts.splice(i,1)[0];if(o.wt>0)pick.push(o)}
+ const pick=[],drawW=L=>{while(pick.length<3&&L.length){let tot=L.reduce((a,o)=>a+o.wt,0),r=Math.random()*tot,i=0;for(;i<L.length-1;i++){r-=L[i].wt;if(r<=0)break}const o=L.splice(i,1)[0];if(o.wt>0)pick.push(o)}};
+ {const so=opts.filter(o=>o.type==='s'),mo=opts.filter(o=>o.type!=='s');drawW(mo);if(pick.length<3)drawW(so);else if(so.length&&Math.random()<.05){pick.pop();drawW(so)}}  // skill boosts only fill empty slots (+5% for one slot)
  if(G.lvl>=10&&megaRoll(MEGA_RATES.card))for(let i=0;i<pick.length;i++){if(i<pick.length-1&&Math.random()<.6)continue;const k=pickMega();pick[i]={k,type:'m',L:mg(k)};break}
  if(G.forceMegaCard)pick[0]={k:G.forceMegaCard,type:'m',L:mg(G.forceMegaCard)};
  {const ek=evoCandidate();if(ek&&Math.random()<.06){let i=pick.length-1;while(i>0&&pick[i].type==='m')i--;if(pick[i]&&pick[i].type!=='m')pick[i]={k:ek,type:'evo',tier:3}}}  // ~6% evolve card when a weapon is eligible
