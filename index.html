@@ -928,22 +928,23 @@ function rollCards(forced){const opts=[];
  const pick=[];while(pick.length<3&&opts.length){let tot=opts.reduce((a,o)=>a+o.wt,0),r=Math.random()*tot,i=0;for(;i<opts.length-1;i++){r-=opts[i].wt;if(r<=0)break}const o=opts.splice(i,1)[0];if(o.wt>0)pick.push(o)}
  if(G.lvl>=10&&megaRoll(MEGA_RATES.card))for(let i=0;i<pick.length;i++){if(i<pick.length-1&&Math.random()<.6)continue;const k=pickMega();pick[i]={k,type:'m',L:mg(k)};break}
  if(G.forceMegaCard)pick[0]={k:G.forceMegaCard,type:'m',L:mg(G.forceMegaCard)};
+ {const ek=evoCandidate();if(ek&&Math.random()<.06){let i=pick.length-1;while(i>0&&pick[i].type==='m')i--;if(pick[i]&&pick[i].type!=='m')pick[i]={k:ek,type:'evo',tier:3}}}  // ~6% evolve card when a weapon is eligible
  if(forced&&forced.length){pick.length=0;forced.forEach(o=>pick.push(Object.assign({},o)))}
  const box=$('choices');box.innerHTML='';box.className='';$('slotinfo').innerHTML=slotsHtml();
  if(!pick.length)pick.push({k:'heal',type:'heal'});
  for(const o of pick){const b=document.createElement('button');const D=o.type==='w'?WEAPONS[o.k]:o.type==='p'?PASSIVES[o.k]:o.type==='m'?MEGA[o.k]:null;
-  if(o.tier==null)o.tier=o.type==='m'?4:o.type==='heal'?0:o.el?Math.max(2,rollTier()):rollTier();const TT=TIERS[o.tier];b.className='card'+(o.tier===4?' mega':'')+(o.el?' elite':'');b.dataset.type=o.type;b.dataset.k=o.k;b.style.setProperty('--tc',TRGB[o.tier]);b.style.setProperty('--tg',o.tier*7);
+  if(o.tier==null)o.tier=o.type==='m'?4:o.type==='heal'?0:o.el?Math.max(2,rollTier()):rollTier();const TT=TIERS[o.tier];b.className='card'+(o.tier===4?' mega':'')+(o.el?' elite':'')+(o.type==='evo'?' evo':'');if(o.type==='evo')b.style.boxShadow='0 0 0 2px #ffd24a,0 0 22px rgba(255,200,60,.75)';b.dataset.type=o.type;b.dataset.k=o.k;b.style.setProperty('--tc',TRGB[o.tier]);b.style.setProperty('--tg',o.tier*7);
   const SG=o.type==='s'?Math.min(99,o.L+SKGAIN[o.tier]):0,mx=D&&D.max?D.max:99,NL=o.type==='w'||o.type==='p'?Math.min(mx,o.L+TIER_LV[o.tier]):0,EX=o.tier===1&&o.type!=='m'?' · +15% heal':o.tier===2?' · +4% might':'';
   let pj='';if(o.type==='w'&&PROJW[o.k]){const d=wstat(o.k,NL).proj-(o.L?wstat(o.k,o.L).proj:0);if(o.L&&d>0)pj=`<em class="pj">+${d} projectile${d>1?'s':''}</em>`}
   const ev=evoHint(o.type,o.k,NL),EV=ev?`<span class="ev">${ev}</span>`:'',nm=o.type==='w'?(o.el?'<em class="elb">★ ELITE</em> ':'')+wname(o.k):D&&D.name;
-  const body=o.type==='m'?`<span style="color:#ffcf6a">${D.name}</span><br><span class="lvl">${o.L?'Lv '+o.L+' → '+Math.min(MEGA_MAX,o.L+1):'BONUS +1 SLOT'}</span><small>${o.L?mUp(o.k,o.L):D.desc}</small>`:o.type==='heal'?'Shark<small>Heal 50 HP</small>':
+  const body=o.type==='evo'?`<span style="color:#ffe07a">★ Evolve: ${WEAPONS[o.k].name}</span><br><span class="lvl">→ ${EVO[o.k].name}</span><small>Evolve your maxed weapon now</small>`:o.type==='m'?`<span style="color:#ffcf6a">${D.name}</span><br><span class="lvl">${o.L?'Lv '+o.L+' → '+Math.min(MEGA_MAX,o.L+1):'BONUS +1 SLOT'}</span><small>${o.L?mUp(o.k,o.L):D.desc}</small>`:o.type==='heal'?'Shark<small>Heal 50 HP</small>':
    o.type==='s'?`<span style="color:${SKCOL[o.k]}">${o.k}</span><br><span class="lvl">Lv ${o.L} → ${SG}</span><small>Permanent skill boost · ${SKTIP[o.k]}${EX}</small>`:
    o.L?`${nm}<br><span class="lvl">Lv ${o.L} → ${NL}${NL>=mx?' · MAX':''}</span>${pj}<small>${o.type==='w'?upTxt(o.k,o.L,NL,!!pj):PASFX[o.k](NL)}${EX}</small>${EV}`:
    `${nm}<br><span class="lvl" style="color:#7dff8a">NEW · Lv ${NL}</span><small>${D.desc}${o.type==='w'?' · '+WSKILL[o.k]+(PROJW[o.k]?' · +1 projectile at Lv 3/6/9/12':''):' · '+PASFX[o.k](NL)}${EX}</small>${EV}`;
   b.title=(o.type==='w'?wname(o.k):(D&&D.name)||'')+' — '+(D?D.desc:'');
-  b.innerHTML=`<img src="${ICONURL[o.type==='w'?wicon(o.k):o.k]}" alt=""><span class="t">${body}</span><span class="gem"><i></i>${TT.n}</span>`;
+  b.innerHTML=`<img src="${ICONURL[o.type==='w'?wicon(o.k):o.type==='evo'?'evo_'+o.k:o.k]}" alt=""><span class="t">${body}</span><span class="gem"><i></i>${TT.n}</span>`;
   b.onclick=()=>{if(G.banMode){if(o.type!=='w'&&o.type!=='p'){b.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:200});return}G.banned.push(o.k);G.ch.banish--;G.banMode=false;buzz(20);rollCards();return}
-   if(o.type!=='m'&&o.type!=='heal')tierExtra(o.tier);if(o.type==='m')grantMega(o.k);else if(o.type==='s'){const need=XPT[SG]-SK[o.k];if(need>0)addSkillXp(o.k,need);saveSkills()}else if(o.type==='w')G.w[o.k]=NL;else if(o.type==='p'){G.pas[o.k]=NL;if(o.k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}}else G.p.hp=Math.min(G.p.max,G.p.hp+50);
+   if(o.type!=='m'&&o.type!=='heal'&&o.type!=='evo')tierExtra(o.tier);if(o.type==='evo'){if(!G.evo[o.k])evolve(o.k)}else if(o.type==='m')grantMega(o.k);else if(o.type==='s'){const need=XPT[SG]-SK[o.k];if(need>0)addSkillXp(o.k,need);saveSkills()}else if(o.type==='w')G.w[o.k]=NL;else if(o.type==='p'){G.pas[o.k]=NL;if(o.k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}}else G.p.hp=Math.min(G.p.max,G.p.hp+50);
    closeLvl()};box.appendChild(b)}
  G.curCards=pick.map(o=>({k:o.k,type:o.type,L:o.L,tier:o.tier,el:o.el}));
  const T=$('lvtools'),C=G.ch;T.innerHTML='';const tb=(id,ic,lab,n,fn)=>{const b=document.createElement('button');b.id=id;b.innerHTML=`<img src="${ICONURL[ic]}" alt="">${lab} <b>${n}</b>`;b.disabled=n<=0;b.onclick=fn;T.appendChild(b);return b};
@@ -954,7 +955,7 @@ function rollCards(forced){const opts=[];
  T.style.display='flex'}
 let chestTok=0;function openChest(tier,boss){tier=Math.max(0,Math.min(3,tier|0));G.paused=true;const tok=++chestTok,CT=CHESTS[tier];let n=CT.n2;if(boss&&n<3&&Math.random()<.35)n++;
  G.chests++;if(tier>=2)G.gchests++;if(tier===3)G.lchests=(G.lchests||0)+1;const gb=Math.round([5,15,40,120][tier]*goldMul());G.gold+=gb;
- const evk=(tier>=2||boss)?evoCandidate():null,mch=tier===3?MEGA_RATES.chest3:tier===2?MEGA_RATES.chest2:0;let used=false,mu=false;
+ const evk=(tier>=2||boss||(tier===1&&Math.random()<.35))?evoCandidate():null,mch=tier===3?MEGA_RATES.chest3:tier===2?MEGA_RATES.chest2:0;let used=false,mu=false;
  const roll=()=>{if(evk&&!used){used=true;return evolve(evk)}if(!mu&&mch&&megaRoll(mch)){mu=true;const k=pickMega();grantMega(k);return{icon:k,txt:'MEGA RARE! '+MEGA[k].name,evo:1}}return randUpgrade(1)};
  if(window.__sim){for(let j=0;j<n;j++)roll();G.paused=false;return}
  $('chestT').innerHTML=`<span style="color:${CT.c}">${boss?'Dragon\'s ':''}${CT.n} chest</span>`;$('chestP').style.boxShadow=`inset 0 0 0 1px ${CT.c},0 0 36px ${CT.c}66,0 18px 50px rgba(0,0,0,.7)`;
