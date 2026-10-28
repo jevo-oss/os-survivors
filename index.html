@@ -765,19 +765,24 @@ const CLASSES={
   perks:[[1,'Devout: +0.5 HP/s regen',{regen:.5}],[3,'+1 skip per run',{skip:1}],[4,'Blessed body: +10 max HP',{hp:10}],[6,'Free Shark: once per run, auto-heal 50 HP when below 35% HP',{sig:'shark'}],[7,'Quick learner: +10% XP',{xp:.1}],[9,'Armed: your starting weapon begins at Lv 2',{sig:'slv2'}],[2,'Lifesteal: every kill heals you 0.5 HP',{sig:'leech'}],[5,'Holy ward: a shield blocks one hit every 15s',{sig:'ward'}],[10,'Redemption: revive once per run at 50% HP',{sig:'revive'}],[15,'Judgement: Prayer kills explode in holy light',{sig:'judge'}],[20,'Blessed: start every run with a random passive at Lv 2',{sig:'blessed'}],[8,'+1 reroll per run',{reroll:1}],[12,'+1 weapon slot',{wslot:1}],[18,'+1 banish per run',{banish:1}],[22,'Head start: begin every run with a free upgrade pick',{sig:'head'}],[25,'+1 passive slot',{pslot:1}],[30,'Saint: +1 HP/s regen and an extra revive',{regen:1,rev:1}]]},
 };
 for(const k in CLASSES)CLASSES[k].perks.sort((a,b)=>a[0]-b[0]);
-const SHOP={might:{name:'Might',desc:'+5% damage',icon:'Attack',max:5,eff:{dmg:.05}},vit:{name:'Vitality',desc:'+10 max HP',icon:'Hitpoints',max:5,eff:{hp:10}},swift:{name:'Swiftness',desc:'+4% move speed',icon:'spd',max:5,eff:{sp:.04}},
- reach:{name:'Reach',desc:'+10% pickup range',icon:'magnet',max:5,eff:{mag:.1}},greed:{name:'Greed',desc:'+15% gold found',icon:'coin',max:5,eff:{greed:.15}},
- armor:{name:'Armour',desc:'-3% damage taken',icon:'armor',max:3,eff:{dr:.03}},regen:{name:'Recovery',desc:'+0.2 HP/s regen',icon:'regen',max:3,eff:{regen:.2}},
- luck:{name:'Luck',desc:'+6% luck',icon:'luck',max:3,eff:{luck:.06}},growth:{name:'Growth',desc:'+5% XP gained',icon:'xp',max:5,eff:{xp:.05}},
- haste:{name:'Haste',desc:'3% faster cooldowns',icon:'cd',max:3,eff:{cd:.03}},revival:{name:'Revival',desc:'Revive once per run at 50% HP',icon:'rev',max:1,eff:{rev:1},base:600},
- reroll:{name:'Reroll',desc:'+1 level-up reroll per run',icon:'reroll',max:3,eff:{reroll:1},base:80},skip:{name:'Skip',desc:'+1 level-up skip per run (+XP)',icon:'skip',max:3,eff:{skip:1},base:60},
- banish:{name:'Banish',desc:'+1 banish per run (remove a card for the run)',icon:'banish',max:3,eff:{banish:1},base:100},
- fortune:{name:'Fortune',desc:'+4% luck and +10% mega rare odds',icon:'luck',max:3,eff:{luck:.04,mlk:.1},base:400},
- treasure:{name:'Treasure hunter',desc:'+8% chance a Wooden chest upgrades to Silver',icon:'chest',max:3,eff:{cup:.08},base:300},
- arsenal:{name:'Arsenal',desc:'Start every run with a random 2nd weapon (Lv 1)',icon:'knives',max:1,eff:{sig:'arsenal'},base:1500},
- blessing:{name:'Blessing',desc:'Start every run with a random passive at Lv 2 (an extra one if your class already has this perk)',icon:'xp',max:1,eff:{sig:'blessed2'},base:1200},
- second:{name:'Second wind',desc:'+1 extra revive per run (stacks with Revival)',icon:'rev',max:1,eff:{rev:1},base:2500},
- trail:{name:'Hero trail',desc:'Cosmetic: glowing footstep trail (Ember → Frost → Gilded)',icon:'star',max:3,eff:{trail:1},base:500}};
+const SHOP={might:{name:'Might',desc:'+4% damage',icon:'Attack',max:7,om:5,eff:{dmg:.04}},vit:{name:'Vitality',desc:'+8 max HP',icon:'Hitpoints',max:7,om:5,eff:{hp:8}},swift:{name:'Swiftness',desc:'+3% move speed',icon:'spd',max:7,om:5,eff:{sp:.03}},
+ reach:{name:'Reach',desc:'+8% pickup range',icon:'magnet',max:7,om:5,eff:{mag:.08}},greed:{name:'Greed',desc:'+12% gold found',icon:'coin',max:7,om:5,eff:{greed:.12}},
+ armor:{name:'Armour',desc:'-2.5% damage taken',icon:'armor',max:5,om:3,eff:{dr:.025}},regen:{name:'Recovery',desc:'+0.15 HP/s regen',icon:'regen',max:5,om:3,eff:{regen:.15}},
+ luck:{name:'Luck',desc:'+5% luck',icon:'luck',max:5,om:3,eff:{luck:.05}},growth:{name:'Growth',desc:'+4% XP gained',icon:'xp',max:7,om:5,eff:{xp:.04}},
+ haste:{name:'Haste',desc:'2.5% faster cooldowns',icon:'cd',max:5,om:3,eff:{cd:.025}},revival:{name:'Revival',desc:'Revive once per run at 50% HP',icon:'rev',max:2,om:1,eff:{rev:1},base:600},
+ reroll:{name:'Reroll',desc:'+1 level-up reroll per run',icon:'reroll',max:5,om:3,eff:{reroll:1},base:80},skip:{name:'Skip',desc:'+1 level-up skip per run (+XP)',icon:'skip',max:5,om:3,eff:{skip:1},base:60},
+ banish:{name:'Banish',desc:'+1 banish per run (remove a card for the run)',icon:'banish',max:5,om:3,eff:{banish:1},base:100},
+ fortune:{name:'Fortune',desc:'+3% luck and +8% mega rare odds',icon:'luck',max:5,om:3,eff:{luck:.03,mlk:.08},base:400},
+ treasure:{name:'Treasure hunter',desc:'+6% chance a Wooden chest upgrades to Silver',icon:'chest',max:5,om:3,eff:{cup:.06},base:300},
+ arsenal:{name:'Arsenal',desc:'Start every run with a random 2nd weapon (Lv 1)',icon:'knives',max:1,om:1,eff:{sig:'arsenal'},base:1500},
+ blessing:{name:'Blessing',desc:'Start every run with a random passive at Lv 2 (an extra one if your class already has this perk)',icon:'xp',max:1,om:1,eff:{sig:'blessed2'},base:1200},
+ second:{name:'Second wind',desc:'+1 extra revive per run (stacks with Revival)',icon:'rev',max:1,om:1,eff:{rev:1},base:2500},
+ precision:{name:'Precision',desc:'+2% critical chance',icon:'luck',max:5,om:3,eff:{crit:.02},base:150},
+ expanse:{name:'Expanse',desc:'+4% attack area',icon:'magnet',max:5,om:3,eff:{area:.04},base:150},
+ focus:{name:'Focus',desc:'+3% damage, -1% damage taken',icon:'Attack',max:5,om:3,eff:{dmg:.03,dr:.01},base:250},
+ multishot:{name:'Multishot',desc:'+1 projectile on every weapon',icon:'knives',max:3,om:1,eff:{proj:1},base:6000},
+ bounce:{name:'Bounce',desc:'+1 ricochet: projectiles bounce to a nearby enemy at 70% damage',icon:'knives',max:3,om:1,eff:{bounce:1},base:6000},
+ trail:{name:'Hero trail',desc:'Cosmetic: glowing footstep trail (Ember → Frost → Gilded)',icon:'star',max:3,om:3,eff:{trail:1},base:500}};
 const POTS={sattack:{name:'Super attack potion',desc:'+15% damage this run',cost:300,col:'#5aa0ff',eff:{dmg:.15}},
  prayer:{name:'Prayer potion',desc:'-15% damage taken this run',cost:350,col:'#4fd6c8',eff:{dr:.15}},
  stamina:{name:'Stamina potion',desc:'+15% move speed this run',cost:150,col:'#c88a4a',eff:{sp:.15}},
@@ -790,7 +795,7 @@ function potIcon(k){if(POTICON[k])return POTICON[k];const P=POTS[k];const c=mk(4
  g.fillStyle=P.col;g.beginPath();g.moveTo(11,30);g.quadraticCurveTo(24,26,37,30);g.quadraticCurveTo(36,43,24,43);g.quadraticCurveTo(12,43,11,30);g.fill();g.fillStyle='rgba(255,255,255,.6)';g.beginPath();g.ellipse(17,24,2,4,.4,0,6.283);g.fill()});return POTICON[k]=c.c.toDataURL()}
 function applyPots(){for(const k of G.pots||[])if(POTS[k])for(const e in POTS[k].eff)G.bon[e]=(G.bon[e]||0)+POTS[k].eff[e];updPotHud()}
 function updPotHud(){const h=$('potHud');if(!h)return;const L=(G&&!G.menu&&G.pots)||[];h.innerHTML=L.map(k=>`<span title="${POTS[k].name}"><img src="${potIcon(k)}" alt="">${POTS[k].desc.replace(' this run','')}</span>`).join('');h.style.display=L.length&&running?'flex':'none'}
-const shopCost=(r,k)=>Math.round(((k&&SHOP[k].base)||50)*Math.pow(2,r));
+const shopCost=(r,k)=>{const b=(k&&SHOP[k].base)||50,om=(k&&SHOP[k].om)||99;return r<om?Math.round(b*Math.pow(2,r)):Math.round(b*Math.pow(2,om-1)*Math.pow(1.6,r-om+1)/10)*10};
 const START_BONUS=[{id:'none',n:'None',d:'No starting bonus',L:1},{id:'hardy',n:'Hardy',d:'+20 max HP',L:3,eff:{hp:20}},{id:'scholar',n:'Scholar',d:'+10% XP gained',L:6,eff:{xp:.1}},
  {id:'armed',n:'Armed',d:'Start with a random 2nd weapon',L:9},{id:'lucky',n:'Lucky',d:'+15% luck & +1 reroll',L:13,eff:{luck:.15,reroll:1}},{id:'prospector',n:'Prospector',d:'+30% gold found',L:17,eff:{greed:.3}},{id:'veteran',n:'Veteran',d:'Starting weapon begins at Lv 3',L:22}];
 const SKINS=[{id:'base',n:'Classic'},{id:'verdant',n:'Verdant',hue:105,L:10},{id:'royal',n:'Royal',hue:215,L:20},{id:'shadow',n:'Shadow',dark:1,L:30},{id:'gilded',n:'Gilded',gold:1,ach:'champion'}];
@@ -823,7 +828,7 @@ const SK=LS.get('oss_skills',{});SKILLS.forEach(k=>{if(typeof SK[k]!=='number')S
 let skSaveT=0;const saveSkills=()=>LS.set('oss_skills',SK);const sLvl=k=>lvlFor(SK[k]);
 // ---------- run state ----------
 let G;
-function computeBonus(){const b={hp:0,dmg:0,sp:0,mag:0,cd:0,area:0,dr:0,regen:0,greed:0,xp:0,luck:0,rev:0,reroll:0,skip:0,banish:0,wslot:0,pslot:0,proj:0,crit:0,mlk:0,cup:0,trail:0},sig={};const C=CLASSES[META.cls];
+function computeBonus(){const b={hp:0,dmg:0,sp:0,mag:0,cd:0,area:0,dr:0,regen:0,greed:0,xp:0,luck:0,rev:0,reroll:0,skip:0,banish:0,wslot:0,pslot:0,proj:0,crit:0,mlk:0,cup:0,trail:0,bounce:0},sig={};const C=CLASSES[META.cls];
  const add=e=>{for(const k in e){if(k==='sig')sig[e[k]]=1;else if(k==='fw')sig.fw=e[k];else b[k]+=e[k]}};add(C.base);const L=clsInfo(META.cls).L;C.perks.forEach(p=>{if(L>=p[0])add(p[2])});
  for(const k in SHOP){const r=Math.min(SHOP[k].max,META.shop[k]||0);for(let i=0;i<r;i++)add(SHOP[k].eff)}
  const sb=START_BONUS.find(x=>x.id===META.sb[META.cls]);if(sb&&L>=sb.L&&sb.eff)add(sb.eff);
@@ -842,7 +847,9 @@ function newGame(){const{b,sig,sb}=computeBonus();
  for(let bi=(G.sig.blessed?1:0)+(G.sig.blessed2?1:0);bi>0;bi--){const ks=Object.keys(PASSIVES).filter(k=>!G.pas[k]&&avail(PASSIVES[k]));if(ks.length)G.pas[ks[Math.random()*ks.length|0]]=2}
  G.pots=[];
  [enemies,shots,gems,items,pops,parts,fx].forEach(p=>p.clear());G.p.max=G.p.hp=hpMax()}
-function addSkillXp(k,x){const b=sLvl(k);SK[k]+=x;G.runXp[k]=(G.runXp[k]||0)+x;const d=G.drops[k];if(d){d.v+=x;d.life=1.4}else G.drops[k]={v:x,life:1.4};
+const SK_RUN=L=>L<40?5:L<60?4:L<80?3:2;
+function skCap(k){G.skBase=G.skBase||{};if(G.skBase[k]==null)G.skBase[k]=sLvl(k);return Math.min(99,G.skBase[k]+SK_RUN(G.skBase[k]))}
+function addSkillXp(k,x){const b=sLvl(k),cp=skCap(k),lim=cp>=99?XPT[99]:XPT[cp+1]-1;if(SK[k]>=lim)return;x=Math.min(x,lim-SK[k]);SK[k]+=x;G.runXp[k]=(G.runXp[k]||0)+x;const d=G.drops[k];if(d){d.v+=x;d.life=1.4}else G.drops[k]={v:x,life:1.4};
  const a=sLvl(k);if(a>b){G.banner={txt:`${k} level ${a}!`,life:2.2,col:SKCOL[k]};if(k==='Hitpoints'){G.p.max=hpMax();G.p.hp+=(a-b)*2}}}
 const mg=k=>G.mega[k]||0,MEGA_MAX=8;
 const MEGA_DM={tbow:.07,scythe:.07,shadow:.18,ely:.14,obl:.14};{const o=mstat;mstat=function(k,L){const S=o(k,L);if(S&&S.dmg)S.dmg*=(MEGA_DM[k]||.07)*1.2/(1+.2*(Math.max(1,L)-1));return S}}  // megas: strong, not instant boss kills
@@ -852,10 +859,10 @@ let lastMega=LS.get('oss_lastmega','');
 function pickMega(){const first=!Object.keys(G.mega||{}).length;let pool=MEGAKEYS.filter(k=>!mg(k));if(!pool.length)pool=MEGAKEYS.filter(k=>mg(k)<MEGA_MAX);if(!pool.length)pool=MEGAKEYS.slice();if(first&&pool.length>1&&pool.includes(lastMega))pool=pool.filter(k=>k!==lastMega);return pool[Math.random()*pool.length|0]}
 function grantMega(k){if(!Object.keys(G.mega).length&&!G.menu){lastMega=k;LS.set('oss_lastmega',k)}G.mega[k]=Math.min(MEGA_MAX,mg(k)+1);META.seen.mega[k]=1;buzz([50,40,90]);G.p.max=hpMax();if(k==='ely')G.p.hp=G.p.max;G.banner={col:'#ffa21a',big:1,txt:`MEGA RARE! ${MEGA[k].name}${G.mega[k]>1?' Lv '+G.mega[k]:''}`,life:3.5};G.shake=.45;G.flash=.35;burst(G.p.x,G.p.y,'',26,260,GL.orange)}
 const MEGA_RATES={kill:1/60000,elite:1/150,boss1:.05,boss:.03,chest3:.10,chest2:.02,card:.002};
-function megaRoll(p){if(Math.random()<p*(G.megaN?.15:1)*(1+(G.bon.mlk||0))){G.megaN=(G.megaN||0)+1;return true}return false}
+function megaRoll(p){if(Math.random()<p*(G.megaN?.08:1)*Math.min(1,.25+G.t/480)*(1+(G.bon.mlk||0))){G.megaN=(G.megaN||0)+1;return true}return false}
 function dropMega(x,y,k){G.megaDrops++;if(G.loot.length<12)G.loot.push({x,y,tier:4,k:k||pickMega()})}
 // ---- pacing: rarity = levels gained (+bonus), skills climb slowly ----
-let MEGA_KILL=1/60000;const SKGAIN=[1,2,3,5],TIER_LV=[1,1,1,2],TIER_BONUS=['','heal 18%','+5% might','+5% might']; // Uncommon/Rare also get extras below
+let MEGA_KILL=1/60000;const SKGAIN=[1,1,2,2],TIER_LV=[1,1,1,2],TIER_BONUS=['','heal 18%','+5% might','+5% might']; // Uncommon/Rare also get extras below
 // v45: Brotato-style card rarity that ramps with player level (Lv1 62/24/11/3 = old odds -> Lv RAR_LV 45/30/18/7, clamped); Luck shift on top
 const RAR_LV=60,RAR0=[62,24,11,3],RAR1=[45,30,18,7];
 function rarOdds(lv){const f=Math.max(0,Math.min(1,((lv||1)-1)/(RAR_LV-1)));return RAR0.map((a,i)=>a+(RAR1[i]-a)*f)}
@@ -868,7 +875,7 @@ function randUpgrade(bonusLv){const up=[];for(const k in G.w)if(G.w[k]<capW(k))u
  if(up.length&&Math.random()<upP){const[ty,k]=up[Math.random()*up.length|0];if(ty==='m'){const b=mg(k);G.mega[k]=b+1;G.p.max=hpMax();return{icon:k,txt:`${MEGA[k].name} Lv ${b} → ${b+1}`,evo:1}}
   if(!(ty==='w'?G.w:G.pas)[k]&&!window.__sim){(G.offerQ=G.offerQ||[]).push({ty,k,L:Math.min(ty==='w'?capW(k):PASSIVES[k].max,bonusLv)});const D=ty==='w'?WEAPONS[k]:PASSIVES[k];return{icon:ty==='w'?wicon(k):k,txt:`${ty==='w'?wname(k):D.name} offered (take or decline)`}}
   const D=ty==='w'?WEAPONS[k]:PASSIVES[k],o=ty==='w'?G.w:G.pas,b=o[k]||0;o[k]=Math.min(ty==='w'?capW(k):D.max,b+bonusLv);if(ty==='p'&&k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}const nm=ty==='w'?wname(k):D.name;return{icon:ty==='w'?wicon(k):k,txt:b?`${nm} Lv ${b} → ${o[k]}`:`${nm} (new) Lv ${o[k]}`}}
- const r=Math.random();if(r<.6||!G.ch){const g=Math.round(25*(1+(bonusLv||1))*(1+G.t/600)*goldMul());G.gold+=g;return{icon:'coin',txt:`+${g} gold`}}if(r<.8){G.ch.reroll=(G.ch.reroll||0)+1;return{icon:'reroll',txt:'+1 Reroll'}}const h=Math.round(G.p.max*.3);G.p.hp=Math.min(G.p.max,G.p.hp+h);return{icon:'food',txt:`Food: +${h} HP`}}  // v23: gold-heavy fallback, no permanent boosts
+ const r=Math.random();if(r<.6||!G.ch){const g=Math.round(15*(1+(bonusLv||1))*(1+Math.min(G.t,900)/900)*goldMul());G.gold+=g;return{icon:'coin',txt:`+${g} gold`}}if(r<.8){G.ch.reroll=(G.ch.reroll||0)+1;return{icon:'reroll',txt:'+1 Reroll'}}const h=Math.round(G.p.max*.3);G.p.hp=Math.min(G.p.max,G.p.hp+h);return{icon:'food',txt:`Food: +${h} HP`}}  // v23: gold-heavy fallback, no permanent boosts
 function applyDrop(t){const r=randUpgrade(TIER_LV[t]);tierExtra(t);G.banner={txt:`${TIERS[t].n} drop! ${r.txt}`,life:2.6,col:TIERS[t].c}}
 const hpMax=()=>Math.round((90+sLvl('Hitpoints')+15*(G.pas.hp||0)+60*mg('ely')+G.bon.hp)*(G.tr?G.tr.hp||1:1));
 const critCh=()=>.05*(G.pas.crit||0)+G.bon.crit,xpMul=()=>(1+.08*(G.pas.xp||0))*(1+G.bon.xp),goldMul=()=>(1+G.bon.greed)*(1+.2*(G.pas.gold||0)),
@@ -885,10 +892,11 @@ const spdMul=()=>(1+.08*(G.pas.spd||0))*(1+G.bon.sp)*(G.tr?G.tr.sp||1:1);
 const magR=()=>70*(1+.3*(G.pas.mag||0))*(1+G.bon.mag);
 const enemyScale=t=>1.2*(1+t/120+Math.pow(t/400,2));
 const midSoft=t=>t<=180||t>=360?1:1-.15*Math.sin(Math.PI*(t-180)/180);  // v27: up to -15% spawn rate & HP around 4:30, back to normal by 6:00
+const backK=t=>t<=540?0:Math.pow(Math.min(1,(t-540)/1260),1.5),backHp=t=>1+.6*backK(t),backDen=t=>1+.6*backK(t);  // v46: smooth back-half pressure from 9:00 (x1.09 @15:00, x1.24 @20:00, x1.6 @30:00), HP and density
 const lateHp=t=>t<=600?1:t<=1200?1+(t-600)/600:Math.min(3,2+(t-1200)/480);  // v23: non-boss HP x1 to 10:00, x2 @20:00, x3 @28:00  // HP ramp keeps pace with weapon growth
 function pop(x,y,txt,col,kind){const o=pops.get();if(o){o.x=x+(Math.random()-.5)*8;o.y=y;o.txt=txt;o.life=kind?.75:1.1;o.col=col||'#fff';o.kind=kind||0}}
 function spawn(t,opt){opt=opt||{};const e=enemies.get();if(!e)return null;const T=ETYPES[t],a=Math.random()*6.283,d=Math.max(W,H)*.62+40;
- const sc=enemyScale(G.t)*lateHp(G.t)*midSoft(G.t);e.x=opt.x??G.p.x+Math.cos(a)*d;e.y=opt.y??G.p.y+Math.sin(a)*d;
+ const sc=enemyScale(G.t)*lateHp(G.t)*midSoft(G.t)*backHp(G.t);e.x=opt.x??G.p.x+Math.cos(a)*d;e.y=opt.y??G.p.y+Math.sin(a)*d;
  if(G.cage&&opt.x==null){const C=G.cage,ca=Math.random()*6.283;e.x=C.x+Math.cos(ca)*(C.R-40);e.y=C.y+Math.sin(ca)*(C.R-40)}e.cin=G.cage?1:null;e.halfSh=0;e.frz=0;e.tgob=0;e.t=t;e.boss=!!opt.boss;e.elite=!!opt.elite;e.prop=!T.sp&&!e.boss;
  e.max=e.hp=e.prop?T.hp:T.hp*(e.boss?(t==='titan'?1.5*(1+G.t/240):Math.min(38,Math.max(3,7.2*G.t/180-5))):sc)*(e.elite?8:1);e.sp=T.sp*(1+Math.min(G.t/600,.5))*(e.elite?.9:1);e.r=T.r*(e.elite?1.35:1);e.dmg=T.dmg*(1+G.t/400)*(e.elite?1.5:1);e.xp=T.xp*(e.elite?10:1);e.hit=0;e.slow=0;e.rt=0;e.bleed=0;e.bdps=0;e.btk=0;e.ph=Math.random()*6;e.champ=0;e.sw=!!opt.sw;if(e.sw){e.max=e.hp=T.hp*.5*(1+G.t/300);e.sp*=1.35;e.r*=.75}if(!e.boss&&!e.elite&&!e.prop&&!opt.nochamp){const r=Math.random();e.champ=r<.002?2:r<.042?1:0}
  if(e.champ){const m=e.champ===2?3:2.5;e.max=e.hp=e.hp*m;e.xp=e.champ===2?e.xp:Math.max(12,e.xp*2);e.r*=1.12}return e}  // champions: yellow (~4%) / orange (~1%) XP tiers
@@ -914,7 +922,7 @@ function kill(e){e.a=false;
  const r=Math.random();if(r<.07)dropItem(e.x,e.y,'coin',1);else if(r<.071875)dropItem(e.x,e.y,'food');else if(r<.0728125)dropItem(e.x,e.y,'magnet');else if(r<.0735938)dropItem(e.x,e.y,'bomb');else if(r<.0742188)dropItem(e.x,e.y,'star');else if(r<.0748438)dropItem(e.x,e.y,'ult')}  // power-ups x0.3125
 function randEnemy(x,y,R){const A=enemies.a;for(let t=0;t<18;t++){const e=A[Math.random()*A.length|0];if(e&&e.a&&!e.prop&&(e.x-x)**2+(e.y-y)**2<R*R)return e}return nearest(x,y,R)}
 function nearest(x,y,maxd,skip){let best=null,bd=maxd*maxd;for(const e of enemies.a){if(!e.a||e.prop||e===skip||(skip&&skip.length&&skip.includes(e)))continue;const d=(e.x-x)**2+(e.y-y)**2;if(d<bd){bd=d;best=e}}return best}
-function fire(x,y,ang,sp,dmg,r,life,pierce,kind,nx){const s=shots.get();if(!s)return;s.x=x;s.y=y;s.vx=Math.cos(ang)*sp;s.vy=Math.sin(ang)*sp;s.dmg=dmg;s.r=r;s.life=life;s.pierce=pierce;s.kind=kind;s.ch=0;s.src=SRC;s.age=0;s.hs=kind==='tbow'||kind==='tum'||kind==='fire'||kind==='knife'||kind==='dbow'||kind==='dart'?[]:null;s.rc=0;s.home=kind==='knife'?(G.evo.knives?11:7):0;s.tg=null;s.rt=0;s.evo=!!G.evo[SRC];
+function fire(x,y,ang,sp,dmg,r,life,pierce,kind,nx){const s=shots.get();if(!s)return;s.x=x;s.y=y;s.vx=Math.cos(ang)*sp;s.vy=Math.sin(ang)*sp;s.dmg=dmg;s.r=r;s.life=life;s.pierce=pierce;s.kind=kind;s.ch=0;s.src=SRC;s.age=0;s.hs=kind==='tbow'||kind==='tum'||kind==='fire'||kind==='knife'||kind==='dbow'||kind==='dart'?[]:null;s.rc=0;s.bn=G.bon.bounce||0;s.home=kind==='knife'?(G.evo.knives?11:7):0;s.tg=null;s.rt=0;s.evo=!!G.evo[SRC];
  if(G.sig.extra&&!nx&&(kind==='knife'||kind==='arrow'||kind==='ball'||kind==='dart'))fire(x,y,ang+.14,sp,dmg,r,life,pierce,kind,true);return s}
 function addFx(x,y,r,life,kind,ang){const f=fx.get();if(f){f.x=x;f.y=y;f.r=r;f.life=f.max=life;f.kind=kind;f.ang=ang||0;f.pts=null;f.tk=0;f.dmg=0}return f}
 function inArc(e,p,R,a,hw){const dx=e.x-p.x,dy=e.y-p.y;if(dx*dx+dy*dy>(R+e.r)**2)return false;return Math.abs(((Math.atan2(dy,dx)-a+9.4248)%6.2832)-3.1416)<(hw||1.1)}
@@ -952,7 +960,8 @@ function wstat0(k,L){const m=k==='wind'||k==='barrage'||k==='fire'||k==='runes'?
  case 'eldritch':return{dmg:60+L*17,cd:Math.max(1.6,2.8-L*.14),area:Math.round((85+L*7)*A),proj:1+(L>=6),pierce:99};
  case 'purging':return{dmg:36+L*9,cd:Math.max(1.4,2.4-L*.12),area:Math.round((130+L*8)*A),proj:0,pierce:99,life:2+L*.5};
  case 'relic':return{dmg:52+L*14,cd:Math.max(1.2,2.2-L*.12),area:Math.round((45+L*3)*A),proj:2+Math.floor(L/3),pierce:99}}}
-const msc=()=>1+G.t/240,mdm=L=>.7*enemyScale(G.t)*(1+.25*(L-1));  // mega dmg tracks the enemy HP ramp, +25%/level
+const msc=()=>1+G.t/240;const MEGA_TP=300,MEGA_EXP=.6;const megaScale=t=>{const b=enemyScale(Math.min(t,MEGA_TP));return t<=MEGA_TP?b:b*Math.pow(enemyScale(t)/b,MEGA_EXP)};  // v46: full ramp to 5:00, softened (^0.6) after
+const mdm=L=>.7*megaScale(G.t)*(1+.25*(L-1));  // mega dmg tracks the enemy HP ramp, +25%/level
 function mstat(k,L){const A=AREA();switch(k){
  case 'tbow':return{dmg:240*mdm(L),cd:Math.max(.5,1.1/L),proj:L,pierce:4+L,area:0};
  case 'shadow':return{dmg:150*mdm(1)*(1+.12*(L-1)),cd:Math.max(1,2.2/L),proj:2+Math.ceil(L/2),pierce:3+L,area:0};
@@ -991,7 +1000,8 @@ function dragonAI(dt,p){const B=G.bossE,on=B&&B.a&&B.boss&&!B.fin&&G.bossT>0;G.t
   else{const n=Math.min(9,3+Math.floor(idx/2)+(half?2:0));for(let i=0;i<n;i++){const a2=Math.random()*6.283,d=i?90+Math.random()*190:0;G.tele.push({x:p.x+Math.cos(a2)*d,y:p.y+Math.sin(a2)*d,r:62,t:tt+.15+i*.08,T:tt+.15+i*.08,dmg:M*.2})}}}
  for(const z of G.tele){z.t-=dt;if(z.t<=0&&!z.done){z.done=1;addFx(z.x,z.y,z.cone||z.lane?80:z.r,.4,'ring');burst(z.x,z.y,'#ff7a1a',z.cone?20:10,220);G.shake=Math.max(G.shake,.3);if(zHit(z,p.x,p.y))hurtP(z.dmg);if(z.tp&&z.tp.a){z.tp.x=z.x+Math.cos(z.a)*z.len*.85;z.tp.y=z.y+Math.sin(z.a)*z.len*.85;burst(z.tp.x,z.tp.y,'#8a6a3a',20,200)}}}G.tele=G.tele.filter(z=>!z.done);
  if(G.fb&&G.fb.length){for(const b of G.fb){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if((p.x-b.x)**2+(p.y-b.y)**2<18*18){b.life=0;hurtP(b.dm||30)}}G.fb=G.fb.filter(b=>b.life>0)}}
-function finalWin(e){const bonus=Math.round(5000*goldMul());G.gold+=bonus;burst(e.x,e.y,'#ff7a1a',60,300);for(let i=0;i<20;i++)dropItem(e.x,e.y,'coin',50);G.fin=0;G.won=true;G.titanRef=null;gameOver(true);
+const fillGold=()=>Math.round((5+Math.min(G.t,900)/90)*goldMul());
+function finalWin(e){const bonus=Math.round(2500*goldMul());G.gold+=bonus;burst(e.x,e.y,'#ff7a1a',60,300);for(let i=0;i<20;i++)dropItem(e.x,e.y,'coin',50);G.fin=0;G.won=true;G.titanRef=null;gameOver(true);
  try{$('overT').textContent='The Ember Titan falls! Victory!';$('newrec').insertAdjacentHTML('afterbegin',`<p style="color:#ffd24a">Titan reward: +${bonus} gold</p>`)}catch(_){}}
 function megaFirst(k,col){if(G.megaSeen[k])return;G.megaSeen[k]=1;G.banner={txt:`${MEGA[k].name} unleashed!`,life:2.4,col,big:1};G.tint={col,life:.6}}
 function drawClassW(p){const w=G.w,now=NOW;ctx.save();
@@ -1135,7 +1145,7 @@ function bigCap(){return Math.round(4+4*Math.min(1,Math.max(0,G.t-180)/1440))}
 function pickT(ty,esc){if(G.t>=180){const ph=phaseAt(G.t),pr=esc?1/40:ph===2?1/12:1/25;if(Math.random()<pr){let n=0;for(const e of enemies.a)if(e.a&&e.t==='skeleton'&&!e.elite)n++;if(n<bigCap())return 'skeleton'}}return ty[Math.random()*ty.length|0]}  // phases rotate every 45s: normal / horde-heavy / brute-heavy; strongest type last (elites)
 function bomb(){SRC='bomb';G.flash=.5;G.shake=.4;const p=G.p;for(const e of enemies.a)if(e.a&&Math.abs(e.x-p.x)<W/2+40&&Math.abs(e.y-p.y)<H/2+40){if(e.boss)hurt(e,e.max*.1/dmgMul());else if(!e.prop)hurt(e,e.hp/dmgMul()+1)}addFx(p.x,p.y,Math.max(W,H),.5,'nova');SRC=''}
 function collect(it){const p=G.p;it.a=false;if(it.bl&&G.brk){G.brk=0;G.brkCd=3}
- if(it.k==='coin'){const v=Math.round(it.v*goldMul()*10)/10;G.gold+=v;pop(p.x,p.y-30,'+'+Math.round(v)+'g','#ffd24a')}
+ if(it.k==='coin'){const v=Math.round(it.v*goldMul()/(1+Math.max(0,G.t-900)/900)*10)/10;G.gold+=v;pop(p.x,p.y-30,'+'+Math.round(v)+'g','#ffd24a')}
  else if(it.k==='shark'){const h=Math.round(p.max*2/3);p.hp=Math.min(p.max,p.hp+h);pop(p.x,p.y-30,'Shark +'+h,'#7dff8a',2);burst(p.x,p.y,'',12,110,GL.green);buzz(15)}
  else if(it.k==='food'){const h=Math.round(p.max*.3);p.hp=Math.min(p.max,p.hp+h);pop(p.x,p.y-30,'+'+h,'#6f6');burst(p.x,p.y,'',8,90,GL.green)}
  else if(it.k==='magnet'){for(const g of gems.a)if(g.a)g.mag=true;for(const o of items.a)if(o.a&&o.k==='coin')o.mag=true;G.banner={txt:'Magnet! XP vacuumed',life:1.6,col:'#ff8a8a'}}
@@ -1156,7 +1166,7 @@ function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();ret
  else if(G.brkCd>0){G.brkCd-=dt;G.banner=G.brkCd>0?{txt:String(Math.ceil(G.brkCd)),life:.4,col:'#ffe28a',big:1,brk:1}:{txt:'Fight!',life:1,col:'#ff8a6a',big:1}}
  const[dx,dy]=inputVec(),sp=p.sp*spdMul()*(G.fleet>0?1.3:1);p.x+=dx*sp*dt;p.y+=dy*sp*dt;if(dx||dy){const l=Math.hypot(dx,dy);p.face=[dx/l,dy/l]}p.moving=!!(dx||dy);
  // waves: ~30 min structure
- if(!calm&&!G.fin&&!bossOn){G.spawnT-=dt;if(G.spawnT<=0){G.spawnT=Math.max(.14,1-G.t/300);const ph=phaseAt(G.t);G.spawnAcc=(G.spawnAcc||0)+(1+G.t/90)*.65*midSoft(G.t)*(G.lull>0?.05:1)*(ph===1?1.25:ph===2&&G.t>=240?.8:1);const n=Math.max(0,Math.floor(G.spawnAcc)),ty=waveTypes(G.t);G.spawnAcc-=n;for(let i=0;i<n;i++)spawn(pickT(ty))}  // ~35% fewer stream spawns
+ if(!calm&&!G.fin&&!bossOn){G.spawnT-=dt;if(G.spawnT<=0){G.spawnT=Math.max(.14,1-G.t/300);const ph=phaseAt(G.t);G.spawnAcc=(G.spawnAcc||0)+(1+G.t/90)*.65*midSoft(G.t)*backDen(G.t)*(G.lull>0?.05:1)*(ph===1?1.25:ph===2&&G.t>=240?.8:1);const n=Math.max(0,Math.floor(G.spawnAcc)),ty=waveTypes(G.t);G.spawnAcc-=n;for(let i=0;i<n;i++)spawn(pickT(ty))}  // ~35% fewer stream spawns
  if(G.t>=G.eliteNext){G.eliteNext+=90;const ty=waveTypes(G.t);spawn(G.t>=180?'skeleton':ty[ty.length-1],{elite:true});G.banner={txt:'An elite approaches!',life:1.8,col:'#ffd24a'}}
  if(G.evNext==null)G.evNext=G.t+60;if(G.t>=G.evNext){G.evNext=G.t+22+Math.random()*28;if(G.t>=45&&Math.abs(G.t-G.swarmNext)>8&&G.t>(G.bossEnd||0)+20&&!(G.lull>0)){spawnEvent();if(G.t>=360&&Math.random()<.2&&!(G.lull>0)){spawnEvent(1);G.banner={txt:'Double trouble!',life:2,col:'#ff6a4a',big:1}}}}  // v29: events every 22-50s, 20% double from 6:00 (never during boss fights/Titan)
  evTick(dt);
@@ -1193,8 +1203,9 @@ function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();ret
   if(s.kind==='chin'){if(s.life<=0){s.a=false;SRC=s.src;const R=s.r;addFx(s.x,s.y,R,.42,'boom');burst(s.x,s.y,'#ffb040',8,R*2.4);burst(s.x,s.y,'',5,R*2,GL.orange);for(const o of enemies.a)if(o.a&&(o.x-s.x)**2+(o.y-s.y)**2<(R+o.r)**2)hurt(o,s.dmg,'Ranged');SRC='';G.shake=Math.max(G.shake,.06)}continue}
   if(s.life<=0){s.a=false;continue}
   for(const e of live){if(!e.a||(s.hs&&s.hs.includes(e)))continue;if((e.x-s.x)**2+(e.y-s.y)**2<(e.r+s.r)**2){if(s.hs)s.hs.push(e);SRC=s.src;hurt(e,s.dmg,s.kind==='wind'||s.kind==='tum'||s.kind==='fire'?'Magic':'Ranged');SRC='';if(s.home)s.tg=null;
-   if(s.kind==='wind'&&G.sig.chain&&!s.ch){const n=nearest(e.x,e.y,220,e);if(n){const q=shots.get();if(q){q.x=e.x;q.y=e.y;const a=Math.atan2(n.y-e.y,n.x-e.x);q.vx=Math.cos(a)*420;q.vy=Math.sin(a)*420;q.dmg=s.dmg*.8;q.r=6;q.life=.8;q.pierce=0;q.kind='wind';q.ch=1;q.src='wind';q.age=0;q.hs=null}}}
+   if(s.kind==='wind'&&G.sig.chain&&!s.ch){const n=nearest(e.x,e.y,220,e);if(n){const q=shots.get();if(q){q.x=e.x;q.y=e.y;const a=Math.atan2(n.y-e.y,n.x-e.x);q.vx=Math.cos(a)*420;q.vy=Math.sin(a)*420;q.dmg=s.dmg*.8;q.r=6;q.life=.8;q.pierce=0;q.kind='wind';q.ch=1;q.src='wind';q.age=0;q.hs=null;q.bn=0}}}
    if(G.sig.rico&&(s.kind==='knife'||s.kind==='dart')&&!s.rc){s.rc=1;const n=nearest(e.x,e.y,240,s.hs||e);if(n){const a=Math.atan2(n.y-e.y,n.x-e.x),v=Math.hypot(s.vx,s.vy);s.vx=Math.cos(a)*v;s.vy=Math.sin(a)*v;s.life=Math.max(s.life,.6);if(s.home)s.tg=n;addFx(e.x,e.y,16,.15,'ring');break}}
+   if(s.bn>0&&s.pierce<=0){s.bn--;const n=nearest(e.x,e.y,260,s.hs||e);if(n){const a=Math.atan2(n.y-e.y,n.x-e.x),v=Math.hypot(s.vx,s.vy)||400;s.vx=Math.cos(a)*v;s.vy=Math.sin(a)*v;s.dmg*=.7;s.x+=s.vx*.03;s.y+=s.vy*.03;s.life=Math.max(s.life,.6);if(s.home)s.tg=n;addFx(e.x,e.y,14,.15,'ring');break}}
    if(s.pierce--<=0){s.a=false;break}}}}
  const mag=magR();
  for(const g of gems.a){if(!g.a)continue;const x=p.x-g.x,y=p.y-g.y,d=Math.hypot(x,y)||1;if(g.mag||d<mag){const v=g.mag?650:420;g.x+=x/d*v*dt;g.y+=y/d*v*dt}if(d<16){g.a=false;gainXp(g.tier===2?orangeXp(G.lvl):g.v)}}
@@ -1353,7 +1364,7 @@ function hud(now){const p=G.p,T=SAT+8,small=W<520;
  // top bar: level badge, HP, XP
  const bw=Math.min(W-84,520),bx=Math.max(12,Math.min((W-bw)/2,W-72-bw));panel(bx,T,bw,50,12);
  ctx.save();ctx.beginPath();ctx.arc(bx+26,T+25,17,0,6.283);const q=ctx.createRadialGradient(bx+20,T+18,2,bx+26,T+25,17);q.addColorStop(0,'#ffe28a');q.addColorStop(1,'#a8700a');ctx.fillStyle=q;ctx.fill();ctx.strokeStyle='#0b0806';ctx.lineWidth=2;ctx.stroke();ctx.restore();txt(''+G.lvl,bx+26,T+31,'#fff',G.lvl>99?12:16,'center',900);
- bar(bx+50,T+8,bw-60-(small?0:0),15,p.hp/p.max,'#ff6a5a','#9a1a12',`${Math.ceil(p.hp)} / ${p.max}`);
+ bar(bx+50,T+8,bw-60-(small?0:0),15,p.hp/p.max,'#ff6a5a','#9a1a12',`${Math.max(0,Math.ceil(p.hp))} / ${Math.round(p.max)}`);
  bar(bx+50,T+28,bw-60,13,G.xp/G.next,'#6ad0ff','#1a5aa8','');
  txt(fmtT(G.t),W/2,T+72,'#fff',small?18:20,'center',900);txt('☠ '+G.kills,bx+bw-6,T+70,'#e8dcc0',13,'right');txt('● '+Math.floor(G.gold),bx+6,T+70,'#ffd24a',13,'left');
  // slots panel
@@ -1406,7 +1417,7 @@ const NCH=4;function rollCards(forced){const opts=[];
  const needP=new Set(Object.keys(G.w).filter(w=>EVO[w]&&!G.evo[w]).map(w=>EVO[w].p));for(const k in PASSIVES){if(BN.includes(k))continue;const L=G.pas[k]||0;if(L&&L<PASSIVES[k].max)opts.push({k,type:'p',L,wt:3});else if(!L&&nP<G.ps&&newP.includes(k))opts.push({k,type:'p',L,wt:needP.has(k)?pw*2:pw})}  // equal passive weight; 2x for a missing evo passive
  for(const k in G.mega)if(mg(k)<MEGA_MAX)opts.push({k,type:'m',L:mg(k),wt:2});
  const owned=new Set(Object.keys(G.w).map(k=>WSKILL[k]));owned.add('Hitpoints');
- for(const k of SKILLS){const L=sLvl(k);if(L<99)opts.push({k,type:'s',L,wt:owned.has(k)?1.5:.4})}
+ for(const k of SKILLS){const L=sLvl(k);if(L<skCap(k))opts.push({k,type:'s',L,wt:owned.has(k)?1.5:.4})}
  const pick=[],drawW=L=>{while(pick.length<NCH&&L.length){let tot=L.reduce((a,o)=>a+o.wt,0),r=Math.random()*tot,i=0;for(;i<L.length-1;i++){r-=L[i].wt;if(r<=0)break}const o=L.splice(i,1)[0];if(o.wt>0)pick.push(o)}};
  {const so=opts.filter(o=>o.type==='s'),mo=opts.filter(o=>o.type!=='s');drawW(mo);if(pick.length<NCH)drawW(so);else if(so.length&&Math.random()<.05){pick.pop();drawW(so)}}  // skill boosts only fill empty slots (+5% for one slot)
  if(G.lvl>=10&&megaRoll(MEGA_RATES.card))for(let i=0;i<pick.length;i++){if(i<pick.length-1&&Math.random()<.6)continue;const k=pickMega();pick[i]={k,type:'m',L:mg(k)};break}
@@ -1414,20 +1425,20 @@ const NCH=4;function rollCards(forced){const opts=[];
  {const ek=evoCandidate();if(ek&&Math.random()<.06){let i=pick.length-1;while(i>0&&pick[i].type==='m')i--;if(pick[i]&&pick[i].type!=='m')pick[i]={k:ek,type:'evo',tier:3}}}  // ~6% evolve card when a weapon is eligible
  if(forced&&forced.length){pick.length=0;forced.forEach(o=>pick.push(Object.assign({},o)))}
  const box=$('choices');box.innerHTML='';box.className='';$('slotinfo').innerHTML=slotsHtml();
- if(!pick.length)pick.push({k:'heal',type:'heal'});
+ if(pick.length<Math.min(3,NCH)){const fl=[{k:'gold',type:'gold'},{k:'heal',type:'heal'},{k:'rr',type:'rr'}].filter(o=>!pick.some(q=>q.type===o.type));while(pick.length<Math.min(3,NCH)&&fl.length)pick.push(fl.shift())}
  for(const o of pick){const b=document.createElement('button');const D=o.type==='w'?WEAPONS[o.k]:o.type==='p'?PASSIVES[o.k]:o.type==='m'?MEGA[o.k]:null;
-  if(o.tier==null)o.tier=o.type==='m'?4:o.type==='heal'?0:o.el?Math.max(2,rollTier()):rollTier();const TT=TIERS[o.tier];b.className='card'+(o.tier===4?' mega':'')+(o.el?' elite':'')+(o.type==='evo'?' evo':'');if(o.type==='evo')b.style.boxShadow='0 0 0 2px #ffd24a,0 0 22px rgba(255,200,60,.75)';b.dataset.type=o.type;b.dataset.k=o.k;b.style.setProperty('--tc',TRGB[o.tier]);b.style.setProperty('--tg',o.tier*7);
-  const SG=o.type==='s'?Math.min(99,o.L+SKGAIN[o.tier]):0,mx=D&&D.max?D.max:99,NL=o.type==='w'||o.type==='p'?Math.min(mx,o.L+TIER_LV[o.tier]):0,EX='',RB=o.type==='w'||o.type==='p'||o.type==='s'?[o.type==='s'?`+${SKGAIN[o.tier]} level${SKGAIN[o.tier]>1?'s':''}`:`+${TIER_LV[o.tier]} level${TIER_LV[o.tier]>1?'s':''}`,TIER_BONUS[o.tier]].filter(Boolean).join(' · '):'',RBH=RB?`<em class="rb" style="color:${TT.c}">${RB}</em>`:'';
+  if(o.tier==null)o.tier=o.type==='m'?4:o.type==='heal'||o.type==='gold'||o.type==='rr'?0:o.el?Math.max(2,rollTier()):rollTier();const TT=TIERS[o.tier];b.className='card'+(o.tier===4?' mega':'')+(o.el?' elite':'')+(o.type==='evo'?' evo':'');if(o.type==='evo')b.style.boxShadow='0 0 0 2px #ffd24a,0 0 22px rgba(255,200,60,.75)';b.dataset.type=o.type;b.dataset.k=o.k;b.style.setProperty('--tc',TRGB[o.tier]);b.style.setProperty('--tg',o.tier*7);
+  const SG=o.type==='s'?Math.min(skCap(o.k),o.L+SKGAIN[o.tier]):0,mx=D&&D.max?D.max:99,NL=o.type==='w'||o.type==='p'?Math.min(mx,o.L+TIER_LV[o.tier]):0,EX='',RB=o.type==='w'||o.type==='p'||o.type==='s'?[o.type==='s'?`+${SKGAIN[o.tier]} level${SKGAIN[o.tier]>1?'s':''}`:`+${TIER_LV[o.tier]} level${TIER_LV[o.tier]>1?'s':''}`,TIER_BONUS[o.tier]].filter(Boolean).join(' · '):'',RBH=RB?`<em class="rb" style="color:${TT.c}">${RB}</em>`:'';
   let pj='';if(o.type==='w'&&PROJW[o.k]){const d=wstat(o.k,NL).proj-(o.L?wstat(o.k,o.L).proj:0);if(o.L&&d>0)pj=`<em class="pj">+${d} projectile${d>1?'s':''}</em>`}
   const ev=evoHint(o.type,o.k,NL),EV=ev?`<span class="ev">${ev}</span>`:'',nm=o.type==='w'?(o.el?'<em class="elb">★ ELITE</em> ':'')+(WEAPONS[o.k].cls?`<em class="elb" style="background:${CTR[WEAPONS[o.k].cls].skill.col};color:#1a1008">${CLASSES[WEAPONS[o.k].cls].name.toUpperCase()}</em> `:'')+wname(o.k):D&&D.name;
-  const body=o.type==='evo'?`<span style="color:#ffe07a">★ Evolve: ${WEAPONS[o.k].name}</span><br><span class="lvl">→ ${EVO[o.k].name}</span><small>Evolve your maxed weapon now</small>`:o.type==='m'?`<span style="color:#ffcf6a">${D.name}</span><br><span class="lvl">${o.L?'Lv '+o.L+' → '+Math.min(MEGA_MAX,o.L+1):'BONUS +1 SLOT'}</span><small>${o.L?mUp(o.k,o.L):D.desc}</small>`:o.type==='heal'?'Shark<small>Heal 50 HP</small>':
+  const body=o.type==='evo'?`<span style="color:#ffe07a">★ Evolve: ${WEAPONS[o.k].name}</span><br><span class="lvl">→ ${EVO[o.k].name}</span><small>Evolve your maxed weapon now</small>`:o.type==='m'?`<span style="color:#ffcf6a">${D.name}</span><br><span class="lvl">${o.L?'Lv '+o.L+' → '+Math.min(MEGA_MAX,o.L+1):'BONUS +1 SLOT'}</span><small>${o.L?mUp(o.k,o.L):D.desc}</small>`:o.type==='heal'?'Shark<small>Heal 50 HP</small>':o.type==='gold'?`Coin pouch<small>+${fillGold()} gold</small>`:o.type==='rr'?'Lucky dice<small>+1 reroll this run</small>':
    o.type==='s'?`<span style="color:${SKCOL[o.k]}">${o.k}</span><br><span class="lvl">Lv ${o.L} → ${SG}</span>${RBH}<small>${SKTIP[o.k]}</small>`:
    o.L?`${nm}<br><span class="lvl">Lv ${o.L} → ${NL}${NL>=mx?' · MAX':''}</span>${RBH}${pj}<small>${o.type==='w'?upTxt(o.k,o.L,NL,!!pj):PASFX[o.k](NL)}</small>${EV}`:
    `${nm}<br><span class="lvl" style="color:#7dff8a">NEW · Lv ${NL}</span>${RBH}<small>${D.desc}${o.type==='w'?`<br>${WSKILL[o.k]}${PROJW[o.k]?' · +1 projectile every 3 levels':''}`:''}</small>${EV}`;
   b.title=(o.type==='w'?wname(o.k):(D&&D.name)||'')+' — '+(D?D.desc:'');
   b.innerHTML=`<img src="${ICONURL[o.type==='w'?wicon(o.k):o.type==='evo'?'evo_'+o.k:o.k]}" alt=""><span class="t">${body}</span><span class="gem"><i></i>${TT.n}</span>`;
   b.onclick=()=>{if(G.banMode){if(o.type!=='w'&&o.type!=='p'){b.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:200});return}G.banned.push(o.k);G.ch.banish--;G.banMode=false;buzz(20);rollCards();return}
-   if(o.type!=='m'&&o.type!=='heal'&&o.type!=='evo')tierExtra(o.tier);if(o.type==='evo'){if(!G.evo[o.k])evolve(o.k)}else if(o.type==='m')grantMega(o.k);else if(o.type==='s'){const need=XPT[SG]-SK[o.k];if(need>0)addSkillXp(o.k,need);saveSkills()}else if(o.type==='w')G.w[o.k]=NL;else if(o.type==='p'){G.pas[o.k]=NL;if(o.k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}}else G.p.hp=Math.min(G.p.max,G.p.hp+50);
+   if(o.type!=='m'&&o.type!=='heal'&&o.type!=='evo')tierExtra(o.tier);if(o.type==='evo'){if(!G.evo[o.k])evolve(o.k)}else if(o.type==='m')grantMega(o.k);else if(o.type==='s'){const need=XPT[SG]-SK[o.k];if(need>0)addSkillXp(o.k,need);saveSkills()}else if(o.type==='gold'){G.gold+=fillGold()}else if(o.type==='rr'){G.ch.reroll=(G.ch.reroll||0)+1}else if(o.type==='w')G.w[o.k]=NL;else if(o.type==='p'){G.pas[o.k]=NL;if(o.k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}}else G.p.hp=Math.min(G.p.max,G.p.hp+50);
    closeLvl()};box.appendChild(b)}
  G.curCards=pick.map(o=>({k:o.k,type:o.type,L:o.L,tier:o.tier,el:o.el}));
  const T=$('lvtools'),C=G.ch;T.innerHTML='';const tb=(id,ic,lab,n,fn)=>{const b=document.createElement('button');b.id=id;b.innerHTML=`<img src="${ICONURL[ic]}" alt="">${lab} <b>${n}</b>`;b.disabled=n<=0;b.onclick=fn;T.appendChild(b);return b};
@@ -1530,7 +1541,7 @@ function start(){newGame();if(bustOn()){bustedBuild()}else G.pots=Object.keys(ME
  if(G.sig.head)setTimeout(()=>{if(G&&!G.over&&!G.paused&&!G.menu)levelUp()},500)}
 // ---------- pause / save ----------
 const SAVE_KEY='oss_run';
-const SAVE_FIELDS=['bossKills','might','dmg','first','megaSeen','cls','t','kills','lvl','xp','next','gold','w','pas','mega','cd','spawnT','bossNext','eliteNext','swarmNext','propT','megaGuar','megaDrops','xpTot','revived','runXp','loot','evo','ch','banned','revLeft','gchests','chests','sb','achRun','lchests','ws','ps','megaSeen','sharkUsed','brk','brkCd','megaN','lastEvo','pots','swPend','seed','evNext','cage','bossEnd','csk','feed','feedG','surge','lull'];
+const SAVE_FIELDS=['skBase','bossKills','might','dmg','first','megaSeen','cls','t','kills','lvl','xp','next','gold','w','pas','mega','cd','spawnT','bossNext','eliteNext','swarmNext','propT','megaGuar','megaDrops','xpTot','revived','runXp','loot','evo','ch','banned','revLeft','gchests','chests','sb','achRun','lchests','ws','ps','megaSeen','sharkUsed','brk','brkCd','megaN','lastEvo','pots','swPend','seed','evNext','cage','bossEnd','csk','feed','feedG','surge','lull'];
 function saveRun(auto){if(!running||!G||G.over||G.menu)return false;const o={v:1,at:Date.now(),auto:auto?1:0};
  const vis=id=>$(id).style.display==='flex';o.pendLvl=vis('lvl')&&G.curCards?JSON.parse(JSON.stringify(G.curCards)):null;o.offerQ=JSON.parse(JSON.stringify((G.curOffer&&vis('offer')?[G.curOffer]:[]).concat(G.offerQ||[])));SAVE_FIELDS.forEach(k=>{if(G[k]!==undefined)o[k]=JSON.parse(JSON.stringify(G[k]))});
  o.p={x:G.p.x,y:G.p.y,hp:G.p.hp,face:G.p.face,star:Math.max(0,G.p.star)};o.cannons=G.cannons.map(c=>({x:c.x,y:c.y,life:c.life}));saveSkills();LS.set(SAVE_KEY,o);return true}
@@ -1545,7 +1556,7 @@ function continueRun(){const r=hasRun();if(!r)return start();META.cls=r.cls;save
  G.cannons=(r.cannons||[]).map(c=>({x:c.x,y:c.y,life:c.life,ft:0,ang:0,fl:-9}));clearRun();
  ['menu','over','lvl','chest','shop','pause'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';setTimeout(updPotHud,0);G.banner={txt:'Run restored · '+fmtT(G.t),life:2,col:'#ffcf6a'};
  G.offerQ=Array.isArray(r.offerQ)?r.offerQ.filter(o=>o&&(o.ty==='w'?WEAPONS[o.k]:PASSIVES[o.k])):[];G.hold=false;
- if(Array.isArray(r.pendLvl)&&r.pendLvl.length){const ok=r.pendLvl.filter(o=>o&&(o.type==='heal'||o.type==='s'||(o.type==='w'?WEAPONS[o.k]:o.type==='p'?PASSIVES[o.k]:MEGA[o.k])));G.paused=true;G.banMode=false;rollCards(ok);show('lvl',1)}else if(G.xp>=G.next)gainXp(0)}
+ if(Array.isArray(r.pendLvl)&&r.pendLvl.length){const ok=r.pendLvl.filter(o=>o&&(o.type==='heal'||o.type==='gold'||o.type==='rr'||o.type==='s'||(o.type==='w'?WEAPONS[o.k]:o.type==='p'?PASSIVES[o.k]:MEGA[o.k])));G.paused=true;G.banMode=false;rollCards(ok);show('lvl',1)}else if(G.xp>=G.next)gainXp(0)}
 function pauseGame(){if(!running||!G||G.over)return;G.hold=true;$('quitConfirm').style.display='none';['quitBtn','saveQuitBtn','resumeBtn'].forEach(id=>$(id).style.display='block');
  $('pstats').innerHTML=`<div>Time<b>${fmtT(G.t)}</b></div><div>Level<b>${G.lvl}</b></div><div>Kills<b>${G.kills}</b></div>`;$('pslots').innerHTML=slotsHtml();show('pause',1)}
 function resumeGame(){show('pause',0);if(G){G.hold=false;last=performance.now()}}
@@ -1610,7 +1621,7 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=45;
+const VERSION=46;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
  b64e(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)},
  b64d(b){const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(_){return bin}},
