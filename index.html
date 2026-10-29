@@ -745,8 +745,8 @@ const MEGA={tbow:{name:'Twisted bow',sk:'Ranged',desc:'Fires huge piercing arrow
  obl:{name:'Obligator',sk:'Prayer',desc:'Hurls a spiked flail on a chain into the biggest crowd: obliterating crater, drags foes in, aftershocks · ALL Prayer x2 per stack'}};
 // v28 class identity: traits (pro + con) and one tappable class skill each
 const CTR={
- warrior:{mods:{dr:.8,sp:.93,dmg:1.25,cdm:1/1.09},skill:{n:'Earthshaker',ic:'scim',cd:20,col:'#ff9a5a'},
-  traits:[['Heavy plate','Take 20% less damage','Move 7% slower'],['Brute force','+25% damage on everything','Weapons attack 9% slower']],
+ warrior:{mods:{dr:.76,sp:.93,dmg:1.35,cdm:1/1.04},skill:{n:'Earthshaker',ic:'scim',cd:20,col:'#ff9a5a'},
+  traits:[['Heavy plate','Take 24% less damage','Move 7% slower'],['Brute force','+35% damage on everything; on the move, up to +15% more and slow healing','Weapons attack 4% slower']],
   sd:'Slam the ground: 45 Attack dmg (scales with time) to every foe within 6 m, knocks them back 3.5 m, then take 50% less damage for 3s. 20s cooldown.'},
  ranger:{mods:{sp:1.2,cdm:1.15,hp:.85,dr:1.09},skill:{n:'Dash Volley',ic:'knives',cd:10,col:'#9fe07a'},
   traits:[['Fleet-footed','+20% move speed','—'],['Quick draw','Weapons attack 15% faster','—'],['Glass frame','—','-15% max HP and take 9% more damage']],
@@ -759,9 +759,9 @@ const CTR={
   sd:'Consecrate a 4 m holy zone for 6s: you heal 5% max HP/s inside it, foes inside are slowed and take 12 Prayer dmg every 0.5s (scales with time). 24s cooldown.'}};
 const clsSkLv=()=>{const L=clsInfo(G.cls).L;return{dm:1+.04*(L-1),cd:Math.max(.8,1-.01*(L-1))}};  // class level: +4% skill dmg and -1% cooldown per level (max -20%)
 const stillK=()=>Math.min(1,(G.still||0)/3);
-const trDmg=()=>{const T=G&&G.tr;if(!T)return 1;let m=T.dmg||1;if(T.still)m*=G.p.moving?.91:1+.6*stillK();return m};
+const trDmg=()=>{const T=G&&G.tr;if(!T)return 1;let m=T.dmg||1;if(G.cls==='warrior')m*=1+.15*actK();if(T.still)m*=G.p.moving?.91:1+.6*stillK();return m};
 const CLASSES={
- warrior:{name:'Warrior',tag:'Melee bruiser',start:'scim',base:{hp:30,dr:.15},sk:'Attack',blurb:'Starts with Rune scimitar · +30 HP · 15% damage reduction',
+ warrior:{name:'Warrior',tag:'Melee bruiser',start:'scim',base:{hp:45,dr:.15},sk:'Attack',blurb:'Starts with Rune scimitar · +45 HP · 15% damage reduction',
   perks:[[1,'Tough: +10 max HP',{hp:10}],[3,'+1 skip per run',{skip:1}],[4,'Iron skin: take 5% less damage',{dr:.05}],[6,'Battle-hardened: +5% damage',{dmg:.05}],[7,'Quick learner: +10% XP',{xp:.1}],[9,'Armed: your starting weapon begins at Lv 2',{sig:'slv2'}],[2,'Rampage: every 5th melee swing hits twice as hard and 30% wider',{sig:'rampage'}],[5,'Bleed: Attack hits make foes bleed for +30% extra damage over 2s',{sig:'bleed'}],[10,'Cleave: 15% crits deal x2 and cleave nearby foes',{sig:'cleave'}],[15,'Second wind: below 35% HP you deal +30% damage and take 20% less',{sig:'wind2'}],[20,'War chest: start every run with a free Dragon halberd',{fw:'halberd:1'}],[8,'+1 reroll per run',{reroll:1}],[12,'Arms master: +5% damage',{dmg:.05}],[18,'+1 banish per run',{banish:1}],[22,'Head start: begin every run with a free upgrade pick',{sig:'head'}],[25,'+1 passive slot',{pslot:1}],[30,'Juggernaut: +20% damage, -5% damage taken',{dmg:.2,dr:.05}]]},
  ranger:{name:'Ranger',tag:'Swift skirmisher',start:'knives',base:{sp:.12,mag:.1},sk:'Ranged',blurb:'Starts with Bronze knives · +12% speed · +10% pickup range',
   perks:[[1,'Light feet: +5% move speed',{sp:.05}],[3,'+1 skip per run',{skip:1}],[4,'Keen eye: +25% pickup range',{mag:.25}],[6,'Deadeye: +5% crit chance',{crit:.05}],[7,'Quick learner: +10% XP',{xp:.1}],[9,'Armed: your starting weapon begins at Lv 2',{sig:'slv2'}],[2,'Ricochet: knives and darts bounce once to a second foe',{sig:'rico'}],[5,"Hunter's mark: elites and bosses take +25% damage",{sig:'mark'}],[10,'Volley: +1 projectile on every ranged shot',{sig:'extra'}],[15,'Fleet foot: every kill gives a quick burst of speed',{sig:'fleet'}],[20,'Quiver: start every run with Dragon darts at Lv 2',{fw:'darts:2'}],[8,'+1 reroll per run',{reroll:1}],[12,'Arms master: +5% damage',{dmg:.05}],[18,'+1 banish per run',{banish:1}],[22,'Head start: begin every run with a free upgrade pick',{sig:'head'}],[25,'+1 passive slot',{pslot:1}],[30,'Hail: +1 projectile on all projectile weapons',{proj:1}]]},
@@ -962,7 +962,9 @@ const STARTERS={scim:1,knives:1,wind:1,prayer:1};
 const CPOOL={warrior:['scim','halberd'],ranger:['knives','cannon','darts','chin'],mage:['wind','barrage','fire','runes'],cleric:['prayer','smite']};
 const classPool=c=>Object.keys(WEAPONS).filter(k=>!WEAPONS[k].elite&&(WEAPONS[k].cls===c||(!WEAPONS[k].cls&&(CPOOL[c]||[]).includes(k)))&&avail(WEAPONS[k]));
 function wstat(k,L){const st=STARTERS[k],S=wstat0(k,L);if(L>8&&!st)S.dmg=wstat0(k,8+(L-8)*.5).dmg;if(st){S.dmg*=1.1+.05*L;if(k==='wind')S.pierce=Math.max(S.pierce,Math.floor(L/6))}if(WEAPONS[k]&&WEAPONS[k].elite)S.dmg*=(EMUL[k]||.75);  // v23: Lv9-12 dmg gains halved
- if(PROJW[k]&&G.bon.proj)S.proj+=G.bon.proj;if(PROJW[k]&&G.tr&&G.tr.proj)S.proj+=G.tr.proj;if(G.evo&&G.evo[k]){S.dmg*=1.25;S.cd*=.92;if(PROJW[k])S.proj+=1;if(S.area)S.area=Math.round(S.area*1.1);if(S.pierce<99)S.pierce+=2;S.evo=1}return S}
+ if(PROJW[k]&&G.bon.proj)S.proj+=G.bon.proj;if(PROJW[k]&&G.tr&&G.tr.proj)S.proj+=G.tr.proj;if(G.evo&&G.evo[k]){S.dmg*=1.25;S.cd*=.92;if(PROJW[k])S.proj+=1;if(S.area)S.area=Math.round(S.area*1.1);if(S.pierce<99)S.pierce+=2;S.evo=1}if(G.cls==='warrior'&&WARW[k]){S.dmg*=(WAR_D+WAR_DA*actK())*(1+WAR_LATE*easeK(G.t));if(S.area)S.area=Math.round(S.area*WAR_A)}return S}
+// v54: Warrior melee kit hits harder and wider when played as Warrior
+const WARW={scim:1,halberd:1,axes:1,quake:1,godsword:1,bulwark:1,whip:1},WAR_D=1.2,WAR_DA=.6,WAR_A=1.25,WAR_RG=.012,WAR_LATE=.6;
 function wstat0(k,L){const m=k==='wind'||k==='barrage'||k==='fire'||k==='runes'?mg('shadow'):k==='knives'||k==='cannon'||k==='darts'||k==='chin'?mg('tbow'):k==='scim'||k==='halberd'?mg('scythe'):0,A=AREA(),D=durMul();switch(k){
  case 'axes':return{dmg:8+L*2,cd:.35,proj:1+pb(L),area:Math.round((62+L*3)*A),pierce:99,sp:3.2+L*.12};
  case 'quake':return{dmg:16+L*4,cd:Math.max(1.6,3.2-L*.12),area:Math.round((95+L*7)*A),proj:0,pierce:99};
@@ -1172,7 +1174,7 @@ function evTick(dt){const p=G.p;if(G.surge>0){G.surge-=dt;G.surA=(G.surA||0)+dt*
   if(e.fsp==null){e.fsp=G.p.sp*.75;e.sp=.01;e.stT=2}e.stT-=dt;if(e.stT<=0){e.stun=.55+Math.random()*.35;e.stT=2+Math.random()*2.2;pop(e.x,e.y-22,Math.random()<.5?'Oof!':'*trips*','#ffd24a')}
   if(e.stun>0)e.stun-=dt;else{const v=e.fsp*(d>480?.6:1),wb=Math.sin(G.t*3+e.x*.01)*.35;e.x+=(dx/d-dy/d*wb)*v*dt;e.y+=(dy/d+dx/d*wb)*v*dt}if(Math.random()<dt*6)burst(e.x,e.y,'#ffd24a',1,40);if(e.tgob<=0){e.a=false;burst(e.x,e.y,'#ffd24a',10,90);G.banner={txt:'The treasure goblin escaped!',life:1.6,col:'#c8b07a'}}}}  // v26: event spawns replace ~60% of stream spawns so density stays about the same
 function sdmg(b){return b*enemyScale(G.t)*lateHp(G.t)*midSoft(G.t)*clsSkLv().dm}
-function classTick(dt,p,calm){if(!G.tr)G.tr=Object.assign({},(CTR[G.cls]||{}).mods||{});if(p.moving)G.still=0;else G.still=(G.still||0)+dt;G.act=(G.act??1)+((p.moving?1:0)-(G.act??1))*Math.min(1,dt/30);if(G.guard>0)G.guard-=dt;if(!calm&&G.csk>0)G.csk-=dt;if(G.ultT>0){G.ultT-=dt;if(G.csk>.3)G.csk=.3}
+function classTick(dt,p,calm){if(!G.tr)G.tr=Object.assign({},(CTR[G.cls]||{}).mods||{});if(p.moving)G.still=0;else G.still=(G.still||0)+dt;G.act=(G.act??1)+((p.moving?1:0)-(G.act??1))*Math.min(1,dt/30);if(G.cls==='warrior'&&p.hp>0&&p.hp<p.max)p.hp=Math.min(p.max,p.hp+p.max*WAR_RG*actK()*dt);if(G.guard>0)G.guard-=dt;if(!calm&&G.csk>0)G.csk-=dt;if(G.ultT>0){G.ultT-=dt;if(G.csk>.3)G.csk=.3}
  for(const v of G.vfx||[])v.t-=dt;if(G.vfx)G.vfx=G.vfx.filter(v=>v.t>0);
  const Z=G.sanct;if(Z){Z.t-=dt;Z.tk-=dt;if((p.x-Z.x)**2+(p.y-Z.y)**2<Z.r*Z.r)p.hp=Math.min(p.max,p.hp+p.max*.05*dt);for(const e of enemies.a)if(e.a&&!e.prop&&(e.x-Z.x)**2+(e.y-Z.y)**2<(Z.r+e.r)**2){e.slow=Math.max(e.slow,.3);if(Z.tk<=0)hurt(e,Z.d,'Prayer',true)}if(Z.tk<=0)Z.tk=.5;if(Z.t<=0)G.sanct=null}}
 function castClass(){if(!running||!G||G.over||G.paused||G.hold||G.menu||(G.csk||0)>0)return;const C=CTR[G.cls];if(!C)return;const p=G.p,K=clsSkLv();G.csk=C.skill.cd*K.cd;buzz([20,20,40]);
@@ -1674,7 +1676,7 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=53;
+const VERSION=54;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
  b64e(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)},
  b64d(b){const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(_){return bin}},
