@@ -851,10 +851,10 @@ function newGame(){const{b,sig,sb}=computeBonus();
   evo:{},ch:{reroll:3+b.reroll,skip:b.skip,banish:b.banish},banned:[],revLeft:b.rev,ws:4,ps:4+b.pslot,gchests:0,chests:0,sb,toastQ:[],toast:null,runeOn:0,runeA:0,achT:1};
  G.tr=Object.assign({},(CTR[G.cls]||{}).mods||{});G.csk=0;G.still=0;G.guard=0;G.sanct=null;G.vfx=[];
  const st=CLASSES[META.cls].start;G.w[st]=sb==='veteran'?3:G.sig.slv2?2:1;
- if(sb==='armed'){const ks=Object.keys(WEAPONS).filter(k=>k!==st&&!WEAPONS[k].elite&&avail(WEAPONS[k]));G.w[ks[Math.random()*ks.length|0]]=1}
+ if(sb==='armed'){const ks=classPool(G.cls).filter(k=>!G.w[k]);if(ks.length)G.w[ks[Math.random()*ks.length|0]]=1}
  {const sk=SKINS.find(x=>x.id===META.skin[META.cls]);G.pspr=sk&&skinOk(META.cls,sk)?skinFor(META.cls,sk.id):PLAYER[META.cls]}
  if(G.sig.fw){const[k,l]=G.sig.fw.split(':');if(WEAPONS[k]&&!G.w[k])G.w[k]=+l||1}
- if(G.sig.arsenal){const csk=CLASSES[G.cls].sk;let ks=Object.keys(WEAPONS).filter(k=>!G.w[k]&&!WEAPONS[k].elite&&avail(WEAPONS[k])&&WSKILL[k]===csk);if(ks.length)G.w[ks[Math.random()*ks.length|0]]=1}
+ if(G.sig.arsenal){let ks=classPool(G.cls).filter(k=>!G.w[k]);if(ks.length)G.w[ks[Math.random()*ks.length|0]]=1}
  for(let bi=(G.sig.blessed?1:0)+(G.sig.blessed2?1:0);bi>0;bi--){const ks=Object.keys(PASSIVES).filter(k=>!G.pas[k]&&avail(PASSIVES[k]));if(ks.length)G.pas[ks[Math.random()*ks.length|0]]=2}
  G.pots=[];
  [enemies,shots,gems,items,pops,parts,fx].forEach(p=>p.clear());G.p.max=G.p.hp=hpMax()}
@@ -955,7 +955,13 @@ function inArc(e,p,R,a,hw){const dx=e.x-p.x,dy=e.y-p.y;if(dx*dx+dy*dy>(R+e.r)**2
 const EMUL={godsword:.4,venator:.45,dbow:.3,sang:1.1,eldritch:.33,purging:1.4,relic:.14,whip:1};  // v48: elites benchmarked to Sang staff (±15%, AoE vs single-target role)  // per-elite dmg mult (12-min boss TTK 40-60s)
 // v48: class starters scale harder (x1.1 +5%/Lv, no Lv9+ halving; Wind Strike pierces 1 per 5 Lv)
 const STARTERS={scim:1,knives:1,wind:1,prayer:1};
-function wstat(k,L){const st=STARTERS[k],S=wstat0(k,L);if(L>8&&!st)S.dmg=wstat0(k,8+(L-8)*.5).dmg;if(st){S.dmg*=1.1+.05*L;if(k==='wind')S.pierce=Math.max(S.pierce,Math.floor(L/6))}if(WEAPONS[k]&&WEAPONS[k].elite)S.dmg*=(EMUL[k]||.75);  // v23: Lv9-12 dmg gains halved
+// v49: explicit class weapon pools for 2nd starting weapon (Armed bonus / Arsenal perk); never by skill
+const CPOOL={warrior:['scim','halberd'],ranger:['knives','cannon','darts','chin'],mage:['wind','barrage','fire','runes'],cleric:['prayer','smite']};
+const classPool=c=>Object.keys(WEAPONS).filter(k=>!WEAPONS[k].elite&&(WEAPONS[k].cls===c||(!WEAPONS[k].cls&&(CPOOL[c]||[]).includes(k)))&&avail(WEAPONS[k]));
+// v49: regular weapons normalized to one dps curve (ST x AoE geometric mean, measured); [Lv1,Lv6,Lv12] multipliers, log-interpolated
+const WNORM={wind:[1.136,1.213,0.914],knives:[1.988,0.82,0.424],scim:[1.509,1.416,1.53],cannon:[0.808,0.994,1.564],prayer:[0.839,0.896,0.824],barrage:[0.868,1.07,1.786],darts:[2.026,1.284,1.245],fire:[0.879,0.84,0.838],runes:[3.858,5.52,12.231],chin:[1.512,1.05,1.05],halberd:[1.935,2.963,2.545],smite:[0.988,0.494,0.415],axes:[4.946,2.31,4.335],quake:[1.69,3.044,2.548],chakram:[2.652,1.387,0.991],falcon:[0.759,0.7,0.759],chainl:[0.799,1.241,1.071],vortex:[1.561,2.491,2.427],pillar:[0.349,0.27,0.21],totem:[0.684,0.935,0.949]};
+const wnorm=(k,L)=>{const n=WNORM[k];if(!n)return 1;const l=Math.max(1,Math.min(12,L)),[a,b,t]=l<=6?[n[0],n[1],(l-1)/5]:[n[1],n[2],(l-6)/6];return Math.exp(Math.log(a)*(1-t)+Math.log(b)*t)};
+function wstat(k,L){const st=STARTERS[k],S=wstat0(k,L);if(L>8&&!st)S.dmg=wstat0(k,8+(L-8)*.5).dmg;if(st){S.dmg*=1.1+.05*L;if(k==='wind')S.pierce=Math.max(S.pierce,Math.floor(L/6))}if(WEAPONS[k]&&WEAPONS[k].elite)S.dmg*=(EMUL[k]||.75);else S.dmg*=wnorm(k,L);  // v23: Lv9-12 dmg gains halved
  if(PROJW[k]&&G.bon.proj)S.proj+=G.bon.proj;if(PROJW[k]&&G.tr&&G.tr.proj)S.proj+=G.tr.proj;if(G.evo&&G.evo[k]){S.dmg*=1.25;S.cd*=.92;if(PROJW[k])S.proj+=1;if(S.area)S.area=Math.round(S.area*1.1);if(S.pierce<99)S.pierce+=2;S.evo=1}return S}
 function wstat0(k,L){const m=k==='wind'||k==='barrage'||k==='fire'||k==='runes'?mg('shadow'):k==='knives'||k==='cannon'||k==='darts'||k==='chin'?mg('tbow'):k==='scim'||k==='halberd'?mg('scythe'):0,A=AREA(),D=durMul();switch(k){
  case 'axes':return{dmg:8+L*2,cd:.35,proj:1+pb(L),area:Math.round((62+L*3)*A),pierce:99,sp:3.2+L*.12};
@@ -1659,7 +1665,7 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=48;
+const VERSION=49;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
  b64e(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)},
  b64d(b){const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(_){return bin}},
