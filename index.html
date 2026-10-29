@@ -856,16 +856,18 @@ function newGame(){const{b,sig,sb}=computeBonus();
  if(G.sig.fw){const[k,l]=G.sig.fw.split(':');if(WEAPONS[k]&&!G.w[k])G.w[k]=+l||1}
  if(G.sig.arsenal){let ks=classPool(G.cls).filter(k=>!G.w[k]);if(ks.length)G.w[ks[Math.random()*ks.length|0]]=1}
  for(let bi=(G.sig.blessed?1:0)+(G.sig.blessed2?1:0);bi>0;bi--){const ks=Object.keys(PASSIVES).filter(k=>!G.pas[k]&&avail(PASSIVES[k]));if(ks.length)G.pas[ks[Math.random()*ks.length|0]]=2}
- G.pots=[];
+ G.pots=[];G.macct=acctStr();
  [enemies,shots,gems,items,pops,parts,fx].forEach(p=>p.clear());G.p.max=G.p.hp=hpMax()}
 // v47: per-run skill caps: full XP up to +8/+6/+5/+3 levels, then 25% XP up to +12/+9/+7/+4 (hard stop)
 const SK_RUN=L=>L<40?8:L<60?6:L<80?5:L<90?2:1,SK_HARD=L=>L<40?12:L<60?9:L<80?7:L<90?3:1;
 // v48: from Lv 70 a skill XP boost flattens the OSRS curve (effective cost per level grows 6%/lvl instead of ~10%)
 const skHiMul=L=>L<70?1:Math.max(1,(XPT[L+1]-XPT[L])/((XPT[71]-XPT[70])*Math.pow(1.06,L-70)));
 function skBase(k){G.skBase=G.skBase||{};if(G.skBase[k]==null)G.skBase[k]=sLvl(k);return G.skBase[k]}
-function skCap(k){const b=skBase(k);return Math.min(99,b+SK_RUN(b))}
+// v51: a run can't jump a bracket boundary (40/60/80/90) by more than half the next bracket's allowance
+const SK_B=[40,60,80,90,99],skClamp=(b,n,F)=>{const B=SK_B.find(x=>x>b);return Math.min(99,b+n,B!=null&&B<99?B+Math.max(1,Math.floor(F(B)/2)):99)};
+function skCap(k){const b=skBase(k);return skClamp(b,SK_RUN(b),SK_RUN)}
 const skLim=L=>L>=99?XPT[99]:XPT[L+1]-1;
-function addSkillXp(k,x){const b=sLvl(k),b0=skBase(k),soft=skLim(skCap(k)),hard=skLim(Math.min(99,b0+SK_HARD(b0)));if(SK[k]>=hard)return;
+function addSkillXp(k,x){const b=sLvl(k),b0=skBase(k),soft=skLim(skCap(k)),hard=skLim(skClamp(b0,SK_HARD(b0),SK_HARD));if(SK[k]>=hard)return;
  x*=(1+(G.pots&&G.pots.includes('wise')?POTS.wise.eff.xp:0))*skHiMul(b);
  if(SK[k]+x>soft){const full=Math.max(0,soft-SK[k]);x=full+(x-full)*.25}x=Math.min(x,hard-SK[k]);SK[k]+=x;G.runXp[k]=(G.runXp[k]||0)+x;const d=G.drops[k];if(d){d.v+=x;d.life=1.4}else G.drops[k]={v:x,life:1.4};
  const a=sLvl(k);if(a>b){G.banner={txt:`${k} level ${a}!`,life:2.2,col:SKCOL[k]};if(k==='Hitpoints'){G.p.max=hpMax();G.p.hp+=(a-b)*2}}}
@@ -918,7 +920,7 @@ const spdMul=()=>(1+.08*(G.pas.spd||0))*(1+G.bon.sp)*(G.tr?G.tr.sp||1:1);
 const magR=()=>70*(1+.3*(G.pas.mag||0))*(1+G.bon.mag);
 const enemyScale=t=>1.2*(1+t/120+Math.pow(t/400,2));
 const midSoft=t=>t<=180||t>=360?1:1-.15*Math.sin(Math.PI*(t-180)/180);  // v27: up to -15% spawn rate & HP around 4:30, back to normal by 6:00
-const backK=t=>t<=540?0:Math.pow(Math.min(1,(t-540)/1260),1.5),backHp=t=>1+.6*backK(t),backDen=t=>1+.6*backK(t);  // v46: smooth back-half pressure from 9:00 (x1.09 @15:00, x1.24 @20:00, x1.6 @30:00), HP and density
+const backK=t=>t<=540?0:Math.pow(Math.min(1,(t-540)/1260),1.5),backHp=t=>(1+.6*backK(t))*(1+megaBack(t)),backDen=t=>(1+.6*backK(t))*(1+MACC_N*megaBack(t));  // v46: smooth back-half pressure from 9:00 (x1.09 @15:00, x1.24 @20:00, x1.6 @30:00), HP and density
 const lateHp=t=>t<=600?1:t<=1200?1+(t-600)/600:Math.min(3,2+(t-1200)/480);  // v23: non-boss HP x1 to 10:00, x2 @20:00, x3 @28:00  // HP ramp keeps pace with weapon growth
 function pop(x,y,txt,col,kind){const o=pops.get();if(o){o.x=x+(Math.random()-.5)*8;o.y=y;o.txt=txt;o.life=kind?.75:1.1;o.col=col||'#fff';o.kind=kind||0}}
 function spawn(t,opt){opt=opt||{};const e=enemies.get();if(!e)return null;const T=ETYPES[t],a=Math.random()*6.283,d=Math.max(W,H)*.62+40;
@@ -992,7 +994,11 @@ function wstat0(k,L){const m=k==='wind'||k==='barrage'||k==='fire'||k==='runes'?
  case 'purging':return{dmg:2+L*9.8,cd:Math.max(1.4,2.4-L*.12),area:Math.round((130+L*8)*A),proj:0,pierce:99,life:2+L*.5};
  case 'relic':return{dmg:52+L*12.4,cd:Math.max(1.2,2.2-L*.12),area:Math.round((45+L*3)*A),proj:2+Math.floor(L/3),pierce:99}}}
 const msc=()=>1+G.t/240;const MEGA_TP=300,MEGA_EXP=.4;const megaScale=t=>{const b=enemyScale(Math.min(t,MEGA_TP));return t<=MEGA_TP?b:b*Math.pow(enemyScale(t)/b,MEGA_EXP)};  // v46: full ramp to 5:00, softened (^0.6) after
-const mdm=L=>.7*megaScale(G.t)*(1+.25*(L-1));  // mega dmg tracks the enemy HP ramp, +25%/level
+// v51: account strength 0..1 (perk ranks + combat skill levels); strong accounts' megas fade 5:00-15:00 and the back-half ramp bites harder while a mega is owned
+function acctStr(){let r=0,m=0;for(const k in SHOP){if(SHOP[k].cosm||k==='trail')continue;m+=SHOP[k].max;r+=Math.min(SHOP[k].max,META.shop[k]||0)}const sk=['Attack','Ranged','Magic','Prayer','Hitpoints'].reduce((a,k)=>a+sLvl(k),0)/5;
+ const S=.5*(m?r/m:0)+.5*Math.max(0,Math.min(1,(sk-35)/45));return Math.max(0,Math.min(1,(S-.3)/.65))}
+const MACC_D=.5,MACC_B=3.5,MACC_N=.3,MACC_I=.5;const megaAcc=()=>{const S=G.macct||0;return S?1-MACC_D*S*Math.max(0,Math.min(1,(G.t-300)/600)):1},megaBack=t=>G.macct&&Object.keys(G.mega).length?MACC_B*G.macct*Math.pow(Math.max(0,Math.min(1,(t-420)/600)),1.2):0;
+const mdm=L=>.7*megaScale(G.t)*(1+.25*(L-1))*megaAcc()*(1-MACC_I*(G.macct||0)*Math.max(0,Math.min(1,((G.still||0)-2)/6)));  // mega dmg tracks the enemy HP ramp, +25%/level
 function mstat(k,L){const A=AREA();switch(k){
  case 'tbow':return{dmg:240*mdm(L),cd:Math.max(.5,1.1/L),proj:L,pierce:4+L,area:0};
  case 'shadow':return{dmg:150*mdm(1)*(1+.12*(L-1)),cd:Math.max(1,2.2/L),proj:2+Math.ceil(L/2),pierce:3+L,area:0};
@@ -1663,7 +1669,7 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=50;
+const VERSION=51;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
  b64e(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)},
  b64d(b){const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(_){return bin}},
@@ -1693,6 +1699,6 @@ setTimeout(checkUpdate,1500);document.addEventListener('visibilitychange',()=>{i
 // ================= INIT =================
 menuScene();buildMenu();show('menu',1);requestAnimationFrame(loop);
 {const r=hasRun();if(r&&r.auto&&Array.isArray(r.pendLvl)&&r.pendLvl.length&&Date.now()-r.at<60*60e3)setTimeout(()=>{try{continueRun()}catch(e){console.warn(e)}},60)}
-window.__game={addSkillXp,SPR,WEAPONS,spawnEvent,evTick,set XP(v){[XPA,XPB,XPP]=v},set SKXP(v){SKXP=v},set MK(v){MEGA_KILL=v},gems,enemies,dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG,buildStats,wstat,mstat,saveRun,continueRun,pauseGame,resumeGame,hasRun,checkAch,ACH,EVO,evolve,CHESTS,rollCards,buildCodex,PASSIVES,saveMeta,PREM,pickMega,items,fx,launch,CLASSES,buildShop,MEGAKEYS,closeLvl,kill,orangeXp,MEGA_RATES,megaRoll,startFinal,evoLine,wstat,applyDrop,chestUp,SINKS,sinkCost,goldMul};
+window.__game={addSkillXp,SPR,WEAPONS,spawnEvent,evTick,set XP(v){[XPA,XPB,XPP]=v},set SKXP(v){SKXP=v},set MK(v){MEGA_KILL=v},gems,enemies,dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG,buildStats,wstat,mstat,saveRun,continueRun,pauseGame,resumeGame,hasRun,checkAch,ACH,EVO,evolve,CHESTS,rollCards,buildCodex,PASSIVES,saveMeta,PREM,pickMega,items,fx,launch,CLASSES,buildShop,MEGAKEYS,closeLvl,kill,orangeXp,MEGA_RATES,megaRoll,startFinal,acctStr,evoLine,wstat,applyDrop,chestUp,SINKS,sinkCost,goldMul};
 })();
 </script></body></html>
