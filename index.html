@@ -856,7 +856,7 @@ function newGame(){const{b,sig,sb}=computeBonus();
  if(G.sig.fw){const[k,l]=G.sig.fw.split(':');if(WEAPONS[k]&&!G.w[k])G.w[k]=+l||1}
  if(G.sig.arsenal){let ks=classPool(G.cls).filter(k=>!G.w[k]);if(ks.length)G.w[ks[Math.random()*ks.length|0]]=1}
  for(let bi=(G.sig.blessed?1:0)+(G.sig.blessed2?1:0);bi>0;bi--){const ks=Object.keys(PASSIVES).filter(k=>!G.pas[k]&&avail(PASSIVES[k]));if(ks.length)G.pas[ks[Math.random()*ks.length|0]]=2}
- G.pots=[];G.macct=acctStr();G.mease=acctEase();G.act=1;
+ G.pots=[];G.macct=acctStr();G.mease=acctEase();G.mfg=Math.max(0,Math.min(1,(1-(G.mraw||0))/.2));G.act=1;
  [enemies,shots,gems,items,pops,parts,fx].forEach(p=>p.clear());G.p.max=G.p.hp=hpMax()}
 // v47: per-run skill caps: full XP up to +8/+6/+5/+3 levels, then 25% XP up to +12/+9/+7/+4 (hard stop)
 const SK_RUN=L=>L<40?8:L<60?6:L<80?5:L<90?2:1,SK_HARD=L=>L<40?12:L<60?9:L<80?7:L<90?3:1;
@@ -920,13 +920,13 @@ const spdMul=()=>(1+.08*(G.pas.spd||0))*(1+G.bon.sp)*(G.tr?G.tr.sp||1:1);
 const magR=()=>70*(1+.3*(G.pas.mag||0))*(1+G.bon.mag);
 const enemyScale=t=>1.2*(1+t/120+Math.pow(t/400,2));
 const midSoft=t=>t<=180||t>=360?1:1-.15*Math.sin(Math.PI*(t-180)/180);  // v27: up to -15% spawn rate & HP around 4:30, back to normal by 6:00
-const backK=t=>t<=540?0:Math.pow(Math.min(1,(t-540)/1260),1.5),backHp=t=>(1+.6*backK(t))*(1+megaBack(t))*(1-EASE_HP*easeK(t)),backDen=t=>(1+.6*backK(t))*(1+MACC_N*megaBack(t))*(1-EASE_DEN*easeK(t));  // v46: smooth back-half pressure from 9:00 (x1.09 @15:00, x1.24 @20:00, x1.6 @30:00), HP and density
+const backK=t=>t<=540?0:Math.pow(Math.min(1,(t-540)/1260),1.5),backHp=t=>(1+.6*backK(t))*(1+megaBack(t))*(1-EASE_HP*easeK(t))*(1-FG_HP*fgK(t)),backDen=t=>(1+.6*backK(t))*(1+MACC_N*megaBack(t))*(1-EASE_DEN*easeK(t))*(1-FG_DEN*fgK(t));  // v46: smooth back-half pressure from 9:00 (x1.09 @15:00, x1.24 @20:00, x1.6 @30:00), HP and density
 const lateHp=t=>t<=600?1:t<=1200?1+(t-600)/600:Math.min(3,2+(t-1200)/480);  // v23: non-boss HP x1 to 10:00, x2 @20:00, x3 @28:00  // HP ramp keeps pace with weapon growth
 function pop(x,y,txt,col,kind){const o=pops.get();if(o){o.x=x+(Math.random()-.5)*8;o.y=y;o.txt=txt;o.life=kind?.75:1.1;o.col=col||'#fff';o.kind=kind||0}}
 function spawn(t,opt){opt=opt||{};const e=enemies.get();if(!e)return null;const T=ETYPES[t],a=Math.random()*6.283,d=Math.max(W,H)*.62+40;
  const sc=enemyScale(G.t)*lateHp(G.t)*midSoft(G.t)*backHp(G.t);e.x=opt.x??G.p.x+Math.cos(a)*d;e.y=opt.y??G.p.y+Math.sin(a)*d;
  if(G.cage&&opt.x==null){const C=G.cage,ca=Math.random()*6.283;e.x=C.x+Math.cos(ca)*(C.R-40);e.y=C.y+Math.sin(ca)*(C.R-40)}e.cin=G.cage?1:null;e.halfSh=0;e.frz=0;e.tgob=0;e.t=t;e.boss=!!opt.boss;e.elite=!!opt.elite;e.prop=!T.sp&&!e.boss;
- e.max=e.hp=e.prop?T.hp:T.hp*(e.boss?(t==='titan'?1.5*(1+G.t/240):Math.min(38,Math.max(3,7.2*G.t/180-5))):sc)*(e.elite?8:1);e.sp=T.sp*(1+Math.min(G.t/600,.5))*(e.elite?.9:1);e.r=T.r*(e.elite?1.35:1);e.dmg=T.dmg*(1+G.t/400)*(e.elite?1.5:1);e.xp=T.xp*(e.elite?10:1);e.hit=0;e.slow=0;e.rt=0;e.bleed=0;e.bdps=0;e.btk=0;e.ph=Math.random()*6;e.champ=0;e.sw=!!opt.sw;if(e.sw){e.max=e.hp=T.hp*.5*(1+G.t/300);e.sp*=1.35;e.r*=.75}if(!e.boss&&!e.elite&&!e.prop&&!opt.nochamp){const r=Math.random();e.champ=r<.002?2:r<.042?1:0}
+ e.max=e.hp=e.prop?T.hp:T.hp*(e.boss?(t==='titan'?1.5*(1+G.t/240):Math.min(38,Math.max(3,7.2*G.t/180-5))*(1-FG_BHP*fgB())):sc)*(e.elite?8:1);e.sp=T.sp*(1+Math.min(G.t/600,.5))*(e.elite?.9:1);e.r=T.r*(e.elite?1.35:1);e.dmg=T.dmg*(1+G.t/400)*(e.elite?1.5:1);e.xp=T.xp*(e.elite?10:1);e.hit=0;e.slow=0;e.rt=0;e.bleed=0;e.bdps=0;e.btk=0;e.ph=Math.random()*6;e.champ=0;e.sw=!!opt.sw;if(e.sw){e.max=e.hp=T.hp*.5*(1+G.t/300);e.sp*=1.35;e.r*=.75}if(!e.boss&&!e.elite&&!e.prop&&!opt.nochamp){const r=Math.random();e.champ=r<.002?2:r<.042?1:0}
  if(e.champ){const m=e.champ===2?3:2.5;e.max=e.hp=e.hp*m;e.xp=e.champ===2?e.xp:Math.max(12,e.xp*2);e.r*=1.12}return e}  // champions: yellow (~4%) / orange (~1%) XP tiers
 let SRC='',SKXP=.083;
 function ramp(S){if(!G.sig.rampage)return 1;G.swing=(G.swing||0)+1;if(G.swing%5)return 1;S.dmg*=2;S.area=Math.round(S.area*1.3);pop(G.p.x,G.p.y-44,'Rampage!','#ff6a5a',2);G.shake=Math.max(G.shake,.1);return 2}
@@ -997,9 +997,11 @@ const msc=()=>1+G.t/240;const MEGA_TP=300,MEGA_EXP=.4;const megaScale=t=>{const 
 // v51: account strength 0..1 (perk ranks + combat skill levels); strong accounts' megas fade 5:00-15:00 and the back-half ramp bites harder while a mega is owned
 function acctStr(){let r=0,m=0;for(const k in SHOP){if(SHOP[k].cosm||k==='trail')continue;m+=SHOP[k].max;r+=Math.min(SHOP[k].max,META.shop[k]||0)}const sk=['Attack','Ranged','Magic','Prayer','Hitpoints'].reduce((a,k)=>a+sLvl(k),0)/5;
  const S=.5*(m?r/m:0)+.5*Math.max(0,Math.min(1,(sk-35)/45));return Math.max(0,Math.min(1,(S-.3)/.65))}
-function acctEase(){let r=0,m=0;for(const k in SHOP){if(SHOP[k].cosm||k==='trail')continue;m+=SHOP[k].max;r+=Math.min(SHOP[k].max,META.shop[k]||0)}const sk=['Attack','Ranged','Magic','Prayer','Hitpoints'].reduce((a,k)=>a+sLvl(k),0)/5;const S=.5*(m?r/m:0)+.5*Math.max(0,Math.min(1,(sk-40)/59));return Math.max(0,Math.min(1,(S-.5)/.5))}
+function acctEase(){let r=0,m=0;for(const k in SHOP){if(SHOP[k].cosm||k==='trail')continue;m+=SHOP[k].max;r+=Math.min(SHOP[k].max,META.shop[k]||0)}const sk=['Attack','Ranged','Magic','Prayer','Hitpoints'].reduce((a,k)=>a+sLvl(k),0)/5;const S=.5*(m?r/m:0)+.5*Math.max(0,Math.min(1,(sk-40)/59));G.mraw=S;return Math.max(0,Math.min(1,(S-.5)/.5))}
 // v52: strong accounts that keep moving get a softer back half (enemy count cap + lower density/HP); the v51 mega penalty mostly bites when idle
-const EASE_CAP=150,EASE_DEN=.35,EASE_HP=.2,MACC_ACT=.75;const actK=()=>Math.max(0,Math.min(1,((G.act??1)-.3)/.4)),easeK=t=>Math.pow(G.mease||0,2.2)*actK()*Math.max(0,Math.min(1,(t-900)/600));
+const EASE_CAP=150,EASE_DEN=.35,EASE_HP=.2,MACC_ACT=.75;
+// v53: small forgiveness for everyone below maxed (tapers to 0 at max): gentler bosses before 9:00, and a mild active-gated back-half ease from 10:00
+const FG_CAP=90,FG_DEN=.15,FG_HP=.12,FG_BHP=.3,FG_BDM=.25;const fgK=t=>(G.mfg||0)*actK()*Math.max(0,Math.min(1,(t-600)/600)),fgB=()=>G.t<540?(G.mfg||0):0;const actK=()=>Math.max(0,Math.min(1,((G.act??1)-.3)/.4)),easeK=t=>Math.pow(G.mease||0,2.2)*actK()*Math.max(0,Math.min(1,(t-900)/600));
 const MACC_D=.5,MACC_B=3.5,MACC_N=.3,MACC_I=.5;const megaAcc=()=>{const S=(G.macct||0)*(1-MACC_ACT*actK());return S?1-MACC_D*S*Math.max(0,Math.min(1,(G.t-300)/600)):1},megaBack=t=>G.macct&&Object.keys(G.mega).length?MACC_B*G.macct*(1-MACC_ACT*actK())*Math.pow(Math.max(0,Math.min(1,(t-420)/600)),1.2):0;
 const mdm=L=>.7*megaScale(G.t)*(1+.25*(L-1))*megaAcc()*(1-MACC_I*(G.macct||0)*Math.max(0,Math.min(1,((G.still||0)-2)/6)));  // mega dmg tracks the enemy HP ramp, +25%/level
 function mstat(k,L){const A=AREA();switch(k){
@@ -1033,7 +1035,7 @@ function bossSig(B,p,a,tt,M,half,idx){const T=G.tele,id=B.bid||0,D=M*.25,R=(n,r,
 function dragonAI(dt,p){const B=G.bossE,on=B&&B.a&&B.boss&&!B.fin&&G.bossT>0;G.tele=G.tele||[];
  if(!on){if(G.tele.length&&!G.fin)G.tele=[];if(G.fb&&G.fb.length&&!G.fin)G.fb=[];G.dB=null;return}
  if(G.dB!==B){G.dB=B;G.dT=2.5;G.dP=0}
- const idx=Math.max(0,Math.round(G.t/180)-1),half=B.hp<B.max*.5,tt=Math.max(.65,.95-idx*.03),M=p.max;
+ const idx=Math.max(0,Math.round(G.t/180)-1),half=B.hp<B.max*.5,tt=Math.max(.65,.95-idx*.03),M=p.max*(1-FG_BDM*fgB());
  G.dT-=dt;if(G.dT<=0){G.dT=Math.max(1.5,3.4-idx*.15)*(half?.72:1);const k=(G.dP++)%4,a=Math.atan2(p.y-B.y,p.x-B.x);if(k===3){bossSig(B,p,a,tt,M,half,idx)}else 
   if(k===0){G.tele.push({x:B.x,y:B.y,cone:1,a,w:.42+(half?.12:0),r:360,t:tt,T:tt,dmg:M*.3});if(half&&idx>=4)G.tele.push({x:B.x,y:B.y,cone:1,a:a+(Math.random()<.5?.9:-.9),w:.35,r:320,t:tt+.5,T:tt+.5,dmg:M*.3})}
   else if(k===1)G.tele.push({x:B.x,y:B.y,r:(B.r||60)+110,t:tt,T:tt,dmg:M*.25});
@@ -1208,7 +1210,7 @@ function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();ret
  else if(G.brkCd>0){G.brkCd-=dt;G.banner=G.brkCd>0?{txt:String(Math.ceil(G.brkCd)),life:.4,col:'#ffe28a',big:1,brk:1}:{txt:'Fight!',life:1,col:'#ff8a6a',big:1}}
  const[dx,dy]=inputVec(),sp=p.sp*spdMul()*(G.fleet>0?1.3:1);p.x+=dx*sp*dt;p.y+=dy*sp*dt;if(dx||dy){const l=Math.hypot(dx,dy);p.face=[dx/l,dy/l]}p.moving=!!(dx||dy);
  // waves: ~30 min structure
- if(!calm&&!G.fin&&!bossOn){G.spawnT-=dt;if(G.spawnT<=0){G.spawnT=Math.max(.14,1-G.t/300);const ph=phaseAt(G.t);G.spawnAcc=(G.spawnAcc||0)+(1+G.t/90)*.65*midSoft(G.t)*backDen(G.t)*(G.lull>0?.05:1)*(ph===1?1.25:ph===2&&G.t>=240?.8:1);let n=Math.max(0,Math.floor(G.spawnAcc));const ty=waveTypes(G.t);G.spawnAcc-=n;const eK=easeK(G.t);if(eK>0){let al=0;for(const o of enemies.a)if(o.a&&!o.prop)al++;n=Math.min(n,Math.max(0,Math.round(320-EASE_CAP*eK)-al))}for(let i=0;i<n;i++)spawn(pickT(ty))}  // ~35% fewer stream spawns
+ if(!calm&&!G.fin&&!bossOn){G.spawnT-=dt;if(G.spawnT<=0){G.spawnT=Math.max(.14,1-G.t/300);const ph=phaseAt(G.t);G.spawnAcc=(G.spawnAcc||0)+(1+G.t/90)*.65*midSoft(G.t)*backDen(G.t)*(G.lull>0?.05:1)*(ph===1?1.25:ph===2&&G.t>=240?.8:1);let n=Math.max(0,Math.floor(G.spawnAcc));const ty=waveTypes(G.t);G.spawnAcc-=n;const eK=easeK(G.t),fK=fgK(G.t);if(eK>0||fK>0){let al=0;for(const o of enemies.a)if(o.a&&!o.prop)al++;n=Math.min(n,Math.max(0,Math.round(320-Math.max(EASE_CAP*eK,FG_CAP*fK))-al))}for(let i=0;i<n;i++)spawn(pickT(ty))}  // ~35% fewer stream spawns
  if(G.t>=G.eliteNext){G.eliteNext+=90;const ty=waveTypes(G.t);spawn(G.t>=180?'skeleton':ty[ty.length-1],{elite:true});G.banner={txt:'An elite approaches!',life:1.8,col:'#ffd24a'}}
  if(G.evNext==null)G.evNext=G.t+60;if(G.t>=G.evNext){G.evNext=G.t+22+Math.random()*28;if(G.t>=45&&Math.abs(G.t-G.swarmNext)>8&&G.t>(G.bossEnd||0)+20&&!(G.lull>0)){spawnEvent();if(G.t>=360&&Math.random()<.2&&!(G.lull>0)){spawnEvent(1);G.banner={txt:'Double trouble!',life:2,col:'#ff6a4a',big:1}}}}  // v29: events every 22-50s, 20% double from 6:00 (never during boss fights/Titan)
  evTick(dt);
@@ -1672,7 +1674,7 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=52;
+const VERSION=53;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
  b64e(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)},
  b64d(b){const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(_){return bin}},
