@@ -107,6 +107,7 @@ p{margin:6px 0;font-size:13px;color:#e8dcc0}
 .scroll table{width:100%;border-collapse:collapse}.scroll td{padding:2px 3px;vertical-align:middle}.scroll td.k{font-weight:bold;white-space:nowrap;width:1%}
 .wrow{display:flex;gap:7px;align-items:center;margin:3px 0}.wrow b{display:block}.wrow span{font-size:11px;color:#4a3618}
 .pro{color:#0d6a12;font-weight:bold}.con{color:#9a1010;font-weight:bold}.lk td{color:#7a6646}.nx td{background:rgba(255,200,60,.35)}
+.lad{margin:6px 0 0;padding:6px 8px;border:1px solid #5a4a30;border-radius:8px;background:rgba(0,0,0,.25)}.lad .lr{display:grid;grid-template-columns:34px 1fr 34px;align-items:center;gap:6px}.lad .lr button{height:30px;border-radius:6px;border:1px solid #6a5a3a;background:#2a2218;color:#e8d8b0;font-size:15px}.lad .lr button:disabled{opacity:.35}.lad .ln{text-align:center;font-weight:bold;font-size:14px}.lad .ld{font-size:11px;color:#c9b58a;text-align:center;margin-top:3px;line-height:1.3}.lad .lw{font-size:11px;color:#9fe07a;text-align:center}.lad .lk{font-size:11px;color:#a8977a;text-align:center}
 .cdbust{display:flex;align-items:center;gap:7px;font-size:12px;color:#ffff4a;margin:6px 2px 0}.cdbust input{width:18px;height:18px}.cdbust small{color:#d8a08a}
 .cdbtn{display:grid;grid-template-columns:1fr 1.6fr;gap:7px;margin-top:6px}.cdbtn .btn{margin-top:0}
 #clsDet #loadout{margin-top:4px}#clsDet .lo .sk,#clsDet .lo .sb{border-radius:3px}
@@ -283,11 +284,23 @@ p{font-size:13px;line-height:1.4}
  <p id="best" class="mbest"></p>
  <button type="button" class="savebtn" id="saveBtn">Backup / restore save</button>
 </div></div>
+<div class="ov" id="notes"><div class="panel"><h2>What's new · v57</h2><div class="scroll pnotes" style="max-height:min(58vh,500px);overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:12px;padding-right:4px;text-align:left;font-size:13px;line-height:1.45">
+<p><b>⚔ Danger tiers.</b> Beat 30:00 and the Titan to unlock Danger I for that class, then climb to Nightmare. Pick your tier on the class screen. Higher tiers bring tougher foes, more elites and horde waves, and pay more gold and skill XP.</p>
+<p><b>A real fight, then the payoff.</b> Runs now build tension right up to about 23 minutes, then the last stretch turns into a huge swarm you blast through.</p>
+<p><b>Smarter enemies.</b> From about 10 minutes some foes cut you off instead of just chasing you, and from about 15 minutes fast hunters (red glow) join the horde. Enemy toughness now follows your level as well as the clock.</p>
+<p><b>Elite powers.</b> From 14:00 elites gain a power: <span style="color:#ffb040">Volatile</span> ones explode when slain, <span style="color:#8fd8ff">Frost</span> ones slow you inside their aura, and <span style="color:#c08aff">Sniper</span> ones fire volleys.</p>
+<p><b>Evolutions.</b> A weapon now evolves at Lv 20 with its paired passive. Open a Gold or boss chest from 10:00 to evolve it. Hints on the cards show what each passive evolves.</p>
+<p><b>Chests.</b> Chests can now level weapons and passives past their old max. Weapons go up to Lv 45 and elite weapons to Lv 40.</p>
+<p><b>Balance.</b> Every weapon now follows the same smooth power curve, so no weapon spikes or falls behind. Bosses take a fair amount of damage from every kind of build. Fire Surge hits a little harder than the other evolutions. Classes are rebalanced, and the Cleric is a little stronger than the rest.</p>
+<p><b>Quality of life.</b> XP gems left on the ground slowly drift toward you, and when you stand still you turn to face the nearest foe.</p>
+<p><b>Your progress is safe.</b> Gold, skills, perks and class levels carry over unchanged.</p>
+</div><button class="btn" id="notesOk">Let's go</button></div></div>
 <div class="ov" id="saveOv"><div class="panel"><h2>Save backup</h2><p>Home-screen apps keep their own storage. Export a code before removing the icon, then import it in the new one.</p><div class="row3" style="grid-template-columns:1fr 1fr"><button class="btn sec" id="saveExp">Export save</button><button class="btn sec" id="saveImp">Import save</button></div><textarea id="saveTxt" placeholder="Paste a save code here, then tap Import" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea><p id="saveMsg"></p><button class="btn" id="saveBack">Back</button></div></div>
 <div class="ov" id="clsDet"><div class="panel cdp">
  <div class="cdh"><div class="slot big"><img id="cdPor" alt=""></div><div class="cdhn"><b id="cdName"></b><span id="cdTag"></span><div class="cdlv"><span id="cdLv"></span><div class="xpb"><div id="cdXp"></div></div></div></div></div>
  <div class="scroll" id="cdBody"></div>
  <div id="loadout"></div>
+ <div id="ladSel"></div>
  <label id="bustLbl" class="cdbust" style="display:none"><input type="checkbox" id="bustChk"> Busted build <small>(sandbox, no rewards)</small></label>
  <div class="cdbtn"><button class="btn sec" id="cdBack">Back</button><button class="btn" id="cdStart">Start run</button></div>
 </div></div>
@@ -745,17 +758,17 @@ const MEGA={tbow:{name:'Twisted bow',sk:'Ranged',desc:'Fires huge piercing arrow
  obl:{name:'Obligator',sk:'Prayer',desc:'Hurls a spiked flail on a chain into the biggest crowd: obliterating crater, drags foes in, aftershocks · ALL Prayer x2 per stack'}};
 // v28 class identity: traits (pro + con) and one tappable class skill each
 const CTR={
- warrior:{mods:{dr:.76,sp:.93,dmg:1.35,cdm:1/1.04},skill:{n:'Earthshaker',ic:'scim',cd:20,col:'#ff9a5a'},
-  traits:[['Heavy plate','Take 24% less damage','Move 7% slower'],['Brute force','+35% damage on everything; on the move, up to +15% more and slow healing','Weapons attack 4% slower']],
+ warrior:{mods:{dr:1,sp:.93,dmg:.78,bdm:1.6,cdm:1/1.04},skill:{n:'Earthshaker',ic:'scim',cd:20,col:'#ff9a5a'},
+  traits:[['Heavy plate','Sturdy plate armour soaks blows','Move 7% slower'],['Brute force','+60% damage to bosses; on the move, up to +15% damage and slow healing','Weapons attack 4% slower and deal 22% less damage']],
   sd:'Slam the ground: 45 Attack dmg (scales with time) to every foe within 6 m, knocks them back 3.5 m, then take 50% less damage for 3s. 20s cooldown.'},
- ranger:{mods:{sp:1.2,cdm:1.15,hp:.85,dr:1.09},skill:{n:'Dash Volley',ic:'knives',cd:10,col:'#9fe07a'},
-  traits:[['Fleet-footed','+20% move speed','—'],['Quick draw','Weapons attack 15% faster','—'],['Glass frame','—','-15% max HP and take 9% more damage']],
+ ranger:{mods:{sp:1.2,cdm:1.35,hp:1.3,dr:.9,bdm:.55},skill:{n:'Dash Volley',ic:'knives',cd:10,col:'#9fe07a'},
+  traits:[['Fleet-footed','+20% move speed','—'],['Quick draw','Weapons attack 35% faster','Deal 45% less damage to bosses'],['Light leathers','+30% max HP and take 10% less damage','—']],
   sd:'Dash 5 m the way you face (0.6s invulnerable), then loose 10 arrows at the nearest foes within 12 m: 28 Ranged dmg each (scales with time). 10s cooldown.'},
- mage:{mods:{proj:1,area:1.15,hp:.82,dr:1.12},skill:{n:'Ice Barrage',ic:'wind',cd:16,col:'#8fd8ff'},
-  traits:[['Arcane overflow','+1 projectile on every projectile weapon','—'],['Wide weave','+15% area','—'],['Frail robes','—','-18% max HP and take 12% more damage']],
+ mage:{mods:{proj:1,bdm:1,area:1.15,hp:1,dr:1},skill:{n:'Ice Barrage',ic:'wind',cd:16,col:'#8fd8ff'},
+  traits:[['Arcane overflow','+1 projectile on every projectile weapon','—'],['Wide weave','+15% area','—']],
   sd:'Freeze nova: 35 Magic dmg (scales with time) to every foe within 7.5 m and freezes them solid for 2.5s (bosses are slowed instead). 16s cooldown.'},
- cleric:{mods:{still:1,hp:1.15,sp:.91},skill:{n:'Sanctuary',ic:'prayer',cd:24,col:'#ffe48a'},
-  traits:[['Rooted faith','Standing still ramps up to +60% damage, +30% area and double regen over 3s','The bonus resets the moment you move'],['Heavy vestments','+15% max HP','Move 9% slower and deal 9% less damage while moving']],
+ cleric:{mods:{still:1,dmg:1.3,bdm:1.5,hp:1.4,sp:.95,dr:.8},skill:{n:'Sanctuary',ic:'prayer',cd:24,col:'#ffe48a'},
+  traits:[['Rooted faith','Standing still ramps up to +60% damage, +30% area and double regen over 3s','The bonus resets the moment you move'],['Heavy vestments','+40% max HP, +30% damage, take 20% less damage, +50% damage to bosses','Move 9% slower and deal 9% less damage while moving']],
   sd:'Consecrate a 4 m holy zone for 6s: you heal 5% max HP/s inside it, foes inside are slowed and take 12 Prayer dmg every 0.5s (scales with time). 24s cooldown.'}};
 const clsSkLv=()=>{const L=clsInfo(G.cls).L;return{dm:1+.04*(L-1),cd:Math.max(.8,1-.01*(L-1))}};  // class level: +4% skill dmg and -1% cooldown per level (max -20%)
 const stillK=()=>Math.min(1,(G.still||0)/3);
@@ -823,7 +836,7 @@ const ACH=[{id:'slayer',n:'Slayer',d:'Kill 500 foes in one run',r:'Unlocks Chinc
 // ---------- persistence ----------
 let SANDSNAP=null,SPEED=1,SANDBOX=0;const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v.replace(/"traps"/g,'"falcon"'))}catch(_){return d}},set(k,v){if(SANDBOX&&k!=='oss_speed'&&k!=='oss_busted')return;try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}};
 const META=Object.assign({gold:0,shop:{},cls:'warrior',cxp:{}},LS.get('oss_meta',{}));
-['ach','rec','sb','skin','seen','stats','opt'].forEach(k=>{if(!META[k]||typeof META[k]!=='object')META[k]={}});
+['ach','rec','sb','skin','seen','stats','opt','lad','ladSel'].forEach(k=>{if(!META[k]||typeof META[k]!=='object')META[k]={}});
 META.opt=Object.assign({dmg:1,shake:1,hap:1,aim:1},META.opt);if(!META.seen.evo)META.seen.evo={};if(!META.seen.mega)META.seen.mega={};if(!META.shop||typeof META.shop!=='object')META.shop={};
 const avail=(D)=>(!D.lock||!!META.ach[D.lock])&&(!D.cls||typeof G==='undefined'||!G||G.menu||D.cls===G.cls);
 function buzz(p){try{if(META.opt.hap&&navigator.vibrate)navigator.vibrate(p)}catch(_){}}
@@ -856,7 +869,7 @@ function newGame(){const{b,sig,sb}=computeBonus();
  if(G.sig.fw){const[k,l]=G.sig.fw.split(':');if(WEAPONS[k]&&!G.w[k])G.w[k]=+l||1}
  if(G.sig.arsenal){let ks=classPool(G.cls).filter(k=>!G.w[k]);if(ks.length)G.w[ks[Math.random()*ks.length|0]]=1}
  for(let bi=(G.sig.blessed?1:0)+(G.sig.blessed2?1:0);bi>0;bi--){const ks=Object.keys(PASSIVES).filter(k=>!G.pas[k]&&avail(PASSIVES[k]));if(ks.length)G.pas[ks[Math.random()*ks.length|0]]=2}
- G.pots=[];G.macct=acctStr();G.mease=acctEase();G.mfg=Math.max(0,Math.min(1,(1-(G.mraw||0))/.2));G.act=1;
+ G.pots=[];G.macct=acctStr();G.mease=acctEase();G.mfg=Math.max(0,Math.min(1,(1-(G.mraw||0))/.2));G.mwk=Math.max(0,Math.min(1,(.75-(G.mraw||0))/.4));G.act=1;
  [enemies,shots,gems,items,pops,parts,fx].forEach(p=>p.clear());G.p.max=G.p.hp=hpMax()}
 // v47: per-run skill caps: full XP up to +8/+6/+5/+3 levels, then 25% XP up to +12/+9/+7/+4 (hard stop)
 const SK_RUN=L=>L<40?8:L<60?6:L<80?5:L<90?2:1,SK_HARD=L=>L<40?12:L<60?9:L<80?7:L<90?3:1;
@@ -868,7 +881,7 @@ const SK_B=[40,60,80,90,99],skClamp=(b,n,F)=>{const B=SK_B.find(x=>x>b);return M
 function skCap(k){const b=skBase(k);return skClamp(b,SK_RUN(b),SK_RUN)}
 const skLim=L=>L>=99?XPT[99]:XPT[L+1]-1;
 function addSkillXp(k,x){const b=sLvl(k),b0=skBase(k),soft=skLim(skCap(k)),hard=skLim(skClamp(b0,SK_HARD(b0),SK_HARD));if(SK[k]>=hard)return;
- x*=(1+(G.pots&&G.pots.includes('wise')?POTS.wise.eff.xp:0))*skHiMul(b);
+ x*=(1+(G.pots&&G.pots.includes('wise')?POTS.wise.eff.xp:0))*skHiMul(b)*(1+LAD().x);
  if(SK[k]+x>soft){const full=Math.max(0,soft-SK[k]);x=full+(x-full)*.25}x=Math.min(x,hard-SK[k]);SK[k]+=x;G.runXp[k]=(G.runXp[k]||0)+x;const d=G.drops[k];if(d){d.v+=x;d.life=1.4}else G.drops[k]={v:x,life:1.4};
  const a=sLvl(k);if(a>b){G.banner={txt:`${k} level ${a}!`,life:2.2,col:SKCOL[k]};if(k==='Hitpoints'){G.p.max=hpMax();G.p.hp+=(a-b)*2}}}
 const mg=k=>G.mega[k]||0,MEGA_MAX=8;
@@ -889,12 +902,25 @@ function rarOdds(lv){const f=Math.max(0,Math.min(1,((lv||1)-1)/(RAR_LV-1)));retu
 function rollTier(w){let r=Math.random()*100;if(G&&G.bon)r+=(100-r)*Math.min(.5,luck());if(w)return r<45?0:r<78?1:r<94?2:3;const o=rarOdds(G&&G.lvl),c0=o[0],c1=c0+o[1],c2=c1+o[2];return r<c0?0:r<c1?1:r<c2?2:3}
 function tierExtra(t){if(t===1){G.p.hp=Math.min(G.p.max,G.p.hp+G.p.max*.18)}if(t===2||t===3){G.might=Math.min(.48,G.might+.05)}}
 // v55: level ceilings raised past the old max (old max still = evolution level); smaller gains past it
-const WCAP=k=>WEAPONS[k].elite?30:35,PCAP=k=>PASSIVES[k].max*2,OV_D=.04,OV_CD=.99,OV_A=.01,OV_P=.5,OV_E=.8;
+const WCAP=k=>WEAPONS[k].elite?40:45,PCAP=k=>PASSIVES[k].max*2,OV_D=.04,OV_CD=.99,OV_A=.01,OV_P=.5,OV_E=1.3;
 const pv=k=>{const L=G.pas[k]||0,m=PASSIVES[k].max;return L<=m?L:m+(L-m)*OV_P},pvL=(k,L)=>{const m=PASSIVES[k].max;return L<=m?L:m+(L-m)*OV_P};
+// v57 enemy director knobs (minute-keyed tables, linear between points)
+const GEM_DRIFT=52;const TUNE={hpx:[[0,0.85],[3,0.78],[5,0.8],[7,1.0],[10,1.9],[12,2.9],[15,5.7],[20,8.6],[23,9.0],[25,3.4],[30,3.2]],bhx:[[0,0.7],[4,0.8],[8,1.7],[12,3.8],[16,6],[20,7.6],[30,8]],kN:.03,kD:.03,kE:.03,lref:[[0,1],[5,22],[10,42],[15,70],[20,100],[25,140],[30,180]],den:[[0,1],[8,1],[12,1.2],[18,1.38],[22,1.5],[25,1.8],[30,1.8]],hunt:[[0,0],[12,0],[15,0.12],[18,0.25],[23,0.28],[30,0.2]],lead:[[0,0],[8,0],[15,.25],[23,.35],[30,.35]],eg:[[0,90],[12,75],[18,60],[30,60]],emod:840,edm:1,cdm:[[0,0.85],[5,0.78],[8,0.9],[11,1.45],[15,2.7],[22,3.6],[25,2.5],[30,2.5]]};
+const lerpT=(T,m)=>{if(m<=T[0][0])return T[0][1];for(let i=1;i<T.length;i++)if(m<=T[i][0]){const a=T[i-1],b=T[i];return a[1]+(b[1]-a[1])*(m-a[0])/(b[0]-a[0])}return T[T.length-1][1]};
+// v57 Danger ladder: opt-in tiers above Normal, unlocked per class by beating the tier below (30:00 + Titan)
+const LADDER=[{n:'Normal',hp:0,dm:0,den:0,eg:1,emod:0,sp:0,horde:0,g:0,x:0,c:'#c9b58a',d:'The standard run'},
+ {n:'Danger I',hp:.12,dm:.12,den:.05,eg:1,emod:0,sp:0,horde:0,g:.2,x:.1,c:'#9fe07a',d:'+12% enemy HP and damage'},
+ {n:'Danger II',hp:.32,dm:.3,den:.1,eg:.85,emod:-120,sp:0,horde:0,g:.4,x:.2,c:'#6ab0ff',d:'+32% HP, +30% damage · more elites · elite powers from 12:00'},
+ {n:'Danger III',hp:.5,dm:.46,den:.18,eg:.8,emod:-180,sp:.04,horde:1,g:.6,x:.3,c:'#c08aff',d:'+50% HP, +46% damage · faster spawns · horde waves at 11, 14 and 17 min'},
+ {n:'Danger IV',hp:.95,dm:.85,den:.25,eg:.7,emod:-240,sp:.06,horde:1,g:.8,x:.4,c:'#ffb040',d:'+95% HP, +85% damage · elite powers from 10:00 · horde waves · enemies 6% faster'},
+ {n:'Nightmare',hp:1.45,dm:1.2,den:.35,eg:.6,emod:-300,sp:.1,horde:2,g:1.1,x:.55,c:'#ff5a4a',d:'+145% HP, +120% damage · double elites · big horde waves · enemies 10% faster'}];
+const LAD=()=>LADDER[(G&&G.lad)|0]||LADDER[0];
+const lvlK=k=>(1+k*G.lvl)/(1+k*lerpT(TUNE.lref,G.t/60));
+function hpAdj(e){const m=G.t/60;return lerpT(e.boss?TUNE.bhx:TUNE.hpx,m)*lvlK(e.boss||e.elite?TUNE.kE:TUNE.kN)*(1+LAD().hp)}
 function ovHp(){if(!G||!G.w||G.t<420)return 1;let a=0,n=0;for(const k in G.w){const W=WEAPONS[k];if(!W)continue;n++;const o=Math.max(0,G.w[k]-W.max);a+=(1+OV_D*o)/Math.pow(OV_CD,o)-1}return n?(1+(OV_E+OV_IDLE*(1-actK()))*(1-BRR_OV*brrK())*(a/n)*Math.min(1,(G.t-420)/180))*(1-BRR_HP*brrK()):1}
 // v55: last stretch (23:00-25:00 ramp, active play only): huge swarms that melt
-const OV_IDLE=.6,BRR_OV=.9,BRR_HP=.3,BRR_DR=.3,BRR_DEN=.6,brrK=()=>G&&G.t>1380&&!G.fin?Math.min(1,(G.t-1380)/120)*actK():0;
-const capW=k=>WEAPONS[k].max;  // chests & drops level weapons only up to the evolution level; past it, level-ups only
+const OV_IDLE=.6,BRR_OV=.9,BRR_HP=.3,BRR_DR=.3,BRR_DEN=1.2,brrK=()=>G&&G.t>1380&&!G.fin?Math.min(1,(G.t-1380)/120)*actK():0;
+const capW=k=>WCAP(k);  // v56: chests & drops level weapons and passives up to the new caps
 function randUpgrade(bonusLv){const up=[];for(const k in G.w)if(G.w[k]<capW(k))up.push(['w',k]);for(const k in G.pas)if(G.pas[k]<PCAP(k))up.push(['p',k]);for(const k in G.mega)if(mg(k)<MEGA_MAX)up.push(['m',k]);
  if(Object.keys(G.w).length<G.ws)for(const k in WEAPONS)if(!G.w[k]&&!WEAPONS[k].elite&&avail(WEAPONS[k])&&!G.banned.includes(k))up.push(['w',k]);
  const own=Object.keys(G.w).length+Object.keys(G.pas).length+Object.keys(G.mega).length,upO=up.filter(([t,k])=>t==='w'?G.w[k]:t==='p'?G.pas[k]:1).length,upP=.75*Math.min(1,.4+(own?upO/own:1));  // v23: 75% max, less when most owned items are maxed
@@ -905,38 +931,51 @@ function randUpgrade(bonusLv){const up=[];for(const k in G.w)if(G.w[k]<capW(k))u
 // v48/v50: chests and ground drops level weapons (~68%) or passives, by rarity like upgrade cards (TIER_LV); fallback = small rewards
 let chestFb=0;
 function chestUp(t){t=Math.max(0,Math.min(3,t|0));const lv=TIER_LV[t],up=Object.keys(G.w).filter(k=>WEAPONS[k]&&G.w[k]<capW(k)),pu=Object.keys(G.pas).filter(k=>PASSIVES[k]&&G.pas[k]<PCAP(k));  // v50: weapons ~68%, else passives
- if(pu.length&&(!up.length||Math.random()<.32)){const k=pu[Math.random()*pu.length|0],b=G.pas[k];G.pas[k]=Math.min(PCAP(k),b+lv);if(k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}return{icon:k,txt:`${PASSIVES[k].name} Lv ${b} → ${G.pas[k]}`,t}}
+ if(pu.length&&(!up.length||Math.random()<.25)){const k=pu[Math.random()*pu.length|0],b=G.pas[k];G.pas[k]=Math.min(PCAP(k),b+lv);if(k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}return{icon:k,txt:`${PASSIVES[k].name} Lv ${b} → ${G.pas[k]}`,t}}
  if(up.length){const k=up[Math.random()*up.length|0],b=G.w[k];G.w[k]=Math.min(capW(k),b+lv);return{icon:wicon(k),txt:`${wname(k)} Lv ${b} → ${G.w[k]}`,t}}
  const f=chestFb++%3;if(f===0){const g=fillGold();G.gold+=g;return{icon:'coin',txt:`Coin pouch +${g} gold`,t}}
  if(f===1){G.p.hp=Math.min(G.p.max,G.p.hp+50);return{icon:'shark',txt:'Shark: heal 50 HP',t}}G.ch.reroll=(G.ch.reroll||0)+1;return{icon:'reroll',txt:'Lucky dice: +1 reroll',t}}
 function applyDrop(t){const r=chestUp(t);tierExtra(t);const T=TIERS[t];G.banner={txt:`${T.n} drop! ${r.txt}`,life:2.6,col:T.c};pop(G.p.x,G.p.y-44,`${T.n} · +${TIER_LV[t]} Lv`,T.c,2);burst(G.p.x,G.p.y,'',8+t*6,120+t*40,GL[T.gl])}
 const GOLD_K=.88;  // v48: -12% gold income
 const hpMax=()=>Math.round((90+sLvl('Hitpoints')+15*pv('hp')+60*mg('ely')+G.bon.hp)*(G.tr?G.tr.hp||1:1));
-const critCh=()=>.05*pv('crit')+G.bon.crit,xpMul=()=>(1+.08*pv('xp'))*(1+G.bon.xp),goldMul=()=>GOLD_K*(1+G.bon.greed)*(1+.2*pv('gold')),
- drMul=()=>(1-BRR_DR*brrK())*Math.pow(.7,mg('ely'))*(1-G.bon.dr)*(1-.04*pv('armor'))*(G.tr?G.tr.dr||1:1)*(G.guard>0?.5:1)*(G.bulT>0?1-wstat('bulwark',G.w.bulwark||1).block:1),durMul=()=>1+.1*pv('dur'),luck=()=>.08*pv('luck')+G.bon.luck;
-const wname=k=>G.evo&&G.evo[k]?EVO[k].name:WEAPONS[k].name,wicon=k=>G.evo&&G.evo[k]?'evo_'+k:k;
+const critCh=()=>.05*pv('crit')+G.bon.crit,xpMul=()=>(1+.08*pv('xp'))*(1+G.bon.xp),goldMul=()=>GOLD_K*(1+G.bon.greed)*(1+.2*pv('gold'))*(1+LAD().g),
+ drMul=()=>Math.max(DR_FLOOR,(1-BRR_DR*brrK())*Math.pow(.7,mg('ely'))*(1-G.bon.dr)*(1-.04*pv('armor'))*(G.tr?G.tr.dr||1:1)*(G.guard>0?.5:1)*(G.bulT>0?1-wstat('bulwark',G.w.bulwark||1).block:1)),DR_FLOOR=.28,durMul=()=>1+.1*pv('dur'),luck=()=>.08*pv('luck')+G.bon.luck;
+const wname=k=>G.evo&&G.evo[k]&&EVO[k]?EVO[k].name:WEAPONS[k].name,wicon=k=>G.evo&&G.evo[k]&&ICON['evo_'+k]?'evo_'+k:k;
 function chestTier(boss){let r=Math.random();r+=(1-r)*Math.min(.4,luck());const t=boss?(r<.1?0:r<.55?1:r<.95?2:3):(r<.7?0:r<.96?1:2);return t===0&&!boss&&Math.random()<(G.bon.cup||0)?1:t}
-function evoCandidate(){if(G.lastEvo!=null&&G.t-G.lastEvo<240)return null;for(const k in G.w)if(G.w[k]>=WEAPONS[k].max&&!G.evo[k]&&EVO[k]&&G.pas[EVO[k].p])return k;return null}
+// v57: evolutions come only from Gold/Legendary or boss chests from 10:00, weapon at Lv 20+ with its passive, at most one per 3:00 (boss chests ignore the wait)
+const EVO_L=20,EVO_T=600,EVO_GAP=180;
+function evoCandidate(boss){if(G.t<EVO_T)return null;if(!boss&&G.lastEvo!=null&&G.t-G.lastEvo<EVO_GAP)return null;for(const k in G.w)if(G.w[k]>=EVO_L&&!G.evo[k]&&EVO[k]&&G.pas[EVO[k].p])return k;return null}
 function evolve(k){G.evo[k]=1;G.lastEvo=G.t;META.seen.evo[k]=1;saveMeta();G.banner={txt:`EVOLVED! ${EVO[k].name}`,life:3.2,col:'#ffe07a',big:1};G.flash=.3;G.shake=.3;buzz([40,30,80]);burst(G.p.x,G.p.y,'',24,240,GL.gold);return{icon:'evo_'+k,txt:`★ ${WEAPONS[k].name} evolved into ${EVO[k].name}!`,evo:1}}
 function checkAch(){if(!G||G.menu)return;for(const a of ACH)if(!META.ach[a.id]&&a.t(G)){META.ach[a.id]=Date.now();if(a.gold)META.gold+=a.gold;saveMeta();G.toastQ.push(a);(G.achRun=G.achRun||[]).push(a);buzz([20,30,20])}}
 const skMul=sk=>1+(sLvl(sk||'Attack')-1)*.005;
 const dmgMul=sk=>(1+.1*pv('str')+G.might)*skMul(sk)*megaMul(sk||'Attack')*(1+G.bon.dmg)*trDmg();
 const AREA=()=>(1+G.bon.area)*(G.tr?(G.tr.area||1)*(G.tr.still?1+.3*stillK():1):1);
-const spdMul=()=>(1+.08*pv('spd'))*(1+G.bon.sp)*(G.tr?G.tr.sp||1:1);
+const spdMul=()=>(G.frostT>0?.65:1)*(1+.08*pv('spd'))*(1+G.bon.sp)*(G.tr?G.tr.sp||1:1);
 const magR=()=>70*(1+.3*pv('mag'))*(1+G.bon.mag);
 const enemyScale=t=>1.2*(1+t/120+Math.pow(t/400,2));
 const midSoft=t=>t<=180||t>=360?1:1-.15*Math.sin(Math.PI*(t-180)/180);  // v27: up to -15% spawn rate & HP around 4:30, back to normal by 6:00
-const backK=t=>t<=540?0:Math.pow(Math.min(1,(t-540)/1260),1.5),backHp=t=>(1+.6*backK(t))*(1+megaBack(t))*(1-EASE_HP*easeK(t))*(1-FG_HP*fgK(t)),backDen=t=>(1+.6*backK(t))*(1+MACC_N*megaBack(t))*(1-EASE_DEN*easeK(t))*(1-FG_DEN*fgK(t));  // v46: smooth back-half pressure from 9:00 (x1.09 @15:00, x1.24 @20:00, x1.6 @30:00), HP and density
+// v56: weak accounts (T0-T3, zero from ~T4.5 up) get a softer 12:00-20:00
+const LH15=.15,WF_HP=.22,WF_DEN=.15,wfK=t=>G&&G.mwk?G.mwk*Math.max(0,Math.min(1,(t-690)/60,(1260-t)/60)):0;
+const backK=t=>t<=540?0:Math.pow(Math.min(1,(t-540)/1260),1.5),backHp=t=>(1-WF_HP*wfK(t))*(1+LH15*Math.max(0,Math.min(1,(t-900)/300))*(1-(G&&G.mwk||0)))*(1+.6*backK(t))*(1+megaBack(t))*(1-EASE_HP*easeK(t))*(1-FG_HP*fgK(t)),backDen=t=>(1-WF_DEN*wfK(t))*(1+.6*backK(t))*(1+MACC_N*megaBack(t))*(1-EASE_DEN*easeK(t))*(1-FG_DEN*fgK(t));  // v46: smooth back-half pressure from 9:00 (x1.09 @15:00, x1.24 @20:00, x1.6 @30:00), HP and density
 const lateHp=t=>t<=600?1:t<=1200?1+(t-600)/600:Math.min(3,2+(t-1200)/480);  // v23: non-boss HP x1 to 10:00, x2 @20:00, x3 @28:00  // HP ramp keeps pace with weapon growth
 function pop(x,y,txt,col,kind){const o=pops.get();if(o){o.x=x+(Math.random()-.5)*8;o.y=y;o.txt=txt;o.life=kind?.75:1.1;o.col=col||'#fff';o.kind=kind||0}}
 function spawn(t,opt){opt=opt||{};const e=enemies.get();if(!e)return null;const T=ETYPES[t],a=Math.random()*6.283,d=Math.max(W,H)*.62+40;
  const sc=enemyScale(G.t)*lateHp(G.t)*midSoft(G.t)*backHp(G.t);e.x=opt.x??G.p.x+Math.cos(a)*d;e.y=opt.y??G.p.y+Math.sin(a)*d;
  if(G.cage&&opt.x==null){const C=G.cage,ca=Math.random()*6.283;e.x=C.x+Math.cos(ca)*(C.R-40);e.y=C.y+Math.sin(ca)*(C.R-40)}e.cin=G.cage?1:null;e.halfSh=0;e.frz=0;e.tgob=0;e.t=t;e.boss=!!opt.boss;e.elite=!!opt.elite;e.prop=!T.sp&&!e.boss;
- e.max=e.hp=e.prop?T.hp:ovHp()*T.hp*(e.boss?(t==='titan'?1.5*(1+G.t/240):Math.min(38,Math.max(3,7.2*G.t/180-5))*(1-FG_BHP*fgB())):sc)*(e.elite?8:1);e.sp=T.sp*(1+Math.min(G.t/600,.5))*(e.elite?.9:1);e.r=T.r*(e.elite?1.35:1);e.dmg=T.dmg*(1+G.t/400)*(e.elite?1.5:1);e.xp=T.xp*(e.elite?10:1);e.hit=0;e.slow=0;e.rt=0;e.bleed=0;e.bdps=0;e.btk=0;e.ph=Math.random()*6;e.champ=0;e.sw=!!opt.sw;if(e.sw){e.max=e.hp=T.hp*.5*(1+G.t/300);e.sp*=1.35;e.r*=.75}if(!e.boss&&!e.elite&&!e.prop&&!opt.nochamp){const r=Math.random();e.champ=r<.002?2:r<.042?1:0}
- if(e.champ){const m=e.champ===2?3:2.5;e.max=e.hp=e.hp*m;e.xp=e.champ===2?e.xp:Math.max(12,e.xp*2);e.r*=1.12}return e}  // champions: yellow (~4%) / orange (~1%) XP tiers
+ e.max=e.hp=e.prop?T.hp:hpAdj(e)*T.hp*(e.boss?(t==='titan'?1.5*(1+G.t/240):Math.min(38,Math.max(3,7.2*G.t/180-5))*(1-FG_BHP*fgB())):sc)*(e.elite?8:1);e.sp=T.sp*(1+Math.min(G.t/600,.5))*(e.elite?.9:1)*(1+LAD().sp);e.r=T.r*(e.elite?1.35:1);e.dmg=T.dmg*(1+G.t/400)*(e.elite?1.5:1)*(1+LAD().dm)*lerpT(TUNE.cdm,G.t/60)*(e.boss?1:lvlK(TUNE.kD||0));e.xp=T.xp*(e.elite?10:1);e.hit=0;e.slow=0;e.rt=0;e.bleed=0;e.bdps=0;e.btk=0;e.ph=Math.random()*6;e.champ=0;e.sw=!!opt.sw;if(e.sw){e.max=e.hp=T.hp*.5*(1+G.t/300);e.sp*=1.35;e.r*=.75}if(!e.boss&&!e.elite&&!e.prop&&!opt.nochamp){const r=Math.random();e.champ=r<.002?2:r<.042?1:0}
+ if(e.champ){const m=e.champ===2?3:2.5;e.max=e.hp=e.hp*m;e.xp=e.champ===2?e.xp:Math.max(12,e.xp*2);e.r*=1.12}
+ e.hunt=0;e.lead=0;e.emod=null;e.vt=2;if(!e.prop&&!e.boss){const m=G.t/60;if(!e.elite&&!e.sw&&!e.champ&&Math.random()<lerpT(TUNE.hunt,m)){e.hunt=1;e.sp*=1.45;e.max=e.hp=e.hp*.6}if(Math.random()<lerpT(TUNE.lead,m))e.lead=1;if(e.elite&&G.t>=TUNE.emod+LAD().emod)e.emod=EMODS[Math.random()*EMODS.length|0]}
+ return e}  // v57: hunters (fast flankers) and lead-aiming foes from ~10:00; elites gain a power from 12:00
+const EMODS=['boom','frost','volley'],EMODN={boom:'A volatile elite! It explodes when slain',frost:'A frost elite! Its aura slows you',volley:'A sniper elite! Dodge its volleys'};
+function eliteFx(dt,p){if(G.frostT>0)G.frostT-=dt;if(G.t<TUNE.emod+LAD().emod-1)return;for(const e of enemies.a){if(!e.a||!e.emod)continue;const dx=p.x-e.x,dy=p.y-e.y,d2=dx*dx+dy*dy;
+  if(e.emod==='frost'&&d2<150*150)G.frostT=.25;
+  else if(e.emod==='volley'&&d2<520*520){e.vt-=dt;if(e.vt<=0){e.vt=3.2;const a=Math.atan2(dy,dx);G.fb=G.fb||[];for(let i=-2;i<=2;i++)G.fb.push({x:e.x,y:e.y,vx:Math.cos(a+i*.2)*185,vy:Math.sin(a+i*.2)*185,life:3.2,dm:p.max*.09*TUNE.edm*(1+LAD().dm),el:1})}}}}
+function eliteBoom(e){if(e.emod!=='boom')return;G.tele=G.tele||[];G.tele.push({x:e.x,y:e.y,r:110,t:.9,T:.9,dmg:G.p.max*.22*TUNE.edm*(1+LAD().dm),el:1})}  // champions: yellow (~4%) / orange (~1%) XP tiers
 let SRC='',SKXP=.083;
 function ramp(S){if(!G.sig.rampage)return 1;G.swing=(G.swing||0)+1;if(G.swing%5)return 1;S.dmg*=2;S.area=Math.round(S.area*1.3);pop(G.p.x,G.p.y-44,'Rampage!','#ff6a5a',2);G.shake=Math.max(G.shake,.1);return 2}
-function hurt(e,d,sk,nc){const d0=d;d*=dmgMul(sk);if(e.mk>0)d*=1.15;let crit=false;const S9=G.sig;if(S9.wind2&&G.p.hp<G.p.max*.35)d*=1.3;if(S9.mark&&(e.elite||e.boss))d*=1.25;
+// v57: boss damage normaliser per weapon (single-target specialists hit bosses a bit less, crowd weapons a bit more)
+const BSM={"axes":1.12,"barrage":1.7,"bulwark":1.6,"cannon":0.62,"chainl":1.03,"chakram":0.67,"chin":0.99,"darts":0.59,"dbow":0.55,"eldritch":1.37,"falcon":0.73,"fire":0.7,"godsword":1.64,"halberd":1.26,"knives":0.55,"pillar":1,"prayer":1.5,"purging":1.46,"quake":2.01,"relic":1.38,"runes":1.07,"sang":0.87,"scim":1.17,"smite":0.72,"totem":0.75,"venator":0.61,"vortex":1.64,"whip":0.79,"wind":0.55};
+function hurt(e,d,sk,nc){const d0=d;d*=dmgMul(sk);if(e.boss){if(SRC&&BSM[SRC])d*=BSM[SRC];if(G.tr&&G.tr.bdm)d*=G.tr.bdm}if(e.mk>0)d*=1.15;let crit=false;const S9=G.sig;if(S9.wind2&&G.p.hp<G.p.max*.35)d*=1.3;if(S9.mark&&(e.elite||e.boss))d*=1.25;
  if(!nc&&!e.prop){if(S9.bleed&&sk==='Attack'){e.bdps=Math.max(e.bleed>0?e.bdps||0:0,d0*.15);e.bleed=2}if(sk==='Magic'){if(S9.frost)e.slow=Math.max(e.slow,1);if(S9.burn&&Math.random()<.08){let nb=0;for(const f of fx.a)if(f.a&&f.kind==='burn')nb++;if(nb<10){const f=addFx(e.x,e.y,36,3,'burn');if(f)f.dmg=d0*.14}}}}
  if(!nc){const cl=G.sig.cleave&&sk==='Attack',cc=critCh()+(cl?.15:0);if(cc>0&&Math.random()<cc){d*=2;crit=true;if(cl){addFx(e.x,e.y,70,.25,'ring');for(const o of enemies.a)if(o.a&&o!==e&&!o.prop&&(o.x-e.x)**2+(o.y-e.y)**2<70*70)hurt(o,d*.5/dmgMul(sk),sk,true)}}}
  const real=Math.min(d,Math.max(0,e.hp));if(real>0&&!e.prop){if(SRC){G.dmg[SRC]=(G.dmg[SRC]||0)+real;if(G.first[SRC]==null)G.first[SRC]=G.t}if(sk){const nx=Math.min(2.7,real/enemyScale(G.t)*SKXP);G.ndmg=(G.ndmg||0)+nx;addSkillXp(sk,nx);addSkillXp('Hitpoints',nx*.35)}}
@@ -945,11 +984,11 @@ function dropItem(x,y,k,v,b){const it=items.get();if(it){it.x=x+(Math.random()-.
 function launch(it,big){if(!it)return;const a=Math.random()*6.283,s=50+Math.random()*60;it.vx=Math.cos(a)*s;it.vy=Math.sin(a)*s*.6;it.vz=big?440:340;it.z=.1;const T=CHESTS[it.v]||CHESTS[0];burst(it.x,it.y,T.c,big?16:10,big?280:190);burst(it.x,it.y,'',big?12:7,big?240:170,GL[T.gl]);addFx(it.x,it.y,big?90:60,.4,'ring');G.shake=Math.max(G.shake,big?.25:.08)}
 function kill(e){e.a=false;
  if(e.prop){burst(e.x,e.y,e.t==='torch'?'#ffb040':'#8a5a30',12,140);const r=Math.random(),pk=r<.42?'coin':r<.50125?'food':r<.53875?'magnet':r<.57?'bomb':r<.60125?'star':r<.6325?'ult':null;if(pk)dropItem(e.x,e.y,pk,pk==='coin'?5:1);return}  // power-ups x0.3125
- G.kills++;if(G.sig.leech)G.p.hp=Math.min(G.p.max,G.p.hp+.5);if(G.sig.fleet)G.fleet=1.1;burst(e.x,e.y,DCOL[e.t]||'#fff',e.boss?40:9,e.boss?220:130);burst(e.x,e.y,'',e.boss?14:3,90,GL.white);addFx(e.x,e.y,e.r*1.8,.28,'ring');
- const v=e.xp;const g=gems.get();if(g){g.x=e.x;g.y=e.y;g.v=v;g.mag=false;g.tier=e.elite||e.boss||e.champ===2?2:e.champ||(ETYPES[e.t].gt?1:0)}else{const o=gems.a[Math.random()*gems.a.length|0];o.v+=v}
+ G.kills++;if(G.sig.leech)G.p.hp=Math.min(G.p.max,G.p.hp+.5);if(G.sig.fleet)G.fleet=1.1;{const lite=!e.boss&&brrK()>0;burst(e.x,e.y,DCOL[e.t]||'#fff',e.boss?40:lite?4:9,e.boss?220:130);if(!lite||Math.random()<.3){burst(e.x,e.y,'',e.boss?14:3,90,GL.white);addFx(e.x,e.y,e.r*1.8,.28,'ring')}}
+ const v=e.xp;const g=gems.get();if(g){g.x=e.x;g.y=e.y;g.v=v;g.mag=false;g.bt=G.t;g.tier=e.elite||e.boss||e.champ===2?2:e.champ||(ETYPES[e.t].gt?1:0)}else{const o=gems.a[Math.random()*gems.a.length|0];o.v+=v}
  if(e.fin){dropItem(e.x+24,e.y+10,'shark');finalWin(e);return}
  if(e.tgob){launch(dropItem(e.x,e.y,'chest',chestTier(0)));for(let i=0;i<5;i++)dropItem(e.x+(Math.random()-.5)*50,e.y+(Math.random()-.5)*50,'coin',8);G.banner={txt:'Treasure goblin caught!',life:1.8,col:'#ffd24a'}}
- if(e.boss){pop(e.x,e.y-60,'Boss slain!','#ffb040');G.shake=.5;if(megaRoll(G.bossKills?MEGA_RATES.boss:MEGA_RATES.boss1))dropMega(e.x-30,e.y);G.bossKills++;dropItem(e.x+24,e.y+10,'shark');{for(const o of enemies.a)if(o.a&&!o.prop&&o!==e){o.a=false;burst(o.x,o.y,'',3,80,GL.white)}const bc=dropItem(G.p.x+70,G.p.y-20,'chest',chestTier(1),1);if(bc){bc.bl=1;launch(bc,1)}dropItem(G.p.x-70,G.p.y-20,'magnet');G.brk=1;G.brkCd=0;for(const q of gems.a)if(q.a)q.mag=true;G.banner={txt:'Victory! Collect the loot',life:2.5,col:'#ffd24a',big:1,brk:1};buzz([40,40,80])}if(G.loot.length<12)G.loot.push({x:e.x,y:e.y+34,tier:Math.min(3,rollTier(1)+1)});for(let i=0;i<6;i++)dropItem(e.x,e.y,'coin',10);return}
+ if(e.emod)eliteBoom(e);if(e.boss){pop(e.x,e.y-60,'Boss slain!','#ffb040');G.shake=.5;if(megaRoll(G.bossKills?MEGA_RATES.boss:MEGA_RATES.boss1))dropMega(e.x-30,e.y);G.bossKills++;dropItem(e.x+24,e.y+10,'shark');{for(const o of enemies.a)if(o.a&&!o.prop&&o!==e){o.a=false;burst(o.x,o.y,'',3,80,GL.white)}const bc=dropItem(G.p.x+70,G.p.y-20,'chest',chestTier(1),1);if(bc){bc.bl=1;launch(bc,1)}dropItem(G.p.x-70,G.p.y-20,'magnet');G.brk=1;G.brkCd=0;for(const q of gems.a)if(q.a)q.mag=true;G.banner={txt:'Victory! Collect the loot',life:2.5,col:'#ffd24a',big:1,brk:1};buzz([40,40,80])}if(G.loot.length<12)G.loot.push({x:e.x,y:e.y+34,tier:Math.min(3,rollTier(1)+1)});for(let i=0;i<6;i++)dropItem(e.x,e.y,'coin',10);return}
  if(e.elite){launch(dropItem(e.x,e.y,'chest',chestTier(0)));if(G.loot.length<12)G.loot.push({x:e.x+34,y:e.y+8,tier:rollTier(1)});dropItem(e.x+12,e.y,'coin',10);if(megaRoll(MEGA_RATES.elite))dropMega(e.x-20,e.y);return}
  if(megaRoll(MEGA_KILL))dropMega(e.x,e.y);
  else if(Math.random()<1/2500&&G.loot.length<10)G.loot.push({x:e.x,y:e.y,tier:rollTier(1)});
@@ -967,10 +1006,13 @@ const STARTERS={scim:1,knives:1,wind:1,prayer:1};
 // v49: explicit class weapon pools for 2nd starting weapon (Armed bonus / Arsenal perk); never by skill
 const CPOOL={warrior:['scim','halberd'],ranger:['knives','cannon','darts','chin'],mage:['wind','barrage','fire','runes'],cleric:['prayer','smite']};
 const classPool=c=>Object.keys(WEAPONS).filter(k=>!WEAPONS[k].elite&&(WEAPONS[k].cls===c||(!WEAPONS[k].cls&&(CPOOL[c]||[]).includes(k)))&&avail(WEAPONS[k]));
-function wstat(k,L){{const MX=WEAPONS[k]&&WEAPONS[k].max;if(MX&&L>MX){const S=wstat(k,MX),o=L-MX;S.dmg*=1+OV_D*o;S.cd*=Math.pow(OV_CD,o);if(S.area)S.area=Math.round(S.area*(1+OV_A*o));return S}}const st=STARTERS[k],S=wstat0(k,L);if(L>8&&!st)S.dmg=wstat0(k,8+(L-8)*.5).dmg;if(st){S.dmg*=1.1+.05*L;if(k==='wind')S.pierce=Math.max(S.pierce,Math.floor(L/6))}if(WEAPONS[k]&&WEAPONS[k].elite)S.dmg*=(EMUL[k]||.75);  // v23: Lv9-12 dmg gains halved
- if(PROJW[k]&&G.bon.proj)S.proj+=G.bon.proj;if(PROJW[k]&&G.tr&&G.tr.proj)S.proj+=G.tr.proj;if(G.evo&&G.evo[k]){S.dmg*=1.25;S.cd*=.92;if(PROJW[k])S.proj+=1;if(S.area)S.area=Math.round(S.area*1.1);if(S.pierce<99)S.pierce+=2;S.evo=1}if(G.cls==='warrior'&&WARW[k]){S.dmg*=(WAR_D+WAR_DA*actK())*(1+WAR_LATE*easeK(G.t));if(S.area)S.area=Math.round(S.area*WAR_A)}return S}
+// v57: every weapon follows one smooth power curve (bench-calibrated per level); elites follow the Sanguinesti curve; evolving is a +20% step
+const WCAL={"axes":[0.8816,0.8065,0.6583,0.6652,0.7075,0.6706,0.706,0.7832,0.8483,0.9971,1.2836,1.6523],"barrage":[0.6274,0.5725,0.5674,0.5591,0.5396,0.5338,0.5379,0.5792,0.6773,0.8105,0.9723,1.1844],"bulwark":[0.669,0.6446,0.6092,0.6229,0.6528,0.6665,0.5765,0.5092,0.4741,0.4887],"cannon":[0.6656,0.6536,0.6531,0.5948,0.5651,0.5933,0.5862,0.5827,0.6641,0.8036,0.9776,1.2174],"chainl":[1.5937,1.5493,1.54,1.6102,1.7182,1.5285,1.1784,1.0904,1.2176,1.4024,1.5838,1.7226],"chakram":[2.6671,2.2467,1.578,1.3804,1.3191,1.1433,1.1466,1.1818,1.141,1.247,1.3718,1.2742],"chin":[1.6384,1.0944,0.7731,0.744,0.7119,0.6002,0.5698,0.5527,0.5423,0.5941,0.6216,0.5513],"darts":[1.6844,1.5109,1.1492,1.043,0.987,0.8309,0.8114,0.8911,0.9315,1.0151,1.0901,0.9578],"dbow":[1.2186,1.3629,1.4146,1.5435,1.6869,1.8134,1.6207,1.4723,1.3977,1.4406],"eldritch":[2.548,2.2745,2.173,2.1418,1.7672,1.3063,0.9546,0.8124,0.7426,0.7282],"falcon":[0.7782,0.8284,0.7147,0.5576,0.5186,0.569,0.5513,0.4918,0.502,0.5686,0.6597,0.7308],"fire":[1.5311,1.2882,0.9286,0.8249,0.7978,0.7037,0.7027,0.7229,0.6991,0.7482,0.8042,0.7542],"godsword":[1.9503,1.7545,1.6885,1.3772,0.9201,0.7609,0.6278,0.5499,0.5387,0.5403],"halberd":[0.5609,0.6507,0.6837,0.6691,0.7096,0.7925,0.773,0.6785,0.6773,0.7486,0.83,0.9543],"knives":[1.709,1.4636,1.0787,0.9081,0.799,0.6818,0.6668,0.6578,0.5912,0.5682,0.5618,0.493],"pillar":[1,1,1,1,1,1,1,1,1,1,1,1],"prayer":[0.4507,0.3951,0.3634,0.3492,0.3459,0.3513,0.3663,0.3907,0.4224,0.4629,0.5137,0.5728],"purging":[1.6521,1.152,0.8893,0.7904,0.7443,0.7375,0.6321,0.5374,0.4784,0.4835],"quake":[0.4293,0.4361,0.4611,0.488,0.5093,0.5396,0.5776,0.6361,0.7289,0.8475,0.9659,1.0847],"relic":[6.2857,6.4135,5.7774,5.4381,5.2899,4.7244,3.682,3.2453,2.8072,2.4056],"runes":[1.0314,1.1427,1.0369,0.9936,0.9702,0.9,0.9558,1.1046,1.2427,1.4682,1.89,2.4329],"sang":[1.1674,1.1671,1.1098,1.0784,1.1039,1.1238,0.9425,0.8263,0.743,0.6789],"scim":[0.6338,0.578,0.5714,0.5679,0.4945,0.3808,0.342,0.3607,0.3738,0.3897,0.4257,0.4874],"smite":[1.2827,1.0569,0.8085,0.6823,0.623,0.5623,0.5553,0.5557,0.5445,0.5888,0.6228,0.561],"totem":[0.7881,0.8197,0.8162,0.7938,0.8205,0.9149,0.9903,1.0302,1.1582,1.3508,1.4905,1.5899],"venator":[2.2586,2.4299,2.2731,1.8368,1.7442,1.7539,1.3424,1.1274,1.0596,1.0707],"vortex":[1.705,1.0675,0.9447,0.9381,0.9995,1.1841,1.1659,1.0471,1.06,1.1755,1.344,1.5335],"whip":[1.7066,1.5323,1.4572,1.3757,1.3713,1.4006,1.1185,0.9398,0.8626,0.7817],"wind":[1.4811,1.2789,0.9393,0.8454,0.8291,0.727,0.7088,0.7152,0.6538,0.6273,0.6364,0.6187]},WCALE={"axes":1.26,"barrage":0.862,"cannon":0.944,"chainl":0.568,"chakram":0.622,"chin":0.721,"darts":0.731,"falcon":0.62,"fire":0.76,"halberd":0.834,"knives":0.624,"pillar":1,"prayer":0.766,"quake":0.803,"runes":1.273,"scim":0.806,"smite":0.718,"totem":0.87,"vortex":0.82,"wind":0.977},WBUFF={"axes":1.01,"barrage":0.89,"bulwark":0.86,"cannon":1.35,"chainl":1.03,"chakram":1.17,"chin":1.03,"darts":1.35,"dbow":1.26,"eldritch":0.88,"falcon":1.28,"fire":1.2,"godsword":0.86,"halberd":0.94,"knives":1.35,"prayer":0.89,"purging":0.87,"quake":0.86,"relic":0.89,"runes":0.99,"sang":0.97,"scim":0.94,"smite":1.21,"totem":1.24,"venator":1.11,"vortex":0.94,"whip":1.02,"wind":1.35};  // crowd-weighted correction (crowds matter more than single targets in real runs); Fire Wave +8% on top
+const WT=L=>L<=12?.04*Math.pow(1.313,L-1):.8*Math.pow(1.07,L-12),WTE=L=>1.1*WT(L+6),wCurve=(k,L)=>WEAPONS[k]&&WEAPONS[k].elite?WTE(L):WT(L);
+function wstat(k,L){{const MX=WEAPONS[k]&&WEAPONS[k].max;if(MX&&L>MX){const S=wstat(k,MX),o=L-MX;S.dmg*=wCurve(k,L)/wCurve(k,MX)*Math.pow(OV_CD,o)/Math.sqrt(1+OV_A*o);S.cd*=Math.pow(OV_CD,o);if(S.area)S.area=Math.round(S.area*(1+OV_A*o));return S}}const st=STARTERS[k],S=wstat0(k,L);if(L>8&&!st)S.dmg=wstat0(k,8+(L-8)*.5).dmg;if(st){S.dmg*=1.1+.05*L;if(k==='wind')S.pierce=Math.max(S.pierce,Math.floor(L/6))}if(WEAPONS[k]&&WEAPONS[k].elite)S.dmg*=(EMUL[k]||.75);  // v23: Lv9-12 dmg gains halved
+ if(PROJW[k]&&G.bon.proj)S.proj+=G.bon.proj;if(PROJW[k]&&G.tr&&G.tr.proj)S.proj+=G.tr.proj;{const c=WCAL[k];if(c&&L>=1)S.dmg*=c[Math.min(c.length,Math.max(1,Math.round(L)))-1]*(WBUFF[k]||1)}if(G.evo&&G.evo[k]){S.dmg*=1.25*(WCALE[k]||1);S.cd*=.92;if(PROJW[k])S.proj+=1;if(S.area)S.area=Math.round(S.area*1.1);if(S.pierce<99)S.pierce+=2;S.evo=1}if(G.cls==='warrior'&&WARW[k]){S.dmg*=(WAR_D+WAR_DA*actK())*(1+WAR_LATE*easeK(G.t));if(S.area)S.area=Math.round(S.area*WAR_A)}return S}
 // v54: Warrior melee kit hits harder and wider when played as Warrior
-const WARW={scim:1,halberd:1,axes:1,quake:1,godsword:1,bulwark:1,whip:1},WAR_D=1.2,WAR_DA=.6,WAR_A=1.25,WAR_RG=.012,WAR_LATE=.6;
+const WARW={scim:1,halberd:1,axes:1,quake:1,godsword:1,bulwark:1,whip:1},WAR_D=.5,WAR_DA=.1,WAR_A=1.0,WAR_RG=.012,WAR_LATE=0;
 function wstat0(k,L){const m=k==='wind'||k==='barrage'||k==='fire'||k==='runes'?mg('shadow'):k==='knives'||k==='cannon'||k==='darts'||k==='chin'?mg('tbow'):k==='scim'||k==='halberd'?mg('scythe'):0,A=AREA(),D=durMul();switch(k){
  case 'axes':return{dmg:8+L*2,cd:.35,proj:1+pb(L),area:Math.round((62+L*3)*A),pierce:99,sp:3.2+L*.12};
  case 'quake':return{dmg:16+L*4,cd:Math.max(1.6,3.2-L*.12),area:Math.round((95+L*7)*A),proj:0,pierce:99};
@@ -1007,7 +1049,7 @@ function acctStr(){let r=0,m=0;for(const k in SHOP){if(SHOP[k].cosm||k==='trail'
  const S=.5*(m?r/m:0)+.5*Math.max(0,Math.min(1,(sk-35)/45));return Math.max(0,Math.min(1,(S-.3)/.65))}
 function acctEase(){let r=0,m=0;for(const k in SHOP){if(SHOP[k].cosm||k==='trail')continue;m+=SHOP[k].max;r+=Math.min(SHOP[k].max,META.shop[k]||0)}const sk=['Attack','Ranged','Magic','Prayer','Hitpoints'].reduce((a,k)=>a+sLvl(k),0)/5;const S=.5*(m?r/m:0)+.5*Math.max(0,Math.min(1,(sk-40)/59));G.mraw=S;return Math.max(0,Math.min(1,(S-.5)/.5))}
 // v52: strong accounts that keep moving get a softer back half (enemy count cap + lower density/HP); the v51 mega penalty mostly bites when idle
-const EASE_CAP=150,EASE_DEN=.35,EASE_HP=.2,MACC_ACT=.75;
+const EASE_CAP=150,EASE_DEN=0,EASE_HP=0,MACC_ACT=.75;
 // v53: small forgiveness for everyone below maxed (tapers to 0 at max): gentler bosses before 9:00, and a mild active-gated back-half ease from 10:00
 const FG_CAP=90,FG_DEN=.15,FG_HP=.12,FG_BHP=.3,FG_BDM=.25;const fgK=t=>(G.mfg||0)*actK()*Math.max(0,Math.min(1,(t-600)/600)),fgB=()=>G.t<540?(G.mfg||0):0;const actK=()=>Math.max(0,Math.min(1,((G.act??1)-.3)/.4)),easeK=t=>Math.pow(G.mease||0,2.2)*actK()*Math.max(0,Math.min(1,(t-900)/600));
 const MACC_D=.5,MACC_B=3.5,MACC_N=.3,MACC_I=.5;const megaAcc=()=>{const S=(G.macct||0)*(1-MACC_ACT*actK());return S?1-MACC_D*S*Math.max(0,Math.min(1,(G.t-300)/600)):1},megaBack=t=>G.macct&&Object.keys(G.mega).length?MACC_B*G.macct*(1-MACC_ACT*actK())*Math.pow(Math.max(0,Math.min(1,(t-420)/600)),1.2):0;
@@ -1020,7 +1062,7 @@ function mstat(k,L){const A=AREA();switch(k){
  case 'ely':return{dmg:200*mdm(L),cd:2.5,proj:0,area:Math.round(80*A),pierce:99,block:1-Math.pow(.7,L)}}}
 function startFinal(){show('finalOv',0);G.paused=false;last=performance.now();G.fin=1;G.fT=3;G.fP=0;G.tele=[];G.fb=[];G.enr=0;for(const o of enemies.a)if(o.a&&!o.prop)o.a=false;
  const a=Math.random()*6.283,e=spawn('titan',{boss:true,x:G.p.x+Math.cos(a)*420,y:G.p.y+Math.sin(a)*420});if(e){e.fin=1;e.champ=0;G.titanRef=e;G.bossE=e;G.bossT=90;startCage(e);G.escTot=G.escLeft=120;G.escAcc=0}G.banner={txt:'The Ember Titan!',life:3,col:'#ff7a1a',big:1};G.shake=.6;buzz([60,40,120])}
-function hurtP(d){const p=G.p;if(p.inv>0||p.star>0)return;const dm=d*drMul();p.hp-=dm;p.inv=.35;G.shake=Math.max(G.shake,.3);pop(p.x,p.y-26,Math.round(dm)+'','#ff8a6a',3);buzz(20)}
+function hurtP(d,src){const p=G.p;if(p.inv>0||p.star>0)return;const dm=d*drMul();p.hp-=dm;{const H=G.hsrc||(G.hsrc={});H[src||'b']=(H[src||'b']||0)+dm/p.max;G.lastSrc=(src||'b')+(G.bossT>0?'@boss':'')}p.inv=.35;G.shake=Math.max(G.shake,.3);pop(p.x,p.y-26,Math.round(dm)+'','#ff8a6a',3);buzz(20)}
 function titanAI(dt,p){const T=G.titanRef;G.tele=G.tele||[];G.fb=G.fb||[];
  if(T&&T.a){const enr=T.hp<T.max*.3;if(enr&&!G.enr){G.enr=1;T.sp*=1.4;G.banner={txt:'The Titan is ENRAGED!',life:2.5,col:'#ff3a1a',big:1};G.shake=.5}
   G.fT-=dt;if(G.fT<=0){G.fT=enr?2.4:3.6;const k=(G.fP++)%3;
@@ -1041,7 +1083,9 @@ function bossSig(B,p,a,tt,M,half,idx){const T=G.tele,id=B.bid||0,D=M*.25,R=(n,r,
  else if(id===7)R(half?16:12,55,M*.2,300);
  else{const c=Math.cos(a),s=Math.sin(a);[-130,0,130].forEach((o,i)=>T.push({x:B.x-s*o-c*80,y:B.y+c*o-s*80,lane:1,a,len:820,w:40,t:tt+.15+i*.25,T:tt+.15+i*.25,dmg:D}))}}
 function dragonAI(dt,p){const B=G.bossE,on=B&&B.a&&B.boss&&!B.fin&&G.bossT>0;G.tele=G.tele||[];
- if(!on){if(G.tele.length&&!G.fin)G.tele=[];if(G.fb&&G.fb.length&&!G.fin)G.fb=[];G.dB=null;return}
+ if(!on){if(!G.fin){G.tele=G.tele.filter(z=>z.el);if(G.fb)G.fb=G.fb.filter(b=>b.el)}G.dB=null;eliteFx(dt,p);
+  if(!G.fin){for(const z of G.tele){z.t-=dt;if(z.t<=0&&!z.done){z.done=1;addFx(z.x,z.y,z.r,.4,'ring');burst(z.x,z.y,'#ff7a1a',10,200);G.shake=Math.max(G.shake,.25);if(zHit(z,p.x,p.y))hurtP(z.dmg,z.el?'e':'b')}}G.tele=G.tele.filter(z=>!z.done);if(G.fb&&G.fb.length){for(const b of G.fb){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if((p.x-b.x)**2+(p.y-b.y)**2<18*18){b.life=0;hurtP(b.dm||30,b.el?'e':'b')}}G.fb=G.fb.filter(b=>b.life>0)}}return}
+ if(on)eliteFx(dt,p);
  if(G.dB!==B){G.dB=B;G.dT=2.5;G.dP=0}
  const idx=Math.max(0,Math.round(G.t/180)-1),half=B.hp<B.max*.5,tt=Math.max(.65,.95-idx*.03),M=p.max*(1-FG_BDM*fgB());
  G.dT-=dt;if(G.dT<=0){G.dT=Math.max(1.5,3.4-idx*.15)*(half?.72:1);const k=(G.dP++)%4,a=Math.atan2(p.y-B.y,p.x-B.x);if(k===3){bossSig(B,p,a,tt,M,half,idx)}else 
@@ -1049,7 +1093,7 @@ function dragonAI(dt,p){const B=G.bossE,on=B&&B.a&&B.boss&&!B.fin&&G.bossT>0;G.t
   else if(k===1)G.tele.push({x:B.x,y:B.y,r:(B.r||60)+110,t:tt,T:tt,dmg:M*.25});
   else{const n=Math.min(9,3+Math.floor(idx/2)+(half?2:0));for(let i=0;i<n;i++){const a2=Math.random()*6.283,d=i?90+Math.random()*190:0;G.tele.push({x:p.x+Math.cos(a2)*d,y:p.y+Math.sin(a2)*d,r:62,t:tt+.15+i*.08,T:tt+.15+i*.08,dmg:M*.2})}}}
  for(const z of G.tele){z.t-=dt;if(z.t<=0&&!z.done){z.done=1;addFx(z.x,z.y,z.cone||z.lane?80:z.r,.4,'ring');burst(z.x,z.y,'#ff7a1a',z.cone?20:10,220);G.shake=Math.max(G.shake,.3);if(zHit(z,p.x,p.y))hurtP(z.dmg);if(z.tp&&z.tp.a){z.tp.x=z.x+Math.cos(z.a)*z.len*.85;z.tp.y=z.y+Math.sin(z.a)*z.len*.85;burst(z.tp.x,z.tp.y,'#8a6a3a',20,200)}}}G.tele=G.tele.filter(z=>!z.done);
- if(G.fb&&G.fb.length){for(const b of G.fb){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if((p.x-b.x)**2+(p.y-b.y)**2<18*18){b.life=0;hurtP(b.dm||30)}}G.fb=G.fb.filter(b=>b.life>0)}}
+ if(G.fb&&G.fb.length){for(const b of G.fb){b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if((p.x-b.x)**2+(p.y-b.y)**2<18*18){b.life=0;hurtP(b.dm||30,b.el?'e':'b')}}G.fb=G.fb.filter(b=>b.life>0)}}
 const fillGold=()=>Math.round((5+Math.min(G.t,900)/90)*goldMul());
 function finalWin(e){const bonus=Math.round(2500*goldMul());G.gold+=bonus;burst(e.x,e.y,'#ff7a1a',60,300);for(let i=0;i<20;i++)dropItem(e.x,e.y,'coin',50);G.fin=0;G.won=true;G.titanRef=null;gameOver(true);
  try{$('overT').textContent='The Ember Titan falls! Victory!';$('newrec').insertAdjacentHTML('afterbegin',`<p style="color:#ffd24a">Titan reward: +${bonus} gold</p>`)}catch(_){}}
@@ -1148,7 +1192,7 @@ function weapons(dt){const p=G.p,w=G.w,cd=G.cd,dc=dt*(1+G.bon.cd)*(G.tr?G.tr.cdm
 let XPA=8,XPB=17,XPP=1.9;
 // orange gems (rare: orange champions, elites, bosses) are worth ~2 levels early, tapering to ~0.75 level by Lv20+
 function orangeXp(L){const k=Math.max(.75,2-1.25*(L-2)/18);let v=0,i=0;for(;i<Math.floor(k);i++)v+=needFor(L+i);v+=(k-Math.floor(k))*needFor(L+i);return Math.max(30,Math.round(v))}
-function needFor(L){const v=XPA+XPB*Math.pow(L-1,XPP+(L>13?.1*Math.min(1,(L-13)/10):0));return Math.round((L<=13?v*.7:v)*(L>=10?1+.15*Math.pow(L-9,1.3):1)*(L>40?1+XP_LATE*(L-40):1))}const XP_LATE=.045;  // v55: slower past Lv40  // v23: steeper from Lv10 (x1.15@10, x1.9@13, x4.4@20, x7.9@28)  // levels 1-13 are 30% cheaper
+function needFor(L){const v=XPA+XPB*Math.pow(L-1,XPP+(L>13?.1*Math.min(1,(L-13)/10):0));return Math.round((L<=13?v*.7:v)*(L>=10?1+.15*Math.pow(L-9,1.3):1)*(L>40?1+XP_LATE*(L-40):1))}const XP_LATE=.11;  // v55: slower past Lv40  // v23: steeper from Lv10 (x1.15@10, x1.9@13, x4.4@20, x7.9@28)  // levels 1-13 are 30% cheaper
 function gainXp(v){v*=xpMul();G.xp+=v;G.xpTot=(G.xpTot||0)+v;if(G.xp>=G.next&&!G.paused){G.xp-=G.next;G.lvl++;G.next=needFor(G.lvl);levelUp()}}
 // v26 variety: per-run seeded phase order (normal/horde/brute shuffled every 135s cycle) + a seeded 'flavor' type per 3-min block
 function srnd(n){let x=((G.seed|0)^Math.imul(n|0,0x9E3779B1))>>>0;x=Math.imul(x^x>>>16,0x45d9f3b);x=Math.imul(x^x>>>16,0x45d9f3b);return ((x^x>>>16)>>>0)/4294967296}
@@ -1216,10 +1260,11 @@ function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();ret
   if(G.bossT<=0){const B=G.bossE;G.bossT=0;G.bossE=null;if(B.fin){G.titanRef=null;gameOver(false);try{$('overT').textContent='The Ember Titan endured — time ran out!'}catch(_){}return}B.a=false;burst(B.x,B.y,'#ff5a2a',40,260);endCage();G.banner={txt:'The dragon escapes! No loot.',life:2.6,col:'#ff8a6a',big:1};G.eliteNext=Math.max(G.eliteNext,G.t+20);G.swarmNext=Math.max(G.swarmNext,G.t+25)}}}if(!calm&&!bossOn)G.t+=dt;  // v27: run clock frozen during boss fights
  if(G.brk){if(!items.a.some(i=>i.a&&i.bl)){const bc=dropItem(p.x+70,p.y-20,'chest',chestTier(1),1);if(bc){bc.bl=1;launch(bc,1)}else G.brk=0,G.brkCd=3}if(!G.banner||G.banner.brk)G.banner={txt:'Victory! Collect the loot',life:.4,col:'#ffd24a',big:1,brk:1}}
  else if(G.brkCd>0){G.brkCd-=dt;G.banner=G.brkCd>0?{txt:String(Math.ceil(G.brkCd)),life:.4,col:'#ffe28a',big:1,brk:1}:{txt:'Fight!',life:1,col:'#ff8a6a',big:1}}
- const[dx,dy]=inputVec(),sp=p.sp*spdMul()*(G.fleet>0?1.3:1);p.x+=dx*sp*dt;p.y+=dy*sp*dt;if(dx||dy){const l=Math.hypot(dx,dy);p.face=[dx/l,dy/l]}p.moving=!!(dx||dy);
+ const[dx,dy]=inputVec(),sp=p.sp*spdMul()*(G.fleet>0?1.3:1);p.x+=dx*sp*dt;p.y+=dy*sp*dt;if(dx||dy){const l=Math.hypot(dx,dy);p.face=[dx/l,dy/l]}else if((G.fcT=(G.fcT||0)-dt)<=0){G.fcT=.3;let bd=220*220,bx=0,by=0;for(const e of enemies.a){if(!e.a||e.prop)continue;const ex=e.x-p.x,ey=e.y-p.y,q=ex*ex+ey*ey;if(q<bd){bd=q;bx=ex;by=ey}}if(bx||by){const l=Math.hypot(bx,by);p.face=[bx/l,by/l]}}p.moving=!!(dx||dy);p.vx=dx*sp;p.vy=dy*sp;
  // waves: ~30 min structure
- if(!calm&&!G.fin&&!bossOn){G.spawnT-=dt;if(G.spawnT<=0){G.spawnT=Math.max(.14,1-G.t/300);const ph=phaseAt(G.t);G.spawnAcc=(G.spawnAcc||0)+(1+G.t/90)*.65*midSoft(G.t)*backDen(G.t)*(G.lull>0?.05:1)*(ph===1?1.25:ph===2&&G.t>=240?.8:1)*(1+BRR_DEN*brrK());let n=Math.max(0,Math.floor(G.spawnAcc));const ty=waveTypes(G.t);G.spawnAcc-=n;const eK=easeK(G.t),fK=fgK(G.t);if(eK>0||fK>0){let al=0;for(const o of enemies.a)if(o.a&&!o.prop)al++;n=Math.min(n,Math.max(0,Math.round(320-Math.max(EASE_CAP*eK,FG_CAP*fK))-al))}for(let i=0;i<n;i++)spawn(pickT(ty))}  // ~35% fewer stream spawns
- if(G.t>=G.eliteNext){G.eliteNext+=90;const ty=waveTypes(G.t);spawn(G.t>=180?'skeleton':ty[ty.length-1],{elite:true});G.banner={txt:'An elite approaches!',life:1.8,col:'#ffd24a'}}
+ if(!calm&&!G.fin&&!bossOn){G.spawnT-=dt;if(G.spawnT<=0){G.spawnT=Math.max(.14,1-G.t/300);const ph=phaseAt(G.t);G.spawnAcc=(G.spawnAcc||0)+(1+G.t/90)*.65*midSoft(G.t)*backDen(G.t)*(G.lull>0?.05:1)*(ph===1?1.25:ph===2&&G.t>=240?.8:1)*(1+BRR_DEN*brrK())*lerpT(TUNE.den,G.t/60)*(1+LAD().den);let n=Math.max(0,Math.floor(G.spawnAcc));const ty=waveTypes(G.t);G.spawnAcc-=n;const eK=easeK(G.t),fK=fgK(G.t);if(eK>0||fK>0){let al=0;for(const o of enemies.a)if(o.a&&!o.prop)al++;n=Math.min(n,Math.max(0,Math.round(320-Math.max(EASE_CAP*eK,FG_CAP*fK))-al))}for(let i=0;i<n;i++)spawn(pickT(ty))}  // ~35% fewer stream spawns
+ if(G.t>=G.eliteNext){G.eliteNext+=lerpT(TUNE.eg,G.t/60)*LAD().eg;const ty=waveTypes(G.t);const EE=spawn(G.t>=180?'skeleton':ty[ty.length-1],{elite:true});G.banner={txt:EE&&EE.emod?EMODN[EE.emod]:'An elite approaches!',life:2,col:'#ffd24a'};if(LAD().n==='Nightmare'&&G.t>=300)spawn(G.t>=180?'skeleton':ty[ty.length-1],{elite:true})}
+ if(LAD().horde&&!G.fin){G.hordeI=G.hordeI||0;const HT=[660,840,1020];if(G.hordeI<3&&G.t>=HT[G.hordeI]){G.hordeI++;const ty=waveTypes(G.t),Rr=Math.max(W,H)*.6+40,N=Math.round((40+30*LAD().horde)*Math.min(2.2,.7+G.t/720));for(let i=0;i<N;i++){const a=i/N*6.283;spawn(pickT(ty),{x:p.x+Math.cos(a)*Rr,y:p.y+Math.sin(a)*Rr,nochamp:1})}G.banner={txt:'Horde wave!',life:2,col:'#ff5a4a',big:1};buzz([30,30,30])}}
  if(G.evNext==null)G.evNext=G.t+60;if(G.t>=G.evNext){G.evNext=G.t+22+Math.random()*28;if(G.t>=45&&Math.abs(G.t-G.swarmNext)>8&&G.t>(G.bossEnd||0)+20&&!(G.lull>0)){spawnEvent();if(G.t>=360&&Math.random()<.2&&!(G.lull>0)){spawnEvent(1);G.banner={txt:'Double trouble!',life:2,col:'#ff6a4a',big:1}}}}  // v29: events every 22-50s, 20% double from 6:00 (never during boss fights/Titan)
  evTick(dt);
  if(G.t>=G.swarmNext){G.swarmNext+=70;G.swPend=1.6;G.banner={txt:'A swarm approaches!',life:1.8,col:'#ff8a6a',big:1};buzz([30,30,30])}  // tiny swarm rings every 70s
@@ -1241,12 +1286,12 @@ function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();ret
  let hit=0;const live=[];
  for(const e of enemies.a){if(!e.a)continue;e.hit-=dt;e.slow-=dt;if(e.prop){live.push(e);continue}if(e.bleed>0){e.bleed-=dt;e.btk-=dt;if(e.btk<=0){e.btk=.5;hurt(e,e.bdps*.5,'Attack',true);if(Math.random()<.5)burst(e.x,e.y,'#c01818',2,50);if(!e.a)continue}}live.push(e);const ex=p.x-e.x,ey=p.y-e.y,d=Math.hypot(ex,ey)||1;
   if(d>Math.max(W,H)*1.25&&!e.boss&&!e.elite){const a=Math.random()*6.283,r=Math.max(W,H)*.62;e.x=p.x+Math.cos(a)*r;e.y=p.y+Math.sin(a)*r;continue}
-  if(e.frz>0)e.frz-=dt;const s=e.sp*(e.frz>0?0:e.slow>0?.4:1);e.x+=ex/d*s*dt;e.y+=ey/d*s*dt;if(d<e.r+12)hit+=e.dmg}
+  if(e.frz>0)e.frz-=dt;const s=e.sp*(e.frz>0?0:e.slow>0?.4:1);if(e.lead&&d>50){const lk=Math.min(.6,d/300),mx=ex+(p.vx||0)*lk,my=ey+(p.vy||0)*lk,ml=Math.hypot(mx,my)||1;e.x+=mx/ml*s*dt;e.y+=my/ml*s*dt}else{e.x+=ex/d*s*dt;e.y+=ey/d*s*dt}if(d<e.r+12)hit+=e.dmg}
  const cell=40,grid=new Map();for(const e of live){if(e.prop)continue;const k=((e.x/cell)|0)*7919+((e.y/cell)|0);let b=grid.get(k);if(!b)grid.set(k,b=[]);b.push(e)}
  for(const b of grid.values())for(let i=0;i<b.length;i++)for(let j=i+1;j<b.length;j++){const A=b[i],B=b[j],x=B.x-A.x,y=B.y-A.y,d=Math.hypot(x,y)||1,m=A.r+B.r;if(d<m){const k=(m-d)/d*.5;A.x-=x*k;A.y-=y*k;B.x+=x*k;B.y+=y*k}}
  if(calm)hit=0;const raw=hit;hit*=drMul();if(G.sig.wind2&&p.hp<p.max*.35)hit*=.8;p.hp=Math.min(p.max,p.hp+dt*(1.5*mg('ely')+G.bon.regen)*(G.tr&&G.tr.still?1+stillK():1));p.star-=dt;
  if(hit&&p.inv<=0&&p.star<=0&&G.sig.ward&&G.wardT<=0){G.wardT=15;p.inv=.6;pop(p.x,p.y-40,'Warded!','#bfe8ff',2);addFx(p.x,p.y,56,.4,'holy');buzz(20)}
- else if(hit&&p.inv<=0&&p.star<=0){if(mg('ely')){G.blockFx=.35;if(Math.random()<.3)pop(p.x,p.y-40,'Blocked '+Math.round((raw-hit)*.25),'#ffe28a')}const dmg=hit*.25;p.hp-=dmg;p.inv=.25;G.shake=.15;if(G.t-(G.lastBuzz||-9)>.6){G.lastBuzz=G.t;buzz(p.hp<p.max*.3?25:10)}pop(p.x,p.y-26,Math.max(1,Math.round(dmg))+'','#fff',3)}p.inv-=dt;
+ else if(hit&&p.inv<=0&&p.star<=0){if(mg('ely')){G.blockFx=.35;if(Math.random()<.3)pop(p.x,p.y-40,'Blocked '+Math.round((raw-hit)*.25),'#ffe28a')}const dmg=hit*.25;p.hp-=dmg;{const H=G.hsrc||(G.hsrc={});H.c=(H.c||0)+dmg/p.max;G.lastSrc='c'+(G.bossT>0?'@boss':'');if(G.t>1380)H.cL=(H.cL||0)+dmg/p.max}p.inv=.25;G.shake=.15;if(G.t-(G.lastBuzz||-9)>.6){G.lastBuzz=G.t;buzz(p.hp<p.max*.3?25:10)}pop(p.x,p.y-26,Math.max(1,Math.round(dmg))+'','#fff',3)}p.inv-=dt;
  if(p.hp<=0){if(G.revLeft>0){G.revLeft--;G.revived=true;buzz([60,40,60]);p.hp=p.max*.5;p.inv=3;p.star=3;bomb();G.banner={txt:(G.sig.revive?'Redemption!':'Revival!')+' You rise again',life:2.6,col:'#ffe28a',big:1}}else{gameOver(false);return}}
  weapons(dt);
  for(const s of shots.a){if(!s.a)continue;s.age+=dt;
@@ -1260,7 +1305,7 @@ function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();ret
    if(s.bn>0&&s.pierce<=0){s.bn--;const n=nearest(e.x,e.y,260,s.hs||e);if(n){const a=Math.atan2(n.y-e.y,n.x-e.x),v=Math.hypot(s.vx,s.vy)||400;s.vx=Math.cos(a)*v;s.vy=Math.sin(a)*v;s.dmg*=.7;s.x+=s.vx*.03;s.y+=s.vy*.03;s.life=Math.max(s.life,.6);if(s.home)s.tg=n;addFx(e.x,e.y,14,.15,'ring');break}}
    if(s.pierce--<=0){s.a=false;break}}}}
  const mag=magR();
- for(const g of gems.a){if(!g.a)continue;const x=p.x-g.x,y=p.y-g.y,d=Math.hypot(x,y)||1;if(g.mag||d<mag){const v=g.mag?650:420;g.x+=x/d*v*dt;g.y+=y/d*v*dt}if(d<16){g.a=false;gainXp(g.tier===2?orangeXp(G.lvl):g.v)}}
+ for(const g of gems.a){if(!g.a)continue;const x=p.x-g.x,y=p.y-g.y,d=Math.hypot(x,y)||1;if(g.mag||d<mag){const v=g.mag?650:420;g.x+=x/d*v*dt;g.y+=y/d*v*dt}else if(d<900&&G.t-(g.bt||0)>8){g.x+=x/d*GEM_DRIFT*dt;g.y+=y/d*GEM_DRIFT*dt}if(d<16){g.a=false;gainXp(g.tier===2?orangeXp(G.lvl):g.v)}}
  for(const it of items.a){if(!it.a)continue;it.t+=dt;if(it.vz||it.z>0){it.vz-=1150*dt;it.z+=it.vz*dt;it.x+=it.vx*dt;it.y+=it.vy*dt;if(it.z<=0){it.z=0;if(it.vz<-140){it.vz=-it.vz*.42;it.vx*=.55;it.vy*=.55;burst(it.x,it.y,'rgba(230,210,170,.8)',5,70)}else{it.vz=0;it.vx=it.vy=0;if(it.k==='chest'){addFx(it.x,it.y,52,.35,'ring');burst(it.x,it.y,'',8,150,GL[(CHESTS[it.v]||CHESTS[0]).gl])}}}if(it.vz||it.z>0)continue}const x=p.x-it.x,y=p.y-it.y,d=Math.hypot(x,y)||1;if(it.mag||(it.k==='coin'&&d<mag)){it.x+=x/d*500*dt;it.y+=y/d*500*dt}if(d<24){collect(it);if(G.paused)break}if(d>1400&&it.k!=='chest')it.a=false;if(it.k==='chest'&&Math.random()<dt*(3+it.v*2))rise(it.x,it.y,GL[CHESTS[it.v].gl],3+it.v)}
  G.loot=G.loot.filter(l=>{if((l.x-p.x)**2+(l.y-p.y)**2<30*30){if(l.tier===4)grantMega(l.k);else applyDrop(l.tier);return false}if(l.tier&&Math.random()<dt*(2+l.tier*2))rise(l.x,l.y,GL[TIERS[l.tier].gl],3+l.tier);return true});
  for(const q of parts.a)if(q.a){q.x+=q.vx*dt;q.y+=q.vy*dt;q.vx*=.92;q.vy=q.vy*.92+q.grav*dt;q.life-=dt;if(q.life<=0)q.a=false}
@@ -1339,7 +1384,8 @@ const DBG={};function render(){const now=NOW=performance.now()/1000;const p=G.p;
    if(G.t-o.fl<.06){ctx.save();ctx.globalCompositeOperation='lighter';addGlow(GL.orange,o.x+Math.cos(o.ang)*22,o.y-6+Math.sin(o.ang)*22,30,1);ctx.restore()}}
   else if(d[1]===2){const e=o,fr=SPR[e.boss&&e.bsk?e.bsk:e.t][(Math.floor(now*6+e.ph)&1)],sc=(e.elite?1.35:e.champ?1.12:1)*(e.boss&&e.bsz?e.bsz:ETYPES[e.t].sz||1)*(e.sw?.7:1),w=fr.w*sc,h=fr.h*sc,flip=e.x>p.x&&!e.prop;const bob=e.prop?0:Math.abs(Math.sin(now*8+e.ph))*2;
    if(!DBG.ns)dI(SPR.shadow,e.x-w*.42+3,e.y+h*.3,w*.9,w*.3);
-   if(e.elite||e.boss){ctx.save();ctx.globalCompositeOperation='lighter';addGlow(GL[e.boss?'red':'gold'],e.x,e.y,w*1.5,.35+.15*Math.sin(now*4));ctx.restore()}
+   if(e.hunt&&!DBG.ns){ctx.save();ctx.globalCompositeOperation='lighter';addGlow(GL.red,e.x,e.y,w*.9,.28);ctx.restore()}if(e.emod==='frost'){ctx.save();ctx.globalAlpha=.16+.06*Math.sin(now*3);ctx.strokeStyle='#8fd8ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,150,0,6.283);ctx.stroke();ctx.restore()}
+    if(e.elite||e.boss){ctx.save();ctx.globalCompositeOperation='lighter';addGlow(GL[e.boss?'red':e.emod==='boom'?'orange':e.emod==='frost'?'ice':e.emod==='volley'?'purple':'gold'],e.x,e.y,w*1.5,.35+.15*Math.sin(now*4));ctx.restore()}
    else if(e.champ){ctx.save();ctx.globalCompositeOperation='lighter';addGlow(GL[e.champ===2?'orange':'gold'],e.x,e.y,w*(e.champ===2?1.5:1.25),(e.champ===2?.5:.38)+.12*Math.sin(now*5+e.ph));ctx.restore()}
    if(e.t==='torch'){ctx.save();ctx.globalCompositeOperation='lighter';addGlow(GL.orange,e.x,e.y-h*.3,70+6*Math.sin(now*9+e.ph),.45);ctx.restore()}
    if(!DBG.ne){ctx.save();ctx.translate(e.x,e.y-h*.1-bob);if(flip)ctx.scale(-1,1);ctx.drawImage(fr.c,-w/2,-h/2,w,h);if(e.hit>0){ctx.globalAlpha=e.hit*7;ctx.drawImage(fr.f,-w/2,-h/2,w,h)}ctx.restore();}
@@ -1456,7 +1502,7 @@ const STATN={fal:'Falcons',dmg:'Damage',cd:'Cooldown',area:'Area',proj:'Projecti
 const fCd=v=>(v<.3?v.toFixed(2):v.toFixed(1))+'s',fM=px=>{const m=px/40;return(m<10?Math.round(m*2)/2:Math.round(m))+' m'},fSt=(f,v)=>f==='cd'?fCd(v):f==='area'?fM(v):f==='block'?Math.round(v*100)+'%':String(Math.round(v));
 const lines2=a=>{const o=[];for(let i=0;i<a.length;i+=2)o.push(a.slice(i,i+2).join(' · '));return o.join('<br>')};
 function upTxt(k,L,NL,noProj){const a=wstat(k,L),b=wstat(k,NL),out=[];const dm=dmgMul(WSKILL[k]);a.dmg*=dm;b.dmg*=dm;for(const f of['dmg','cd','area','proj','fal','pierce','block']){if(a[f]==null||b[f]===99||(noProj&&f==='proj'))continue;const fa=fSt(f,a[f]),fb=fSt(f,b[f]);if(fa===fb)continue;out.push(`${STATN[f]} ${fa} → ${fb}`)}return lines2(out)||'Stronger'}
-function evoHint(type,k,NL){if(type==='w'&&EVO[k]){if(G.evo[k])return'';const pn=PASSIVES[EVO[k].p].name;if(NL>=WEAPONS[k].max)return G.pas[EVO[k].p]?'★ Ready to evolve! Open a Gold or boss chest':`★ Lv ${WEAPONS[k].max} reached · evolves with ${pn}`;return`★ Evolves at Lv ${WEAPONS[k].max} with ${pn}`}
+function evoHint(type,k,NL){if(type==='w'&&EVO[k]){if(G.evo[k])return'';const pn=PASSIVES[EVO[k].p].name;if(NL>=EVO_L)return G.pas[EVO[k].p]?(G.t<EVO_T?'★ Ready to evolve from 10:00: open a Gold or boss chest':'★ Ready to evolve! Open a Gold or boss chest'):`★ Lv ${EVO_L} reached · evolves with ${pn}`;return`★ Evolves at Lv ${EVO_L} with ${pn} (Gold or boss chest)`}
  if(type==='p'){const ws=Object.keys(EVO).filter(w=>EVO[w].p===k&&avail(WEAPONS[w]));if(!ws.length)return'';const own=ws.filter(w=>G.w[w]&&!G.evo[w]);return own.length?'★ Evolves '+own.map(w=>`${WEAPONS[w].name} → ${EVO[w].name}`).join(', '):'Evolves '+ws.map(w=>WEAPONS[w].name).join(', ')+' (not equipped)'}return''}
 const evoOwn=k=>Object.keys(EVO).some(w=>EVO[w].p===k&&G.w[w]&&!G.evo[w]);
 // v48: always-visible evolution line on the Stats screen
@@ -1466,7 +1512,7 @@ function evoLine(type,k){if(type==='w'){const E=EVO[k];if(!E)return'';if(G.evo[k
  return`<span class="evl">Evolves: ${ws.slice(0,2).map(w=>`${WEAPONS[w].name} → ${EVO[w].name}`).join(', ')} · not equipped</span>`}
 const SKTIP={Attack:'+0.5% melee dmg per level',Ranged:'+0.5% ranged dmg per level',Magic:'+0.5% magic dmg per level',Prayer:'+0.5% prayer dmg per level',Hitpoints:'+1 max HP per level'};
 function levelUp(){G.paused=true;G.banMode=false;buzz(15);rollCards();show('lvl',1)}
-function closeLvl(){show('lvl',0);G.paused=false;G.banMode=false;last=performance.now();if(G.sig.surge){for(const k in G.cd)if(G.cd[k]>0)G.cd[k]=0;const p=G.p,R=200;addFx(p.x,p.y,R,.5,'void');burst(p.x,p.y,'',12,R*2,GL.purple);for(const o of enemies.a)if(o.a&&!o.prop&&(o.x-p.x)**2+(o.y-p.y)**2<R*R)hurt(o,30+G.lvl*5,'Magic',true)}if(G.xp>=G.next)gainXp(0)}
+function closeLvl(){G.evoOffer=null;show('lvl',0);G.paused=false;G.banMode=false;last=performance.now();if(G.sig.surge){for(const k in G.cd)if(G.cd[k]>0)G.cd[k]=0;const p=G.p,R=200;addFx(p.x,p.y,R,.5,'void');burst(p.x,p.y,'',12,R*2,GL.purple);for(const o of enemies.a)if(o.a&&!o.prop&&(o.x-p.x)**2+(o.y-p.y)**2<R*R)hurt(o,30+G.lvl*5,'Magic',true)}if(G.xp>=G.next)gainXp(0)}
 const NCH=4;function rollCards(forced){const opts=[];
  const nW=Object.keys(G.w).length,nP=Object.keys(G.pas).length,BN=G.banned;
  const newW=Object.keys(WEAPONS).filter(k=>!G.w[k]&&!WEAPONS[k].elite&&avail(WEAPONS[k])&&!BN.includes(k)),newP=Object.keys(PASSIVES).filter(k=>!G.pas[k]&&avail(PASSIVES[k])&&!BN.includes(k));
@@ -1480,7 +1526,7 @@ const NCH=4;function rollCards(forced){const opts=[];
  {const so=opts.filter(o=>o.type==='s'),mo=opts.filter(o=>o.type!=='s');drawW(mo);if(pick.length<NCH)drawW(so);else if(so.length&&Math.random()<.05){pick.pop();drawW(so)}}  // skill boosts only fill empty slots (+5% for one slot)
  if(G.lvl>=10&&megaRoll(MEGA_RATES.card))for(let i=0;i<pick.length;i++){if(i<pick.length-1&&Math.random()<.6)continue;const k=pickMega();pick[i]={k,type:'m',L:mg(k)};break}
  if(G.forceMegaCard)pick[0]={k:G.forceMegaCard,type:'m',L:mg(G.forceMegaCard)};
- {const ek=evoCandidate();if(ek&&Math.random()<.06){let i=pick.length-1;while(i>0&&pick[i].type==='m')i--;if(pick[i]&&pick[i].type!=='m')pick[i]={k:ek,type:'evo',tier:3}}}  // ~6% evolve card when a weapon is eligible
+ G.evoOffer=null;{const ek=null;if(ek){let i=pick.length-1;while(i>0&&pick[i].type==='m')i--;if(pick[i]&&pick[i].type!=='m'){pick[i]={k:ek,type:'evo',tier:3};G.evoOffer=ek}}}  // ~6% evolve card when a weapon is eligible
  if(forced&&forced.length){pick.length=0;forced.forEach(o=>pick.push(Object.assign({},o)))}
  const box=$('choices');box.innerHTML='';box.className='';$('slotinfo').innerHTML=slotsHtml();
  if(pick.length<Math.min(3,NCH)){const fl=[{k:'gold',type:'gold'},{k:'heal',type:'heal'},{k:'rr',type:'rr'}].filter(o=>!pick.some(q=>q.type===o.type));while(pick.length<Math.min(3,NCH)&&fl.length)pick.push(fl.shift())}
@@ -1489,7 +1535,7 @@ const NCH=4;function rollCards(forced){const opts=[];
   const SG=o.type==='s'?Math.min(skCap(o.k),o.L+SKGAIN[o.tier]):0,mx=o.type==='w'?WCAP(o.k):o.type==='p'?PCAP(o.k):D&&D.max?D.max:99,NL=o.type==='w'||o.type==='p'?Math.min(mx,o.L+TIER_LV[o.tier]):0,EX='',RB=o.type==='w'||o.type==='p'||o.type==='s'?[o.type==='s'?`+${SKGAIN[o.tier]} level${SKGAIN[o.tier]>1?'s':''}`:`+${TIER_LV[o.tier]} level${TIER_LV[o.tier]>1?'s':''}`,TIER_BONUS[o.tier]].filter(Boolean).join(' · '):'',RBH=RB?`<em class="rb" style="color:${TT.c}">${RB}</em>`:'';
   let pj='';if(o.type==='w'&&PROJW[o.k]){const d=wstat(o.k,NL).proj-(o.L?wstat(o.k,o.L).proj:0);if(o.L&&d>0)pj=`<em class="pj">+${d} projectile${d>1?'s':''}</em>`}
   const ev=evoHint(o.type,o.k,NL),EV=ev?`<span class="ev${o.type==='p'&&!evoOwn(o.k)?' off':''}">${ev}</span>`:'',nm=o.type==='w'?(o.el?'<em class="elb">★ ELITE</em> ':'')+(WEAPONS[o.k].cls?`<em class="elb" style="background:${CTR[WEAPONS[o.k].cls].skill.col};color:#1a1008">${CLASSES[WEAPONS[o.k].cls].name.toUpperCase()}</em> `:'')+wname(o.k):D&&D.name;
-  const body=o.type==='evo'?`<span style="color:#ffe07a">★ Evolve: ${WEAPONS[o.k].name}</span><br><span class="lvl">→ ${EVO[o.k].name}</span><small>Evolve your maxed weapon now</small>`:o.type==='m'?`<span style="color:#ffcf6a">${D.name}</span><br><span class="lvl">${o.L?'Lv '+o.L+' → '+Math.min(MEGA_MAX,o.L+1):'BONUS +1 SLOT'}</span><small>${o.L?mUp(o.k,o.L):D.desc}</small>`:o.type==='heal'?'Shark<small>Heal 50 HP</small>':o.type==='gold'?`Coin pouch<small>+${fillGold()} gold</small>`:o.type==='rr'?'Lucky dice<small>+1 reroll this run</small>':
+  const body=o.type==='evo'?`<span style="color:#ffe07a">★ Evolve: ${WEAPONS[o.k].name}</span><br><span class="lvl">→ ${EVO[o.k].name}</span><small>Evolve this weapon now</small>`:o.type==='m'?`<span style="color:#ffcf6a">${D.name}</span><br><span class="lvl">${o.L?'Lv '+o.L+' → '+Math.min(MEGA_MAX,o.L+1):'BONUS +1 SLOT'}</span><small>${o.L?mUp(o.k,o.L):D.desc}</small>`:o.type==='heal'?'Shark<small>Heal 50 HP</small>':o.type==='gold'?`Coin pouch<small>+${fillGold()} gold</small>`:o.type==='rr'?'Lucky dice<small>+1 reroll this run</small>':
    o.type==='s'?`<span style="color:${SKCOL[o.k]}">${o.k}</span><br><span class="lvl">Lv ${o.L} → ${SG}</span>${RBH}<small>${SKTIP[o.k]}</small>`:
    o.L?`${nm}<br><span class="lvl">Lv ${o.L} → ${NL}${NL>=mx?' · MAX':''}</span>${RBH}${pj}<small>${o.type==='w'?upTxt(o.k,o.L,NL,!!pj):PASFX[o.k](NL)}</small>${EV}`:
    `${nm}<br><span class="lvl" style="color:#7dff8a">NEW · Lv ${NL}</span>${RBH}<small>${D.desc}${o.type==='w'?`<br>${WSKILL[o.k]}${PROJW[o.k]?' · +1 projectile every 3 levels':''}`:''}</small>${EV}`;
@@ -1507,7 +1553,7 @@ const NCH=4;function rollCards(forced){const opts=[];
  T.style.display='flex'}
 let chestTok=0;function openChest(tier,boss){tier=Math.max(0,Math.min(3,tier|0));G.paused=true;const tok=++chestTok,CT=CHESTS[tier];let n=CT.n2;if(boss&&n<3&&Math.random()<.35)n++;
  G.chests++;if(tier>=2)G.gchests++;if(tier===3)G.lchests=(G.lchests||0)+1;const gb=Math.round([5,15,40,120][tier]*goldMul());G.gold+=gb;
- const evk=(tier>=2||boss||(tier===1&&Math.random()<.35))?evoCandidate():null,mch=tier===3?MEGA_RATES.chest3:tier===2?MEGA_RATES.chest2:0;let used=false,mu=false;
+ const evk=(tier>=2||boss)?evoCandidate(boss):null,mch=tier===3?MEGA_RATES.chest3:tier===2?MEGA_RATES.chest2:0;let used=false,mu=false;
  const roll=()=>{if(evk&&!used){used=true;return evolve(evk)}if(!mu&&mch&&megaRoll(mch)){mu=true;const k=pickMega();grantMega(k);return{icon:k,txt:'MEGA RARE! '+MEGA[k].name,evo:1}}return chestUp(tier)};
  if(window.__sim){for(let j=0;j<n;j++)roll();G.paused=false;return}
  $('chestT').innerHTML=`<span style="color:${CT.c}">${boss?'Dragon\'s ':''}${CT.n} chest</span> <small style="color:${TIERS[tier].c}">${TIERS[tier].n} · +${TIER_LV[tier]} Lv per item</small>`;$('chestP').style.boxShadow=`inset 0 0 0 1px ${CT.c},0 0 36px ${CT.c}66,0 18px 50px rgba(0,0,0,.7)`;
@@ -1531,6 +1577,8 @@ function gameOver(win){if(G.sandbox)queueMicrotask(gameOverSB);G.over=true;runni
  const ar=G.achRun||[];if(ar.length)$('newrec').innerHTML+=ar.map(a=>`<p style="font-size:12px;color:#ffcf6a;margin:2px 0">🏆 ${a.n} — ${a.r}</p>`).join('');
  const id=G.cls,before=clsInfo(id),gain=Math.floor((G.t/5+Math.sqrt(G.kills)*6+G.lvl*8)*(win?1.5:1));META.cxp[id]=(META.cxp[id]||0)+gain;const after=clsInfo(id);
  if(!win&&G.fin){const pen=Math.floor(G.gold*.25);G.gold-=pen;queueMicrotask(()=>$('newrec').insertAdjacentHTML('afterbegin',`<p style="color:#ff6a4a;font-weight:bold">The Titan claimed 25% of your loot: -${pen} gold</p>`))}
+ if(G.lad)queueMicrotask(()=>$('newrec').insertAdjacentHTML('afterbegin',`<p style="color:${LAD().c};font-weight:bold;margin:2px 0">⚔ ${LAD().n} · +${Math.round(LAD().g*100)}% gold · +${Math.round(LAD().x*100)}% skill XP</p>`));
+ if(win&&!G.sandbox){META.lad=META.lad||{};const nt=(G.lad|0)+1;if(nt>(META.lad[id]|0)){META.lad[id]=Math.min(LADDER.length,nt);if(nt<LADDER.length)queueMicrotask(()=>$('newrec').insertAdjacentHTML('afterbegin',`<p style="color:${LADDER[nt].c};font-weight:bold">★ ${LADDER[nt].n} unlocked for ${CLASSES[id].name}!</p>`))}}
  const gold=Math.floor(G.gold);META.gold+=gold;saveMeta();
  $('overT').textContent=win?'You survived 30:00!':'Oh dear, you are dead!';
  $('stats').innerHTML=`<div>Time<b>${fmtT(G.t)}</b></div><div>Kills<b>${G.kills}</b></div><div>Level<b>${G.lvl}</b></div>`;
@@ -1543,7 +1591,7 @@ function gameOver(win){if(G.sandbox)queueMicrotask(gameOverSB);G.over=true;runni
 function traitHtml(id,L){const T=CTR[id];if(!T)return'';const K={dm:1+.04*(L-1),cd:Math.max(.8,1-.01*(L-1))};return T.traits.map(t=>`<div><b style="color:#ffcf6a">${t[0]}</b>${t[1]!=='—'?` <span style="color:#7dff8a">▲ ${t[1]}</span>`:''}${t[2]!=='—'?` <span style="color:#ff8a7a">▼ ${t[2]}</span>`:''}</div>`).join('')+`<div style="margin-top:3px"><b style="color:${T.skill.col}">⚡ Skill: ${T.skill.n}</b> <small>(tap the round button)</small> — ${T.sd}${L>1?` <span style="color:#9fe0ff">Class Lv ${L}: +${Math.round((K.dm-1)*100)}% skill dmg, ${(T.skill.cd*K.cd).toFixed(1)}s cd.</span>`:''}</div>`}
 function buildMenu(){const box=$('classes');box.innerHTML='';const sv=hasRun();$('contBtn').style.display=sv?'block':'none';$('startBtn').className=sv?'btn sec':'btn';$('startBtn').textContent=sv?'New run':'Play';if(sv)$('contInfo').textContent=`${CLASSES[sv.cls].name} · Lv ${sv.lvl} · ${fmtT(sv.t)} · ${sv.kills} kills`;
  for(const id in CLASSES){const C=CLASSES[id],I=clsInfo(id),b=document.createElement('button');b.className='cls'+(META.cls===id?' sel':'');b.dataset.cls=id;
-  b.innerHTML=`<div class="slot"><img src="${portraitOf(id)}" alt=""></div><b>${C.name}</b><i>${C.tag}</i><span class="lv">Level ${I.L}${I.L>=CL_MAX?' (max)':''}</span><div class="xpb"><div style="width:${I.L>=CL_MAX?100:I.cur/I.need*100}%"></div></div>`;
+  b.innerHTML=`<div class="slot"><img src="${portraitOf(id)}" alt=""></div><b>${C.name}</b><i>${C.tag}</i><span class="lv">Level ${I.L}${I.L>=CL_MAX?' (max)':''}${((META.lad||{})[id]|0)>1?` <em style="color:${LADDER[Math.min(LADDER.length-1,(META.lad[id]|0)-1)].c};font-style:normal">★${LADDER[Math.min(LADDER.length-1,(META.lad[id]|0)-1)].n}</em>`:''}</span><div class="xpb"><div style="width:${I.L>=CL_MAX?100:I.cur/I.need*100}%"></div></div>`;
   b.onclick=()=>{META.cls=id;saveMeta();buildMenu();menuScene();openDet()};box.appendChild(b)}
  const C=CLASSES[META.cls],L=clsInfo(META.cls).L;
  $('gold').textContent=Math.floor(META.gold)+' gold';{const pb=$('premBadge');pb.style.display=PREM.u?'inline-block':'none';pb.textContent=PREM.on?'★ PREMIUM · start with a mega rare':'★ PREMIUM · perk off'}const b=LS.get('oss_best',{t:0,k:0}),R=META.rec[META.cls];
@@ -1564,7 +1612,12 @@ function buildDet(){const id=META.cls,C=CLASSES[id],T=CTR[id],I=clsInfo(id),L=I.
   `<h4>Traits</h4><table>${base?`<tr><td class="k">Base</td><td class="pro">${base}</td></tr>`:''}${T.traits.map(t=>`<tr><td class="k">${t[0]}</td><td>${t[1]!=='—'?`<span class="pro">${/^[+-]/.test(t[1])?t[1]:"+ "+t[1]}</span>`:''}${t[1]!=='—'&&t[2]!=='—'?'<br>':''}${t[2]!=='—'?`<span class="con">${/^[+-]/.test(t[2])?t[2]:"− "+t[2]}</span>`:''}</td></tr>`).join('')}</table>`,
   `<h4>Unlocks${nx>=0?` · next at Lv ${C.perks[nx][0]}`:''}</h4><table>${C.perks.map((q,i)=>`<tr class="${L>=q[0]?'':'lk'}${i===nx?' nx':''}"><td class="k">${L>=q[0]?'✓':'Lv '+q[0]}</td><td>${q[1]}</td></tr>`).join('')}</table>`];
  $('cdBody').innerHTML=h.join('')}
-function openDet(){buildDet();show('menu',0);show('clsDet',1);$('cdBody').scrollTop=0}
+function buildLad(){const el=$('ladSel');if(!el)return;const c=META.cls,u=ladUnl(c);META.ladSel=META.ladSel||{};let t=ladSel(c);const L=LADDER[t],best=(META.lad||{})[c]|0;
+ el.className='lad';el.innerHTML=`<div class="lr"><button id="ladL" ${t<=0?'disabled':''}>◀</button><div class="ln" style="color:${L.c}">${t?'⚔ ':''}${L.n}</div><button id="ladR" ${t>=LADDER.length-1?'disabled':''}>▶</button></div><div class="ld">${L.d}</div>${t?`<div class="lw">Rewards: +${Math.round(L.g*100)}% gold · +${Math.round(L.x*100)}% skill XP</div>`:''}<div class="lk">${t+1<LADDER.length?(u>t?`${LADDER[t+1].n} unlocked · tap ▶`:`Survive 30:00 and beat the Titan to unlock ${LADDER[t+1].n}`):(best>=LADDER.length?'★ Nightmare conquered!':'The hardest tier')}</div>`;
+ $('ladL').onclick=()=>{META.ladSel[c]=Math.max(0,t-1);saveMeta();buildLad()};$('ladR').onclick=()=>{if(t+1>u){const k=$('ladSel').querySelector('.lk');k.style.color='#ff8a6a';buzz(30);return}META.ladSel[c]=t+1;saveMeta();buildLad()}}
+function showNotes(){try{if((+LS.get('oss_notes',0))>=VERSION)return;LS.set('oss_notes',VERSION);show('notes',1);$('notesOk').onclick=()=>show('notes',0)}catch(_){}}
+setTimeout(()=>{if(!running)showNotes()},700);
+function openDet(){buildDet();buildLad();show('menu',0);show('clsDet',1);$('cdBody').scrollTop=0}
 const SKURL={};function skinURL(cls,id){const k=cls+id;if(!SKURL[k])SKURL[k]=skinFor(cls,id)[0].c.toDataURL();return SKURL[k]}
 function portraitOf(id){const sk=SKINS.find(x=>x.id===META.skin[id]);return sk&&skinOk(id,sk)?skinURL(id,sk.id):PORTRAIT[id]}
 function buildShop(){$('gold2').textContent=Math.floor(META.gold)+' gold';$('shopList').innerHTML='';
@@ -1597,12 +1650,13 @@ function bustedBuild(){G.sandbox=1;SANDBOX=1;SANDSNAP={meta:JSON.stringify(META)
  const mk2=pickMega();G.mega[mk2]=MEGA_MAX;G.lastEvo=-1e9;G.p.max=hpMax();G.p.hp=G.p.max;G.banner={txt:'BUSTED BUILD · sandbox, no rewards',life:3,col:'#ff8a6a',big:1}}
 function sandboxRestore(){if(!SANDSNAP)return;const m=JSON.parse(SANDSNAP.meta),k2=JSON.parse(SANDSNAP.sk);for(const k in META)delete META[k];Object.assign(META,m);for(const k in SK)delete SK[k];Object.assign(SK,k2);SANDSNAP=null;SANDBOX=0;if(G){G.sandbox=0;G.wasSandbox=1}}
 function gameOverSB(){if(!G.sandbox)return;sandboxRestore();try{$('overT').textContent+=' · SANDBOX';$('newrec').insertAdjacentHTML('afterbegin','<p style="color:#ff8a6a;font-weight:bold">SANDBOX · no rewards (no gold, class XP or progress saved)</p>');$('cxp').innerHTML='';buildMenu()}catch(_){}}
-function start(){newGame();if(bustOn()){bustedBuild()}else G.pots=Object.keys(META.pots||{}).filter(k=>POTS[k]);if(!G.sandbox&&G.pots.length){META.pots={};saveMeta();applyPots();G.banner={txt:'Potions active: '+G.pots.map(k=>POTS[k].name).join(', '),life:3,col:'#9fe0ff'};if(G.pots.includes('wise')){G.xp+=G.next*.9;pop(G.p.x,G.p.y-40,'+20% XP (levels & skills)','#d8d0ff',2)}}clearRun();['menu','clsDet','over','lvl','chest','shop','pause','codex','settings'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';setTimeout(updPotHud,0);
+const ladUnl=c=>Math.min(LADDER.length-1,((META.lad||{})[c]|0)),ladSel=c=>Math.max(0,Math.min((META.ladSel||{})[c]|0,ladUnl(c)));
+function start(){newGame();G.lad=G.sandbox?0:ladSel(G.cls);G.hordeI=0;if(G.lad)setTimeout(()=>{if(G&&!G.over&&!G.banner)G.banner={txt:'⚔ '+LAD().n,life:2.2,col:LAD().c,big:1}},400);if(bustOn()){bustedBuild()}else G.pots=Object.keys(META.pots||{}).filter(k=>POTS[k]);if(!G.sandbox&&G.pots.length){META.pots={};saveMeta();applyPots();G.banner={txt:'Potions active: '+G.pots.map(k=>POTS[k].name).join(', '),life:3,col:'#9fe0ff'};if(G.pots.includes('wise')){G.xp+=G.next*.9;pop(G.p.x,G.p.y-40,'+20% XP (levels & skills)','#d8d0ff',2)}}clearRun();['menu','clsDet','over','lvl','chest','shop','pause','codex','settings'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';setTimeout(updPotHud,0);
  if(premOn()){const k=pickMega();grantMega(k);G.premK=k;G.banner={txt:'★ Premium start: '+MEGA[k].name,life:3,col:'#ffd24a',big:1}}
  if(G.sig.head)setTimeout(()=>{if(G&&!G.over&&!G.paused&&!G.menu)levelUp()},500)}
 // ---------- pause / save ----------
 const SAVE_KEY='oss_run';
-const SAVE_FIELDS=['skBase','bossKills','might','dmg','first','megaSeen','cls','t','kills','lvl','xp','next','gold','w','pas','mega','cd','spawnT','bossNext','eliteNext','swarmNext','propT','megaGuar','megaDrops','xpTot','revived','runXp','loot','evo','ch','banned','revLeft','gchests','chests','sb','achRun','lchests','ws','ps','megaSeen','sharkUsed','brk','brkCd','megaN','lastEvo','pots','swPend','seed','evNext','cage','bossEnd','csk','feed','feedG','surge','lull'];
+const SAVE_FIELDS=['skBase','bossKills','might','dmg','first','megaSeen','cls','t','kills','lvl','xp','next','gold','w','pas','mega','cd','spawnT','bossNext','eliteNext','swarmNext','propT','megaGuar','megaDrops','xpTot','revived','runXp','loot','evo','ch','banned','revLeft','gchests','chests','sb','achRun','lchests','ws','ps','megaSeen','sharkUsed','brk','brkCd','megaN','lastEvo','pots','swPend','seed','evNext','cage','bossEnd','csk','feed','feedG','surge','lull','lad','hordeI'];
 function saveRun(auto){if(!running||!G||G.over||G.menu)return false;const o={v:1,at:Date.now(),auto:auto?1:0};
  const vis=id=>$(id).style.display==='flex';o.pendLvl=vis('lvl')&&G.curCards?JSON.parse(JSON.stringify(G.curCards)):null;o.offerQ=JSON.parse(JSON.stringify((G.curOffer&&vis('offer')?[G.curOffer]:[]).concat(G.offerQ||[])));SAVE_FIELDS.forEach(k=>{if(G[k]!==undefined)o[k]=JSON.parse(JSON.stringify(G[k]))});
  o.p={x:G.p.x,y:G.p.y,hp:G.p.hp,face:G.p.face,star:Math.max(0,G.p.star)};o.cannons=G.cannons.map(c=>({x:c.x,y:c.y,life:c.life}));saveSkills();LS.set(SAVE_KEY,o);return true}
@@ -1682,7 +1736,7 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=55;
+const VERSION=57;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
  b64e(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)},
  b64d(b){const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(_){return bin}},
@@ -1712,6 +1766,6 @@ setTimeout(checkUpdate,1500);document.addEventListener('visibilitychange',()=>{i
 // ================= INIT =================
 menuScene();buildMenu();show('menu',1);requestAnimationFrame(loop);
 {const r=hasRun();if(r&&r.auto&&Array.isArray(r.pendLvl)&&r.pendLvl.length&&Date.now()-r.at<60*60e3)setTimeout(()=>{try{continueRun()}catch(e){console.warn(e)}},60)}
-window.__game={addSkillXp,SPR,WEAPONS,spawnEvent,evTick,set XP(v){[XPA,XPB,XPP]=v},set SKXP(v){SKXP=v},set MK(v){MEGA_KILL=v},gems,enemies,dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG,buildStats,wstat,mstat,saveRun,continueRun,pauseGame,resumeGame,hasRun,checkAch,ACH,EVO,evolve,CHESTS,rollCards,buildCodex,PASSIVES,saveMeta,PREM,pickMega,items,fx,launch,CLASSES,buildShop,MEGAKEYS,closeLvl,kill,orangeXp,MEGA_RATES,megaRoll,startFinal,acctStr,acctEase,evoLine,wstat,applyDrop,chestUp,SINKS,sinkCost,goldMul};
+window.__game={TUNE,LADDER,addSkillXp,SPR,WEAPONS,spawnEvent,evTick,set XP(v){[XPA,XPB,XPP]=v},set SKXP(v){SKXP=v},set MK(v){MEGA_KILL=v},gems,enemies,dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG,buildStats,wstat,mstat,saveRun,continueRun,pauseGame,resumeGame,hasRun,checkAch,ACH,EVO,evolve,CHESTS,rollCards,buildCodex,PASSIVES,saveMeta,PREM,pickMega,items,fx,launch,CLASSES,buildShop,MEGAKEYS,closeLvl,kill,orangeXp,MEGA_RATES,megaRoll,startFinal,acctStr,acctEase,evoLine,wstat,applyDrop,chestUp,SINKS,sinkCost,goldMul};
 })();
 </script></body></html>
