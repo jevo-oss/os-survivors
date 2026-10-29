@@ -856,7 +856,7 @@ function newGame(){const{b,sig,sb}=computeBonus();
  if(G.sig.fw){const[k,l]=G.sig.fw.split(':');if(WEAPONS[k]&&!G.w[k])G.w[k]=+l||1}
  if(G.sig.arsenal){let ks=classPool(G.cls).filter(k=>!G.w[k]);if(ks.length)G.w[ks[Math.random()*ks.length|0]]=1}
  for(let bi=(G.sig.blessed?1:0)+(G.sig.blessed2?1:0);bi>0;bi--){const ks=Object.keys(PASSIVES).filter(k=>!G.pas[k]&&avail(PASSIVES[k]));if(ks.length)G.pas[ks[Math.random()*ks.length|0]]=2}
- G.pots=[];G.macct=acctStr();
+ G.pots=[];G.macct=acctStr();G.mease=acctEase();G.act=1;
  [enemies,shots,gems,items,pops,parts,fx].forEach(p=>p.clear());G.p.max=G.p.hp=hpMax()}
 // v47: per-run skill caps: full XP up to +8/+6/+5/+3 levels, then 25% XP up to +12/+9/+7/+4 (hard stop)
 const SK_RUN=L=>L<40?8:L<60?6:L<80?5:L<90?2:1,SK_HARD=L=>L<40?12:L<60?9:L<80?7:L<90?3:1;
@@ -920,7 +920,7 @@ const spdMul=()=>(1+.08*(G.pas.spd||0))*(1+G.bon.sp)*(G.tr?G.tr.sp||1:1);
 const magR=()=>70*(1+.3*(G.pas.mag||0))*(1+G.bon.mag);
 const enemyScale=t=>1.2*(1+t/120+Math.pow(t/400,2));
 const midSoft=t=>t<=180||t>=360?1:1-.15*Math.sin(Math.PI*(t-180)/180);  // v27: up to -15% spawn rate & HP around 4:30, back to normal by 6:00
-const backK=t=>t<=540?0:Math.pow(Math.min(1,(t-540)/1260),1.5),backHp=t=>(1+.6*backK(t))*(1+megaBack(t)),backDen=t=>(1+.6*backK(t))*(1+MACC_N*megaBack(t));  // v46: smooth back-half pressure from 9:00 (x1.09 @15:00, x1.24 @20:00, x1.6 @30:00), HP and density
+const backK=t=>t<=540?0:Math.pow(Math.min(1,(t-540)/1260),1.5),backHp=t=>(1+.6*backK(t))*(1+megaBack(t))*(1-EASE_HP*easeK(t)),backDen=t=>(1+.6*backK(t))*(1+MACC_N*megaBack(t))*(1-EASE_DEN*easeK(t));  // v46: smooth back-half pressure from 9:00 (x1.09 @15:00, x1.24 @20:00, x1.6 @30:00), HP and density
 const lateHp=t=>t<=600?1:t<=1200?1+(t-600)/600:Math.min(3,2+(t-1200)/480);  // v23: non-boss HP x1 to 10:00, x2 @20:00, x3 @28:00  // HP ramp keeps pace with weapon growth
 function pop(x,y,txt,col,kind){const o=pops.get();if(o){o.x=x+(Math.random()-.5)*8;o.y=y;o.txt=txt;o.life=kind?.75:1.1;o.col=col||'#fff';o.kind=kind||0}}
 function spawn(t,opt){opt=opt||{};const e=enemies.get();if(!e)return null;const T=ETYPES[t],a=Math.random()*6.283,d=Math.max(W,H)*.62+40;
@@ -997,7 +997,10 @@ const msc=()=>1+G.t/240;const MEGA_TP=300,MEGA_EXP=.4;const megaScale=t=>{const 
 // v51: account strength 0..1 (perk ranks + combat skill levels); strong accounts' megas fade 5:00-15:00 and the back-half ramp bites harder while a mega is owned
 function acctStr(){let r=0,m=0;for(const k in SHOP){if(SHOP[k].cosm||k==='trail')continue;m+=SHOP[k].max;r+=Math.min(SHOP[k].max,META.shop[k]||0)}const sk=['Attack','Ranged','Magic','Prayer','Hitpoints'].reduce((a,k)=>a+sLvl(k),0)/5;
  const S=.5*(m?r/m:0)+.5*Math.max(0,Math.min(1,(sk-35)/45));return Math.max(0,Math.min(1,(S-.3)/.65))}
-const MACC_D=.5,MACC_B=3.5,MACC_N=.3,MACC_I=.5;const megaAcc=()=>{const S=G.macct||0;return S?1-MACC_D*S*Math.max(0,Math.min(1,(G.t-300)/600)):1},megaBack=t=>G.macct&&Object.keys(G.mega).length?MACC_B*G.macct*Math.pow(Math.max(0,Math.min(1,(t-420)/600)),1.2):0;
+function acctEase(){let r=0,m=0;for(const k in SHOP){if(SHOP[k].cosm||k==='trail')continue;m+=SHOP[k].max;r+=Math.min(SHOP[k].max,META.shop[k]||0)}const sk=['Attack','Ranged','Magic','Prayer','Hitpoints'].reduce((a,k)=>a+sLvl(k),0)/5;const S=.5*(m?r/m:0)+.5*Math.max(0,Math.min(1,(sk-40)/59));return Math.max(0,Math.min(1,(S-.5)/.5))}
+// v52: strong accounts that keep moving get a softer back half (enemy count cap + lower density/HP); the v51 mega penalty mostly bites when idle
+const EASE_CAP=150,EASE_DEN=.35,EASE_HP=.2,MACC_ACT=.75;const actK=()=>Math.max(0,Math.min(1,((G.act??1)-.3)/.4)),easeK=t=>Math.pow(G.mease||0,2.2)*actK()*Math.max(0,Math.min(1,(t-900)/600));
+const MACC_D=.5,MACC_B=3.5,MACC_N=.3,MACC_I=.5;const megaAcc=()=>{const S=(G.macct||0)*(1-MACC_ACT*actK());return S?1-MACC_D*S*Math.max(0,Math.min(1,(G.t-300)/600)):1},megaBack=t=>G.macct&&Object.keys(G.mega).length?MACC_B*G.macct*(1-MACC_ACT*actK())*Math.pow(Math.max(0,Math.min(1,(t-420)/600)),1.2):0;
 const mdm=L=>.7*megaScale(G.t)*(1+.25*(L-1))*megaAcc()*(1-MACC_I*(G.macct||0)*Math.max(0,Math.min(1,((G.still||0)-2)/6)));  // mega dmg tracks the enemy HP ramp, +25%/level
 function mstat(k,L){const A=AREA();switch(k){
  case 'tbow':return{dmg:240*mdm(L),cd:Math.max(.5,1.1/L),proj:L,pierce:4+L,area:0};
@@ -1167,7 +1170,7 @@ function evTick(dt){const p=G.p;if(G.surge>0){G.surge-=dt;G.surA=(G.surA||0)+dt*
   if(e.fsp==null){e.fsp=G.p.sp*.75;e.sp=.01;e.stT=2}e.stT-=dt;if(e.stT<=0){e.stun=.55+Math.random()*.35;e.stT=2+Math.random()*2.2;pop(e.x,e.y-22,Math.random()<.5?'Oof!':'*trips*','#ffd24a')}
   if(e.stun>0)e.stun-=dt;else{const v=e.fsp*(d>480?.6:1),wb=Math.sin(G.t*3+e.x*.01)*.35;e.x+=(dx/d-dy/d*wb)*v*dt;e.y+=(dy/d+dx/d*wb)*v*dt}if(Math.random()<dt*6)burst(e.x,e.y,'#ffd24a',1,40);if(e.tgob<=0){e.a=false;burst(e.x,e.y,'#ffd24a',10,90);G.banner={txt:'The treasure goblin escaped!',life:1.6,col:'#c8b07a'}}}}  // v26: event spawns replace ~60% of stream spawns so density stays about the same
 function sdmg(b){return b*enemyScale(G.t)*lateHp(G.t)*midSoft(G.t)*clsSkLv().dm}
-function classTick(dt,p,calm){if(!G.tr)G.tr=Object.assign({},(CTR[G.cls]||{}).mods||{});if(p.moving)G.still=0;else G.still=(G.still||0)+dt;if(G.guard>0)G.guard-=dt;if(!calm&&G.csk>0)G.csk-=dt;if(G.ultT>0){G.ultT-=dt;if(G.csk>.3)G.csk=.3}
+function classTick(dt,p,calm){if(!G.tr)G.tr=Object.assign({},(CTR[G.cls]||{}).mods||{});if(p.moving)G.still=0;else G.still=(G.still||0)+dt;G.act=(G.act??1)+((p.moving?1:0)-(G.act??1))*Math.min(1,dt/30);if(G.guard>0)G.guard-=dt;if(!calm&&G.csk>0)G.csk-=dt;if(G.ultT>0){G.ultT-=dt;if(G.csk>.3)G.csk=.3}
  for(const v of G.vfx||[])v.t-=dt;if(G.vfx)G.vfx=G.vfx.filter(v=>v.t>0);
  const Z=G.sanct;if(Z){Z.t-=dt;Z.tk-=dt;if((p.x-Z.x)**2+(p.y-Z.y)**2<Z.r*Z.r)p.hp=Math.min(p.max,p.hp+p.max*.05*dt);for(const e of enemies.a)if(e.a&&!e.prop&&(e.x-Z.x)**2+(e.y-Z.y)**2<(Z.r+e.r)**2){e.slow=Math.max(e.slow,.3);if(Z.tk<=0)hurt(e,Z.d,'Prayer',true)}if(Z.tk<=0)Z.tk=.5;if(Z.t<=0)G.sanct=null}}
 function castClass(){if(!running||!G||G.over||G.paused||G.hold||G.menu||(G.csk||0)>0)return;const C=CTR[G.cls];if(!C)return;const p=G.p,K=clsSkLv();G.csk=C.skill.cd*K.cd;buzz([20,20,40]);
@@ -1205,7 +1208,7 @@ function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();ret
  else if(G.brkCd>0){G.brkCd-=dt;G.banner=G.brkCd>0?{txt:String(Math.ceil(G.brkCd)),life:.4,col:'#ffe28a',big:1,brk:1}:{txt:'Fight!',life:1,col:'#ff8a6a',big:1}}
  const[dx,dy]=inputVec(),sp=p.sp*spdMul()*(G.fleet>0?1.3:1);p.x+=dx*sp*dt;p.y+=dy*sp*dt;if(dx||dy){const l=Math.hypot(dx,dy);p.face=[dx/l,dy/l]}p.moving=!!(dx||dy);
  // waves: ~30 min structure
- if(!calm&&!G.fin&&!bossOn){G.spawnT-=dt;if(G.spawnT<=0){G.spawnT=Math.max(.14,1-G.t/300);const ph=phaseAt(G.t);G.spawnAcc=(G.spawnAcc||0)+(1+G.t/90)*.65*midSoft(G.t)*backDen(G.t)*(G.lull>0?.05:1)*(ph===1?1.25:ph===2&&G.t>=240?.8:1);const n=Math.max(0,Math.floor(G.spawnAcc)),ty=waveTypes(G.t);G.spawnAcc-=n;for(let i=0;i<n;i++)spawn(pickT(ty))}  // ~35% fewer stream spawns
+ if(!calm&&!G.fin&&!bossOn){G.spawnT-=dt;if(G.spawnT<=0){G.spawnT=Math.max(.14,1-G.t/300);const ph=phaseAt(G.t);G.spawnAcc=(G.spawnAcc||0)+(1+G.t/90)*.65*midSoft(G.t)*backDen(G.t)*(G.lull>0?.05:1)*(ph===1?1.25:ph===2&&G.t>=240?.8:1);let n=Math.max(0,Math.floor(G.spawnAcc));const ty=waveTypes(G.t);G.spawnAcc-=n;const eK=easeK(G.t);if(eK>0){let al=0;for(const o of enemies.a)if(o.a&&!o.prop)al++;n=Math.min(n,Math.max(0,Math.round(320-EASE_CAP*eK)-al))}for(let i=0;i<n;i++)spawn(pickT(ty))}  // ~35% fewer stream spawns
  if(G.t>=G.eliteNext){G.eliteNext+=90;const ty=waveTypes(G.t);spawn(G.t>=180?'skeleton':ty[ty.length-1],{elite:true});G.banner={txt:'An elite approaches!',life:1.8,col:'#ffd24a'}}
  if(G.evNext==null)G.evNext=G.t+60;if(G.t>=G.evNext){G.evNext=G.t+22+Math.random()*28;if(G.t>=45&&Math.abs(G.t-G.swarmNext)>8&&G.t>(G.bossEnd||0)+20&&!(G.lull>0)){spawnEvent();if(G.t>=360&&Math.random()<.2&&!(G.lull>0)){spawnEvent(1);G.banner={txt:'Double trouble!',life:2,col:'#ff6a4a',big:1}}}}  // v29: events every 22-50s, 20% double from 6:00 (never during boss fights/Titan)
  evTick(dt);
@@ -1669,7 +1672,7 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=51;
+const VERSION=52;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
  b64e(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)},
  b64d(b){const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(_){return bin}},
@@ -1699,6 +1702,6 @@ setTimeout(checkUpdate,1500);document.addEventListener('visibilitychange',()=>{i
 // ================= INIT =================
 menuScene();buildMenu();show('menu',1);requestAnimationFrame(loop);
 {const r=hasRun();if(r&&r.auto&&Array.isArray(r.pendLvl)&&r.pendLvl.length&&Date.now()-r.at<60*60e3)setTimeout(()=>{try{continueRun()}catch(e){console.warn(e)}},60)}
-window.__game={addSkillXp,SPR,WEAPONS,spawnEvent,evTick,set XP(v){[XPA,XPB,XPP]=v},set SKXP(v){SKXP=v},set MK(v){MEGA_KILL=v},gems,enemies,dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG,buildStats,wstat,mstat,saveRun,continueRun,pauseGame,resumeGame,hasRun,checkAch,ACH,EVO,evolve,CHESTS,rollCards,buildCodex,PASSIVES,saveMeta,PREM,pickMega,items,fx,launch,CLASSES,buildShop,MEGAKEYS,closeLvl,kill,orangeXp,MEGA_RATES,megaRoll,startFinal,acctStr,evoLine,wstat,applyDrop,chestUp,SINKS,sinkCost,goldMul};
+window.__game={addSkillXp,SPR,WEAPONS,spawnEvent,evTick,set XP(v){[XPA,XPB,XPP]=v},set SKXP(v){SKXP=v},set MK(v){MEGA_KILL=v},gems,enemies,dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG,buildStats,wstat,mstat,saveRun,continueRun,pauseGame,resumeGame,hasRun,checkAch,ACH,EVO,evolve,CHESTS,rollCards,buildCodex,PASSIVES,saveMeta,PREM,pickMega,items,fx,launch,CLASSES,buildShop,MEGAKEYS,closeLvl,kill,orangeXp,MEGA_RATES,megaRoll,startFinal,acctStr,acctEase,evoLine,wstat,applyDrop,chestUp,SINKS,sinkCost,goldMul};
 })();
 </script></body></html>
