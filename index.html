@@ -787,7 +787,7 @@ const POTS={sattack:{name:'Super attack potion',desc:'+15% damage this run',cost
  prayer:{name:'Prayer potion',desc:'-15% damage taken this run',cost:350,col:'#4fd6c8',eff:{dr:.15}},
  stamina:{name:'Stamina potion',desc:'+15% move speed this run',cost:150,col:'#c88a4a',eff:{sp:.15}},
  row:{name:'Ring of wealth charge',desc:'+25% gold this run',cost:200,col:'#e8c040',eff:{greed:.25},ring:1},
- wise:{name:"Wise Old Man's blessing",desc:'+20% XP this run',cost:400,col:'#d8d0ff',eff:{xp:.2},ring:2}};
+ wise:{name:"Wise Old Man's blessing",desc:'+20% XP & skill XP this run',cost:400,col:'#d8d0ff',eff:{xp:.2},ring:2}};
 let CONT=0;const POTICON={};
 function potIcon(k){if(POTICON[k])return POTICON[k];const P=POTS[k];const c=mk(48,48,g=>{if(P.ring===1){g.lineWidth=6;g.strokeStyle='#7a5a20';g.beginPath();g.arc(24,27,12,0,6.283);g.stroke();g.lineWidth=3.5;g.strokeStyle=P.col;g.stroke();g.fillStyle='#ff4a6a';g.beginPath();g.arc(24,14,5,0,6.283);g.fill();g.fillStyle='rgba(255,255,255,.7)';g.beginPath();g.arc(22.5,12.5,1.6,0,6.283);g.fill();return}
  if(P.ring===2){g.fillStyle='#6a4a8a';g.beginPath();g.moveTo(24,6);g.lineTo(38,40);g.lineTo(10,40);g.closePath();g.fill();g.fillStyle='#f4f0ff';g.beginPath();g.moveTo(24,22);g.lineTo(32,42);g.lineTo(16,42);g.closePath();g.fill();g.fillStyle='#ffe07a';for(const[x,y]of[[24,14],[19,28],[29,30]]){g.beginPath();g.arc(x,y,2,0,6.283);g.fill()}return}
@@ -847,9 +847,14 @@ function newGame(){const{b,sig,sb}=computeBonus();
  for(let bi=(G.sig.blessed?1:0)+(G.sig.blessed2?1:0);bi>0;bi--){const ks=Object.keys(PASSIVES).filter(k=>!G.pas[k]&&avail(PASSIVES[k]));if(ks.length)G.pas[ks[Math.random()*ks.length|0]]=2}
  G.pots=[];
  [enemies,shots,gems,items,pops,parts,fx].forEach(p=>p.clear());G.p.max=G.p.hp=hpMax()}
-const SK_RUN=L=>L<40?5:L<60?4:L<80?3:2;
-function skCap(k){G.skBase=G.skBase||{};if(G.skBase[k]==null)G.skBase[k]=sLvl(k);return Math.min(99,G.skBase[k]+SK_RUN(G.skBase[k]))}
-function addSkillXp(k,x){const b=sLvl(k),cp=skCap(k),lim=cp>=99?XPT[99]:XPT[cp+1]-1;if(SK[k]>=lim)return;x=Math.min(x,lim-SK[k]);SK[k]+=x;G.runXp[k]=(G.runXp[k]||0)+x;const d=G.drops[k];if(d){d.v+=x;d.life=1.4}else G.drops[k]={v:x,life:1.4};
+// v47: per-run skill caps: full XP up to +8/+6/+5/+3 levels, then 25% XP up to +12/+9/+7/+4 (hard stop)
+const SK_RUN=L=>L<40?8:L<60?6:L<80?5:3,SK_HARD=L=>L<40?12:L<60?9:L<80?7:4;
+function skBase(k){G.skBase=G.skBase||{};if(G.skBase[k]==null)G.skBase[k]=sLvl(k);return G.skBase[k]}
+function skCap(k){const b=skBase(k);return Math.min(99,b+SK_RUN(b))}
+const skLim=L=>L>=99?XPT[99]:XPT[L+1]-1;
+function addSkillXp(k,x){const b=sLvl(k),b0=skBase(k),soft=skLim(skCap(k)),hard=skLim(Math.min(99,b0+SK_HARD(b0)));if(SK[k]>=hard)return;
+ x*=1+(G.pots&&G.pots.includes('wise')?POTS.wise.eff.xp:0);
+ if(SK[k]+x>soft){const full=Math.max(0,soft-SK[k]);x=full+(x-full)*.25}x=Math.min(x,hard-SK[k]);SK[k]+=x;G.runXp[k]=(G.runXp[k]||0)+x;const d=G.drops[k];if(d){d.v+=x;d.life=1.4}else G.drops[k]={v:x,life:1.4};
  const a=sLvl(k);if(a>b){G.banner={txt:`${k} level ${a}!`,life:2.2,col:SKCOL[k]};if(k==='Hitpoints'){G.p.max=hpMax();G.p.hp+=(a-b)*2}}}
 const mg=k=>G.mega[k]||0,MEGA_MAX=8;
 const MEGA_DM={tbow:.07,scythe:.07,shadow:.18,ely:.14,obl:.14};{const o=mstat;mstat=function(k,L){const S=o(k,L);if(S&&S.dmg)S.dmg*=(MEGA_DM[k]||.07)*1.2/(1+.2*(Math.max(1,L)-1));return S}}  // megas: strong, not instant boss kills
@@ -1536,7 +1541,7 @@ function bustedBuild(){G.sandbox=1;SANDBOX=1;SANDSNAP={meta:JSON.stringify(META)
  const mk2=pickMega();G.mega[mk2]=MEGA_MAX;G.lastEvo=-1e9;G.p.max=hpMax();G.p.hp=G.p.max;G.banner={txt:'BUSTED BUILD · sandbox, no rewards',life:3,col:'#ff8a6a',big:1}}
 function sandboxRestore(){if(!SANDSNAP)return;const m=JSON.parse(SANDSNAP.meta),k2=JSON.parse(SANDSNAP.sk);for(const k in META)delete META[k];Object.assign(META,m);for(const k in SK)delete SK[k];Object.assign(SK,k2);SANDSNAP=null;SANDBOX=0;if(G){G.sandbox=0;G.wasSandbox=1}}
 function gameOverSB(){if(!G.sandbox)return;sandboxRestore();try{$('overT').textContent+=' · SANDBOX';$('newrec').insertAdjacentHTML('afterbegin','<p style="color:#ff8a6a;font-weight:bold">SANDBOX · no rewards (no gold, class XP or progress saved)</p>');$('cxp').innerHTML='';buildMenu()}catch(_){}}
-function start(){newGame();if(bustOn()){bustedBuild()}else G.pots=Object.keys(META.pots||{}).filter(k=>POTS[k]);if(!G.sandbox&&G.pots.length){META.pots={};saveMeta();applyPots();G.banner={txt:'Potions active: '+G.pots.map(k=>POTS[k].name).join(', '),life:3,col:'#9fe0ff'}}clearRun();['menu','clsDet','over','lvl','chest','shop','pause','codex','settings'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';setTimeout(updPotHud,0);
+function start(){newGame();if(bustOn()){bustedBuild()}else G.pots=Object.keys(META.pots||{}).filter(k=>POTS[k]);if(!G.sandbox&&G.pots.length){META.pots={};saveMeta();applyPots();G.banner={txt:'Potions active: '+G.pots.map(k=>POTS[k].name).join(', '),life:3,col:'#9fe0ff'};if(G.pots.includes('wise')){G.xp+=G.next*.9;pop(G.p.x,G.p.y-40,'+20% XP (levels & skills)','#d8d0ff',2)}}clearRun();['menu','clsDet','over','lvl','chest','shop','pause','codex','settings'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';setTimeout(updPotHud,0);
  if(premOn()){const k=pickMega();grantMega(k);G.premK=k;G.banner={txt:'★ Premium start: '+MEGA[k].name,life:3,col:'#ffd24a',big:1}}
  if(G.sig.head)setTimeout(()=>{if(G&&!G.over&&!G.paused&&!G.menu)levelUp()},500)}
 // ---------- pause / save ----------
@@ -1621,7 +1626,7 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=46;
+const VERSION=47;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
  b64e(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)},
  b64d(b){const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(_){return bin}},
@@ -1651,6 +1656,6 @@ setTimeout(checkUpdate,1500);document.addEventListener('visibilitychange',()=>{i
 // ================= INIT =================
 menuScene();buildMenu();show('menu',1);requestAnimationFrame(loop);
 {const r=hasRun();if(r&&r.auto&&Array.isArray(r.pendLvl)&&r.pendLvl.length&&Date.now()-r.at<60*60e3)setTimeout(()=>{try{continueRun()}catch(e){console.warn(e)}},60)}
-window.__game={SPR,WEAPONS,spawnEvent,evTick,set XP(v){[XPA,XPB,XPP]=v},set SKXP(v){SKXP=v},set MK(v){MEGA_KILL=v},gems,enemies,dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG,buildStats,wstat,mstat,saveRun,continueRun,pauseGame,resumeGame,hasRun,checkAch,ACH,EVO,evolve,CHESTS,rollCards,buildCodex,PASSIVES,saveMeta,PREM,pickMega,items,fx,launch,CLASSES,buildShop,MEGAKEYS,closeLvl,kill,orangeXp,MEGA_RATES,megaRoll,startFinal};
+window.__game={addSkillXp,SPR,WEAPONS,spawnEvent,evTick,set XP(v){[XPA,XPB,XPP]=v},set SKXP(v){SKXP=v},set MK(v){MEGA_KILL=v},gems,enemies,dropMega,update:dt=>update(dt),grantMega,levelUp,get G(){return G},gainXp,start,SK,XPT,sLvl,META,clsInfo,gameOver,collect,dropItem,needFor,spawn,openChest,computeBonus,buildMenu,menuScene,render,DBG,buildStats,wstat,mstat,saveRun,continueRun,pauseGame,resumeGame,hasRun,checkAch,ACH,EVO,evolve,CHESTS,rollCards,buildCodex,PASSIVES,saveMeta,PREM,pickMega,items,fx,launch,CLASSES,buildShop,MEGAKEYS,closeLvl,kill,orangeXp,MEGA_RATES,megaRoll,startFinal};
 })();
 </script></body></html>
