@@ -894,9 +894,10 @@ function randUpgrade(bonusLv){const up=[];for(const k in G.w)if(G.w[k]<capW(k))u
   if(!(ty==='w'?G.w:G.pas)[k]&&!window.__sim){(G.offerQ=G.offerQ||[]).push({ty,k,L:Math.min(ty==='w'?capW(k):PASSIVES[k].max,bonusLv)});const D=ty==='w'?WEAPONS[k]:PASSIVES[k];return{icon:ty==='w'?wicon(k):k,txt:`${ty==='w'?wname(k):D.name} offered (take or decline)`}}
   const D=ty==='w'?WEAPONS[k]:PASSIVES[k],o=ty==='w'?G.w:G.pas,b=o[k]||0;o[k]=Math.min(ty==='w'?capW(k):D.max,b+bonusLv);if(ty==='p'&&k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}const nm=ty==='w'?wname(k):D.name;return{icon:ty==='w'?wicon(k):k,txt:b?`${nm} Lv ${b} → ${o[k]}`:`${nm} (new) Lv ${o[k]}`}}
  const r=Math.random();if(r<.6||!G.ch){const g=Math.round(15*(1+(bonusLv||1))*(1+Math.min(G.t,900)/900)*goldMul());G.gold+=g;return{icon:'coin',txt:`+${g} gold`}}if(r<.8){G.ch.reroll=(G.ch.reroll||0)+1;return{icon:'reroll',txt:'+1 Reroll'}}const h=Math.round(G.p.max*.3);G.p.hp=Math.min(G.p.max,G.p.hp+h);return{icon:'food',txt:`Food: +${h} HP`}}  // v23: gold-heavy fallback, no permanent boosts
-// v48: chests and ground drops level weapons only (never passives), by rarity like upgrade cards (TIER_LV); fallback = small rewards
+// v48/v50: chests and ground drops level weapons (~68%) or passives, by rarity like upgrade cards (TIER_LV); fallback = small rewards
 let chestFb=0;
-function chestUp(t){t=Math.max(0,Math.min(3,t|0));const lv=TIER_LV[t],up=Object.keys(G.w).filter(k=>WEAPONS[k]&&G.w[k]<capW(k));
+function chestUp(t){t=Math.max(0,Math.min(3,t|0));const lv=TIER_LV[t],up=Object.keys(G.w).filter(k=>WEAPONS[k]&&G.w[k]<capW(k)),pu=Object.keys(G.pas).filter(k=>PASSIVES[k]&&G.pas[k]<PASSIVES[k].max);  // v50: weapons ~68%, else passives
+ if(pu.length&&(!up.length||Math.random()<.32)){const k=pu[Math.random()*pu.length|0],b=G.pas[k];G.pas[k]=Math.min(PASSIVES[k].max,b+lv);if(k==='hp'){G.p.max=hpMax();G.p.hp=G.p.max}return{icon:k,txt:`${PASSIVES[k].name} Lv ${b} → ${G.pas[k]}`,t}}
  if(up.length){const k=up[Math.random()*up.length|0],b=G.w[k];G.w[k]=Math.min(capW(k),b+lv);return{icon:wicon(k),txt:`${wname(k)} Lv ${b} → ${G.w[k]}`,t}}
  const f=chestFb++%3;if(f===0){const g=fillGold();G.gold+=g;return{icon:'coin',txt:`Coin pouch +${g} gold`,t}}
  if(f===1){G.p.hp=Math.min(G.p.max,G.p.hp+50);return{icon:'shark',txt:'Shark: heal 50 HP',t}}G.ch.reroll=(G.ch.reroll||0)+1;return{icon:'reroll',txt:'Lucky dice: +1 reroll',t}}
@@ -958,10 +959,7 @@ const STARTERS={scim:1,knives:1,wind:1,prayer:1};
 // v49: explicit class weapon pools for 2nd starting weapon (Armed bonus / Arsenal perk); never by skill
 const CPOOL={warrior:['scim','halberd'],ranger:['knives','cannon','darts','chin'],mage:['wind','barrage','fire','runes'],cleric:['prayer','smite']};
 const classPool=c=>Object.keys(WEAPONS).filter(k=>!WEAPONS[k].elite&&(WEAPONS[k].cls===c||(!WEAPONS[k].cls&&(CPOOL[c]||[]).includes(k)))&&avail(WEAPONS[k]));
-// v49: regular weapons normalized to one dps curve (ST x AoE geometric mean, measured); [Lv1,Lv6,Lv12] multipliers, log-interpolated
-const WNORM={wind:[1.136,1.213,0.914],knives:[1.988,0.82,0.424],scim:[1.509,1.416,1.53],cannon:[0.808,0.994,1.564],prayer:[0.839,0.896,0.824],barrage:[0.868,1.07,1.786],darts:[2.026,1.284,1.245],fire:[0.879,0.84,0.838],runes:[3.858,5.52,12.231],chin:[1.512,1.05,1.05],halberd:[1.935,2.963,2.545],smite:[0.988,0.494,0.415],axes:[4.946,2.31,4.335],quake:[1.69,3.044,2.548],chakram:[2.652,1.387,0.991],falcon:[0.759,0.7,0.759],chainl:[0.799,1.241,1.071],vortex:[1.561,2.491,2.427],pillar:[0.349,0.27,0.21],totem:[0.684,0.935,0.949]};
-const wnorm=(k,L)=>{const n=WNORM[k];if(!n)return 1;const l=Math.max(1,Math.min(12,L)),[a,b,t]=l<=6?[n[0],n[1],(l-1)/5]:[n[1],n[2],(l-6)/6];return Math.exp(Math.log(a)*(1-t)+Math.log(b)*t)};
-function wstat(k,L){const st=STARTERS[k],S=wstat0(k,L);if(L>8&&!st)S.dmg=wstat0(k,8+(L-8)*.5).dmg;if(st){S.dmg*=1.1+.05*L;if(k==='wind')S.pierce=Math.max(S.pierce,Math.floor(L/6))}if(WEAPONS[k]&&WEAPONS[k].elite)S.dmg*=(EMUL[k]||.75);else S.dmg*=wnorm(k,L);  // v23: Lv9-12 dmg gains halved
+function wstat(k,L){const st=STARTERS[k],S=wstat0(k,L);if(L>8&&!st)S.dmg=wstat0(k,8+(L-8)*.5).dmg;if(st){S.dmg*=1.1+.05*L;if(k==='wind')S.pierce=Math.max(S.pierce,Math.floor(L/6))}if(WEAPONS[k]&&WEAPONS[k].elite)S.dmg*=(EMUL[k]||.75);  // v23: Lv9-12 dmg gains halved
  if(PROJW[k]&&G.bon.proj)S.proj+=G.bon.proj;if(PROJW[k]&&G.tr&&G.tr.proj)S.proj+=G.tr.proj;if(G.evo&&G.evo[k]){S.dmg*=1.25;S.cd*=.92;if(PROJW[k])S.proj+=1;if(S.area)S.area=Math.round(S.area*1.1);if(S.pierce<99)S.pierce+=2;S.evo=1}return S}
 function wstat0(k,L){const m=k==='wind'||k==='barrage'||k==='fire'||k==='runes'?mg('shadow'):k==='knives'||k==='cannon'||k==='darts'||k==='chin'?mg('tbow'):k==='scim'||k==='halberd'?mg('scythe'):0,A=AREA(),D=durMul();switch(k){
  case 'axes':return{dmg:8+L*2,cd:.35,proj:1+pb(L),area:Math.round((62+L*3)*A),pierce:99,sp:3.2+L*.12};
@@ -993,7 +991,7 @@ function wstat0(k,L){const m=k==='wind'||k==='barrage'||k==='fire'||k==='runes'?
  case 'eldritch':return{dmg:36+L*17,cd:Math.max(1.6,2.8-L*.14),area:Math.round((85+L*7)*A),proj:1+(L>=6),pierce:99};
  case 'purging':return{dmg:2+L*9.8,cd:Math.max(1.4,2.4-L*.12),area:Math.round((130+L*8)*A),proj:0,pierce:99,life:2+L*.5};
  case 'relic':return{dmg:52+L*12.4,cd:Math.max(1.2,2.2-L*.12),area:Math.round((45+L*3)*A),proj:2+Math.floor(L/3),pierce:99}}}
-const msc=()=>1+G.t/240;const MEGA_TP=300,MEGA_EXP=.6;const megaScale=t=>{const b=enemyScale(Math.min(t,MEGA_TP));return t<=MEGA_TP?b:b*Math.pow(enemyScale(t)/b,MEGA_EXP)};  // v46: full ramp to 5:00, softened (^0.6) after
+const msc=()=>1+G.t/240;const MEGA_TP=300,MEGA_EXP=.4;const megaScale=t=>{const b=enemyScale(Math.min(t,MEGA_TP));return t<=MEGA_TP?b:b*Math.pow(enemyScale(t)/b,MEGA_EXP)};  // v46: full ramp to 5:00, softened (^0.6) after
 const mdm=L=>.7*megaScale(G.t)*(1+.25*(L-1));  // mega dmg tracks the enemy HP ramp, +25%/level
 function mstat(k,L){const A=AREA();switch(k){
  case 'tbow':return{dmg:240*mdm(L),cd:Math.max(.5,1.1/L),proj:L,pierce:4+L,area:0};
@@ -1665,7 +1663,7 @@ function loop(now){const dt=Math.max(0,Math.min(.05,(now-last)/1000));last=now;
  if(G){if(G.menu)renderMenu();else render()}requestAnimationFrame(loop)}
 function renderMenu(){render()}
 // ---- v42: save backup (export/import all oss_ keys) + auto-update ----
-const VERSION=49;
+const VERSION=50;
 const SAVEIO={pre:'OSS1:',keys(){const o=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('oss_'))o.push(k)}return o},
  b64e(str){const u=new TextEncoder().encode(str);let b='';for(let i=0;i<u.length;i+=8192)b+=String.fromCharCode.apply(null,u.subarray(i,i+8192));return btoa(b)},
  b64d(b){const bin=atob(b);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);try{return new TextDecoder('utf-8',{fatal:true}).decode(u)}catch(_){return bin}},
