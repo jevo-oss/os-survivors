@@ -613,6 +613,9 @@ html body #lvl .card{padding:6px 9px 6px 7px!important;margin:0 0 5px!important}
 html body #lvl h2{font-size:24px!important;margin:0 0 4px!important}
 html body #lvl .lvtools button,html body #lvl .btn{min-height:46px!important}
 html body #lvl .lvtools button,html body #lvl button,html body #lvl .btn{text-transform:none!important}
+/* v66g: HUD 18% smaller; speed beside pause; 44pt hit areas via pseudo-element */
+html body .spdb{top:calc(env(safe-area-inset-top) + 7px)!important;right:47px!important;width:40px!important;height:26px!important;line-height:24px!important;font-size:13.5px!important;overflow:visible!important}
+html body .spdb:after,html body .pbtn:after{content:""!important;position:absolute!important;inset:-9px -4px!important;background:none!important;box-shadow:none!important;width:auto!important;height:auto!important;border:0!important}
 </style>
 </head><body>
 <div id="sat"></div>
@@ -2727,16 +2730,17 @@ return{LZ,mob,mobFrames,hero,drawHero:drawHeroP2,heroPortrait:heroPortraitP2,her
 // Enemies / heroes / fx are NOT desaturated. Live tuning: edit window.WORLD_GRADE in the console, then WORLD_GRADE.rev++ to rebake.
 const WORLD_GRADE=window.WORLD_GRADE={
  rev:0, enabled:true,
+ // ground tiles are procedural per area (p3_tex.js); Dungeon keeps the v64 flagstones
  // per area [Fields, Swamp, Wilderness, Volcano, Dungeon, Abyss] - ground based on the v64 area tiles
  //  exp = ground exposure (.8 = ~20% darker than v64), desat 0..1, con = contrast around mid grey, tint = shadow tint colour + amount,
  //  vig = vignette edge colour (multiply) + strength, pExp/pDesat = props, ambient = mote kind override (null = area default)
  areas:[
-  {n:'Lumbridge Fields', exp:.80,desat:.16,con:1.14,tint:'#24303c',tintAmt:.16,vig:'#1e1c1a',vigAmt:.40,pExp:.90,pDesat:.10},
-  {n:'Draynor Swamp',    exp:.82,desat:.06,con:1.18,tint:'#0e3a34',tintAmt:.26,vig:'#0a1c18',vigAmt:.42,pExp:.88,pDesat:.06},
-  {n:'The Wilderness',   exp:.80,desat:.12,con:1.18,tint:'#3a1e14',tintAmt:.18,vig:'#1e120c',vigAmt:.42,pExp:.88,pDesat:.12},
-  {n:'Karamja Volcano',  exp:.86,desat:.04,con:1.16,tint:'#2a0c06',tintAmt:.14,vig:'#1e0a06',vigAmt:.40,pExp:.95,pDesat:.04},
+  {n:'Lumbridge Fields', exp:1,desat:0.08,con:1.04,tint:'#24303c',tintAmt:.16,vig:'#1e1c1a',vigAmt:.40,pExp:.90,pDesat:.10},
+  {n:'Draynor Swamp',    exp:1,desat:0.03,con:1.04,tint:'#0e3a34',tintAmt:.26,vig:'#0a1c18',vigAmt:.42,pExp:.88,pDesat:.06},
+  {n:'The Wilderness',   exp:1,desat:0.06,con:1.04,tint:'#3a1e14',tintAmt:.18,vig:'#1e120c',vigAmt:.42,pExp:.88,pDesat:.12},
+  {n:'Karamja Volcano',  exp:1,desat:0.02,con:1.04,tint:'#2a0c06',tintAmt:.14,vig:'#1e0a06',vigAmt:.40,pExp:.95,pDesat:.04},
   {n:'Taverley Dungeon', exp:.84,desat:.06,con:1.14,tint:'#0e1e3e',tintAmt:.24,vig:'#060c1a',vigAmt:.46,pExp:.92,pDesat:.06},
-  {n:'The Abyss',        exp:.86,desat:.02,con:1.16,tint:'#24081f',tintAmt:.18,vig:'#140612',vigAmt:.42,pExp:.95,pDesat:.02}],
+  {n:'The Abyss',        exp:1,desat:0.01,con:1.04,tint:'#24081f',tintAmt:.18,vig:'#140612',vigAmt:.42,pExp:.95,pDesat:.02}],
  decal:{exp:.88,desat:.22}, // flowers / mush / pebble / bones / ash decals: muted but keep their own colours (alpha untouched)
  exposure:.97,      // whole-world exposure at screen centre (1 = enemies at full colour)
  vignetteInner:.32, // clear radius around the player (fraction of half-diagonal)
@@ -3370,7 +3374,7 @@ function tierExtra(t){if(t===1){G.p.hp=Math.min(G.p.max,G.p.hp+G.p.max*.18)}if(t
 const WCAP=k=>WEAPONS[k].elite?40:45,PCAP=k=>PASSIVES[k].max*2,OV_D=.04,OV_CD=.99,OV_A=.01,OV_P=.5,OV_E=1.3;
 const pv=k=>{const L=G.pas[k]||0,m=PASSIVES[k].max;return L<=m?L:m+(L-m)*OV_P},pvL=(k,L)=>{const m=PASSIVES[k].max;return L<=m?L:m+(L-m)*OV_P};
 // v57 enemy director knobs (minute-keyed tables, linear between points)
-const GEM_DRIFT=52;const TUNE={hpx:[[0,0.85],[3,0.78],[5,0.8],[7,1.0],[10,1.7],[12,2.4],[15,3.9],[18,6.0],[20,7.6],[23,9.6],[25,3.4],[30,3.2]],bhx:[[0,0.45],[3,0.5],[5,0.75],[8,1.6],[12,3.0],[16,5.2],[20,7.2],[30,8]],kN:.03,kD:.03,kE:.03,lref:[[0,1],[5,22],[10,42],[15,70],[20,100],[25,140],[30,180]],den:[[0,1],[8,1],[12,1.2],[18,1.38],[22,1.5],[25,1.8],[30,1.8]],hunt:[[0,0],[12,0],[15,0.12],[18,0.25],[23,0.28],[30,0.2]],lead:[[0,0],[8,0],[15,.25],[23,.35],[30,.35]],eg:[[0,90],[12,75],[18,60],[30,60]],emod:840,edm:1,cdm:[[0,0.85],[5,0.78],[8,0.9],[11,1.45],[15,2.7],[22,3.6],[25,2.5],[30,2.5]]};
+const GEM_DRIFT=52,GEM_MR=window.__GEMMR||64;const TUNE={hpx:[[0,0.85],[3,0.78],[5,0.8],[7,1.0],[10,1.7],[12,2.4],[15,3.9],[18,6.0],[20,7.6],[23,9.6],[25,3.4],[30,3.2]],bhx:[[0,0.45],[3,0.5],[5,0.75],[8,1.6],[12,3.0],[16,5.2],[20,7.2],[30,8]],kN:.03,kD:.03,kE:.03,lref:[[0,1],[5,22],[10,42],[15,70],[20,100],[25,140],[30,180]],den:[[0,1],[8,1],[12,1.2],[18,1.38],[22,1.5],[25,1.8],[30,1.8]],hunt:[[0,0],[12,0],[15,0.12],[18,0.25],[23,0.28],[30,0.2]],lead:[[0,0],[8,0],[15,.25],[23,.35],[30,.35]],eg:[[0,90],[12,75],[18,60],[30,60]],emod:840,edm:1,cdm:[[0,0.85],[5,0.78],[8,0.9],[11,1.45],[15,2.7],[22,3.6],[25,2.5],[30,2.5]]};
 const lerpT=(T,m)=>{if(m<=T[0][0])return T[0][1];for(let i=1;i<T.length;i++)if(m<=T[i][0]){const a=T[i-1],b=T[i];return a[1]+(b[1]-a[1])*(m-a[0])/(b[0]-a[0])}return T[T.length-1][1]};
 // v57 Danger ladder: opt-in tiers above Normal, unlocked per class by beating the tier below (30:00 + Titan)
 const LADDER=[{n:'Normal',hp:0,dm:0,den:0,eg:1,emod:0,sp:0,horde:0,g:0,x:0,c:'#c9b58a',d:'The standard run'},
@@ -3453,7 +3457,7 @@ function launch(it,big){if(!it)return;const a=Math.random()*6.283,s=50+Math.rand
 function kill(e){e.a=false;p3Death(e);
  if(e.prop){burst(e.x,e.y,e.t==='torch'?'#ffb040':'#8a5a30',12,140);const r=Math.random(),pk=r<.42?'coin':r<.50125?'food':r<.53875?'magnet':r<.57?'bomb':r<.60125?'star':r<.6325?'ult':null;if(pk)dropItem(e.x,e.y,pk,pk==='coin'?5:1);return}  // power-ups x0.3125
  G.kills++;if(G.sig.leech)G.p.hp=Math.min(G.p.max,G.p.hp+.5);if(G.sig.fleet)G.fleet=1.1;{const lite=!e.boss&&brrK()>0;burst(e.x,e.y,DSK(e.sk)||DCOL[e.t]||'#fff',e.boss?40:lite?4:9,e.boss?220:130);if(!lite||Math.random()<.3){if(e.boss)burst(e.x,e.y,'',14,90,GL.white);addFx(e.x,e.y,e.r*1.8,.28,'ring')}}
- const v=e.xp;const g=gems.get();if(g){g.x=e.x;g.y=e.y;g.v=v;g.mag=false;g.bt=G.t;g.tier=e.elite||e.boss||e.champ===2?2:e.champ||(ETYPES[e.t].gt?1:0)}else{const o=gems.a[Math.random()*gems.a.length|0];o.v+=v}
+ const v=e.xp,gt0=e.elite||e.boss||e.champ===2?2:e.champ||(ETYPES[e.t].gt?1:0);let mg=null;if(gt0!==2&&!window.__noGemMerge){let bd=GEM_MR*GEM_MR;for(const o of gems.a)if(o.a&&o.tier!==2&&!o.mag){const dx=o.x-e.x,dy=o.y-e.y,dd=dx*dx+dy*dy;if(dd<bd){bd=dd;mg=o}}}if(mg){mg.v+=v;mg.bt=G.t}else{const g=gems.get();if(g){g.x=e.x;g.y=e.y;g.v=v;g.mag=false;g.bt=G.t;g.tier=gt0}else{let o=null;for(const q of gems.a)if(q.a&&q.tier!==2){o=q;break}if(o)o.v+=v;else{const q=gems.a[Math.random()*gems.a.length|0];q.v+=v}}}
  if(e.fin){dropItem(e.x+24,e.y+10,'shark');finalWin(e);return}
  if(e.tgob){launch(dropItem(e.x,e.y,'chest',chestTier(0)));for(let i=0;i<5;i++)dropItem(e.x+(Math.random()-.5)*50,e.y+(Math.random()-.5)*50,'coin',8);G.banner={txt:'Treasure goblin caught!',life:1.8,col:'#ffd24a'}}
  if(e.emod)eliteBoom(e);if(e.boss){pop(e.x,e.y-60,'Boss slain!','#ffb040');G.shake=.5;G.flash=Math.max(G.flash,.25);burst(e.x,e.y,'',16,280,GL.gold);addFx(e.x,e.y,150,.6,'ring');if(megaRoll(G.bossKills?MEGA_RATES.boss:MEGA_RATES.boss1))dropMega(e.x-30,e.y);G.bossKills++;dropItem(e.x+24,e.y+10,'shark');{for(const o of enemies.a)if(o.a&&!o.prop&&o!==e){o.a=false;burst(o.x,o.y,'',3,80,GL.white)}const bc=dropItem(G.p.x+70,G.p.y-20,'chest',chestTier(1),1);if(bc){bc.bl=1;launch(bc,1)}dropItem(G.p.x-70,G.p.y-20,'magnet');G.brk=1;G.brkCd=0;for(const q of gems.a)if(q.a)q.mag=true;G.banner={txt:'Victory! Collect the loot',life:2.5,col:'#ffd24a',big:1,brk:1};buzz([40,40,80])}if(G.loot.length<12)G.loot.push({x:e.x,y:e.y+34,tier:Math.min(3,rollTier(1)+1)});for(let i=0;i<6;i++)dropItem(e.x,e.y,'coin',10);return}
@@ -3660,7 +3664,9 @@ function weapons(dt){const p=G.p,w=G.w,cd=G.cd,dc=dt*(1+G.bon.cd)*(G.tr?G.tr.cdm
 let XPA=8,XPB=17,XPP=1.9;
 // orange gems (rare: orange champions, elites, bosses) are worth ~2 levels early, tapering to ~0.75 level by Lv20+
 function orangeXp(L){const k=Math.max(.75,2-1.25*(L-2)/18);let v=0,i=0;for(;i<Math.floor(k);i++)v+=needFor(L+i);v+=(k-Math.floor(k))*needFor(L+i);return Math.max(30,Math.round(v))}
-function needFor(L){const v=XPA+XPB*Math.pow(L-1,XPP+(L>13?.1*Math.min(1,(L-13)/10):0));return Math.round((L<=13?v*.7:v)*(L>=10?1+.15*Math.pow(L-9,1.3):1)*(L>40?1+XP_LATE*(L-40):1))}const XP_LATE=.11;  // v55: slower past Lv40  // v23: steeper from Lv10 (x1.15@10, x1.9@13, x4.4@20, x7.9@28)  // levels 1-13 are 30% cheaper
+function needFor(L){const v=XPA+XPB*Math.pow(L-1,XPP+(L>13?.1*Math.min(1,(L-13)/10):0));return Math.round((L<=13?v*.7:v)*(L>=10?1+.15*Math.pow(L-9,1.3):1)*(L>40?1+XP_LATE*(L-40):1))}const XP_LATE=.11;
+function gemVT(g){if(g.tier===2)return 3;const r=g.v/Math.max(1,needFor(G.lvl));return r<.05?0:r<.2?1:2}
+const GEMV=[];function gemSpr(i){if(GEMV[i])return GEMV[i];const b=SPR.gem[0],src=b.c||b,c=document.createElement('canvas');c.width=src.width;c.height=src.height;const g=c.getContext('2d');g.drawImage(src,0,0);const d=g.getImageData(0,0,c.width,c.height),D=d.data,C=[[70,120,190],[76,200,106],[214,40,52]][i],A=[.8,1,1][i];for(let j=0;j<D.length;j+=4){const L=(D[j]*.3+D[j+1]*.59+D[j+2]*.11)/255,m=L<.5?L*2:1,w=L<.5?0:(L-.5)*2;D[j]=C[0]*m+(255-C[0])*w*.8;D[j+1]=C[1]*m+(255-C[1])*w*.8;D[j+2]=C[2]*m+(255-C[2])*w*.8;D[j+3]*=A}g.putImageData(d,0,0);const o={c,w:b.w||src.width,h:b.h||src.height,ok:1};GEMV[i]=o;return o}  // v55: slower past Lv40  // v23: steeper from Lv10 (x1.15@10, x1.9@13, x4.4@20, x7.9@28)  // levels 1-13 are 30% cheaper
 function gainXp(v){v*=xpMul();G.xp+=v;G.xpTot=(G.xpTot||0)+v;if(G.xp>=G.next&&!G.paused){G.xp-=G.next;G.lvl++;G.next=needFor(G.lvl);levelUp()}}
 // v26 variety: per-run seeded phase order (normal/horde/brute shuffled every 135s cycle) + a seeded 'flavor' type per 3-min block
 function srnd(n){let x=((G.seed|0)^Math.imul(n|0,0x9E3779B1))>>>0;x=Math.imul(x^x>>>16,0x45d9f3b);x=Math.imul(x^x>>>16,0x45d9f3b);return ((x^x>>>16)>>>0)/4294967296}
@@ -3883,7 +3889,7 @@ const DBG={};function render(){const now=NOW=performance.now()/1000;const p=G.p;
  for(const it of items.a)if(it.a){const s=it.k==='chest'?(CHSPR[it.v]||CHSPR[0]).sp:PICK[it.k];if(!s){if(!window.__bad)console.warn('BADITEM',it.k,it.v);window.__bad=1;continue}const b=Math.sin(now*4+it.x)*2.5,sz=it.k==='chest'?40+(it.v|0)*4:it.k==='coin'?22:28;dI(SPR.shadow,it.x-sz*.4,it.y+sz*.25,sz*.8,sz*.3);
   if(it.k!=='coin'){ctx.save();ctx.globalCompositeOperation='lighter';addGlow(GL[it.k==='chest'?(CHESTS[it.v]||CHESTS[0]).gl:(it.k==='food'||it.k==='shark')?'green':it.k==='magnet'?'red':it.k==='bomb'?'orange':'gold'],it.x,it.y-6+b-(it.z||0),sz*1.6,.4+.2*Math.sin(now*5));ctx.restore()}
   if(it.k==='chest'&&it.v===3){ctx.save();ctx.globalCompositeOperation='lighter';addGlow(GL.gold,it.x,it.y-10+b-(it.z||0),70,.35+.2*Math.sin(now*7));ctx.restore()}if(it.k==='chest'&&!(it.z>0)){const ph=(now+it.x*.013)%2.4,r=ph<.4?Math.sin(ph*42)*.14*(1-ph/.4):0;ctx.save();ctx.translate(it.x,it.y+b);ctx.rotate(r);dI(s,-sz/2,-sz*.8,sz,sz);ctx.restore()}else dI(s,it.x-sz/2,it.y-sz*.8+b-(it.z||0),sz,sz)}
-  for(const g of gems.a)if(g.a){const t=g.tier||0,s=SPR.gem[t],k=(.8+t*.2)*.6,yy=g.y+Math.sin(now*5+g.x)*1.5;
+  for(const g of gems.a)if(g.a){const vt=gemVT(g),t=vt===3?2:0,s=vt===3?SPR.gem[2]:gemSpr(vt),k=[.5,.62,.74,.72][vt],yy=g.y+Math.sin(now*5+g.x)*1.5;if(vt===2){ctx.save();ctx.globalCompositeOperation='lighter';addGlow(GL.red,g.x,yy,30,.35+.15*Math.sin(now*6+g.x));ctx.restore()}
    if(t){ctx.save();ctx.globalCompositeOperation='lighter';addGlow(GL[t===2?'orange':'gold'],g.x,yy,t===2?46:34,.5+.2*Math.sin(now*6+g.x));ctx.restore()}
    dI(s,g.x-s.w*k/2,yy-s.h*k/2,s.w*k,s.h*k);
    if(t===2){const a=now*3+g.x,sx=g.x+Math.cos(a)*9,sy=yy-6+Math.sin(a*1.3)*5,z=2.5+1.5*Math.abs(Math.sin(now*7+g.y));ctx.save();ctx.globalAlpha=.9;ctx.fillStyle='#fff8d0';ctx.beginPath();ctx.moveTo(sx,sy-z*1.6);ctx.lineTo(sx+z*.45,sy);ctx.lineTo(sx,sy+z*1.6);ctx.lineTo(sx-z*.45,sy);ctx.closePath();ctx.moveTo(sx-z*1.6,sy);ctx.lineTo(sx,sy+z*.45);ctx.lineTo(sx+z*1.6,sy);ctx.lineTo(sx,sy-z*.45);ctx.closePath();ctx.fill();ctx.restore()}}
@@ -4067,6 +4073,7 @@ function hSock(x,y,s,st,ico,lv,maxed){hDraw(bkSock(st,s),x,y);if(ico){const i=s*
  if(maxed){hDraw(bkStar(),x+s-11,y+s-11.5)}else if(lv!=null&&lv!==''){const t=''+lv;ctx.font=`700 14px ${IKF.num}`;const bw=Math.max(14,Math.ceil(ctx.measureText(t).width)+6);hDraw(bkBadge(bw),x+s-bw+1,y+s-11);hText(t,x+s-bw/2+1,y+s+.5,14,GT.goldLt,{al:'center',st:2.4})}}
 function hud(now){const p=G.p,T=(typeof SAT!=='undefined'?SAT:0);const d=Math.min(1/30,Math.max(0,now-(HS.t||now)));HS.t=now;
  if(HS.sab<0){const q=document.createElement('div');q.style.cssText='position:fixed;bottom:0;height:env(safe-area-inset-bottom);width:1px;visibility:hidden';document.body.appendChild(q);HS.sab=q.offsetHeight||0;q.remove()}
+ const _W=W,_T=T;{ctx.save();ctx.scale(.82,.82);const W=_W/.82,T=_T/.82;
  // v66e: v61-style clear HUD - red HP bar w/ number, blue XP bar, level badge, coloured item icons, compact + balanced (top ~18%)
  const xf=Math.max(0,Math.min(1,G.xp/G.next));if(xf<HS.xp-.02||G.lvl!==HS.lv)HS.xp=xf;HS.xp+=(xf-HS.xp)*Math.min(1,d*8);
  const hf=Math.max(0,Math.min(1,p.hp/p.max));if(HS.lastHp<0){HS.hp=HS.lag=hf}if(hf<HS.hp-.001){HS.lagHold=.45;HS.lag=Math.max(HS.lag,HS.hp)}HS.hp=hf>HS.hp?HS.hp+(hf-HS.hp)*Math.min(1,d*10):hf;HS.lastHp=hf;
@@ -4088,7 +4095,7 @@ function hud(now){const p=G.p,T=(typeof SAT!=='undefined'?SAT:0);const d=Math.mi
  hText(''+G.lvl,0,7,G.lvl>99?15:19,'#ffe7a8',{al:'center',st:3});ctx.restore();
  if(HS.lvPop<.6){ctx.save();ctx.globalAlpha=(1-HS.lvPop/.6);ctx.strokeStyle='#ffd27a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,22+HS.lvPop*34,0,6.283);ctx.stroke();ctx.restore()}
  // timer centred top, pause top-right
- hText(fmtT(G.t),W-46,T+31,22,'#ffffff',{al:'right',st:3.6,ls:.5});hDraw(bkStud(),W-38,T+9);
+ hText(fmtT(G.t),W-120,T+31,22,'#ffffff',{al:'right',st:3.6,ls:.5});hDraw(bkStud(),W-38,T+9);
  if(G.sandbox){hDraw(bkStamp(),W/2-43,H-150)}
  // gold + kills + slots panel
  const wk=Object.keys(G.w),pk=Object.keys(G.pas),mk=Object.keys(G.mega),NS=G.ws+G.ps,s=Math.max(24,Math.min(30,Math.floor((W*.66-24)/NS)-3)),gp=3,px0=X+G.ws*(s+gp)+7,ly=Y+75,sy=Y+80,rows=mk.length?2:1,pw=Math.max(bx+bw-X+6,px0+G.ps*(s+gp)-X+4);
@@ -4102,9 +4109,10 @@ function hud(now){const p=G.p,T=(typeof SAT!=='undefined'?SAT:0);const d=Math.mi
  for(let i=0;i<G.ps;i++){const k=pk[i],x=px0+i*(s+gp);if(!k){hSlot(x,sy,s,null,'#3a5a7a');continue}const mx=PASSIVES&&PASSIVES[k]&&G.pas[k]>=PASSIVES[k].max;hSlot(x,sy,s,ICON[k],'#4a8acc',G.pas[k],mx)}
  mk.forEach((k,i)=>{hSlot(X+i*(s+gp),sy+s+gp,s,ICON[k],'#e8b33a','x'+G.mega[k],0)});
  // skills column (compact, right)
- const n=SKILLS.length,SR2=23,stx=W-48,sty=T+77;hPan(stx-3,sty-3,47,n*SR2+5);
+ const n=SKILLS.length,SR2=23,stx=W-48,sty=T+46;hPan(stx-3,sty-3,47,n*SR2+5);
  SKILLS.forEach((k,i)=>{const y=sty+i*SR2,ic=ICON[k];if(ic&&ic.c)ctx.drawImage(ic.c,stx,y,21,21);else{const g2=GI(k);if(g2)ctx.drawImage(g2.c||g2,stx,y,21,21)}hText(''+sLvl(k),W-6,y+16,15,'#ffffff',{al:'right',st:3})});
  let dy=0;for(const k in G.drops){const dd=G.drops[k],a=Math.min(1,dd.life*2);ctx.globalAlpha=a;const y=sty+n*SR2+22+dy-(1.4-dd.life)*18,ic=ICON[k];if(ic&&ic.c)ctx.drawImage(ic.c,W-80,y-15,18,18);hText('+'+Math.round(dd.v),W-8,y,14,'#ffe7a8',{al:'right',st:3});ctx.globalAlpha=1;dy+=20}
+ ctx.restore()}
  // treasure goblin indicator
  for(const e of enemies.a)if(e.a&&e.tgob){const ex=(e.x-p.x)*ZOOM+W/2,ey=(e.y-p.y)*ZOOM+H/2,M=30,top=T+92,bot=H-120,on=ex>M&&ex<W-M&&ey>top&&ey<bot,pul=.5+.5*Math.sin(now*6);
   if(on){const y=ey-(e.r+30)*ZOOM-pul*4;hArrow(ex,y,Math.PI/2,.8)}
@@ -4706,6 +4714,102 @@ var P3GLY;function P3gly(){if(P3GLY)return P3GLY;const W='#fff',Dk='#222';
   darts:g=>{for(let i=0;i<3;i++){g.save();g.translate(14+i*10,26-i*2);g.rotate(.7);pg(g,[0,-17,3.2,-9,-3.2,-9]);g.fillStyle=W;g.fillRect(-1.4,-10,2.8,18);pg(g,[0,6,5,14,0,11,-5,14]);g.restore()}}
  };return P3GLY}
 
+// ===== part3 v66h: procedural structured ground per area (baked once, in background time slices; 1024px tiles = ~683 screen px) =====
+// Fields: grass blades + clumps, worn dirt paths, path cobbles | Swamp: peat, moss mats, reflective puddles, roots, boardwalk + posts + cobble
+// Wilderness: cracked dry-earth plates + crazing, scorch, dead grass, rubble | Volcano: columnar basalt hex plates, glowing lava seams, ash
+// Dungeon: v64 flagstones (kept) | Abyss: membrane cells with dark veins + glowing sinew, tendrils
+var P3TJ=null;
+function P3Tcol(h){return P3hex(h)}
+function* P3Tgen(i){const S=1024,R=P3rng(7717+i*104729),c=document.createElement('canvas');c.width=c.height=S;const g=c.getContext('2d');g.lineCap='round';g.lineJoin='round';
+ const W8=(x,y,r,fn)=>P3wrap(g,S,x,y,r,fn),TAU=6.283;
+ const per=(amp,ph)=>{const a=[R()*TAU,R()*TAU,R()*TAU];return u=>amp*(Math.sin(u*TAU/S+a[0])*.6+Math.sin(2*u*TAU/S+a[1])*.3+Math.sin(3*u*TAU/S+a[2])*.15)+ph};
+ const blob=(r,j,n)=>{const p=[];for(let k=0;k<n;k++){const a=k/n*TAU;p.push([Math.cos(a)*r*(1-j+R()*j*2),Math.sin(a)*r*(1-j+R()*j*2)])}return p};
+ const bpath=(p,X,Y,s)=>{g.beginPath();const n=p.length;for(let k=0;k<=n;k++){const a=p[k%n],b=p[(k+1)%n],mx=(a[0]+b[0])/2*s+X,my=(a[1]+b[1])/2*s+Y;k?g.quadraticCurveTo(a[0]*s+X,a[1]*s+Y,mx,my):g.moveTo(mx,my)}g.closePath()};
+ const soft=(n,cols,r0,r1,al)=>{for(let k=0;k<n;k++){const x=R()*S,y=R()*S,r=r0+R()*(r1-r0),cc=P3hex(cols[(R()*cols.length)|0]);W8(x,y,r,(X,Y)=>{const q=g.createRadialGradient(X,Y,0,X,Y,r);q.addColorStop(0,`rgba(${cc},${al})`);q.addColorStop(1,`rgba(${cc},0)`);g.fillStyle=q;g.fillRect(X-r,Y-r,2*r,2*r)})}};
+ const specks=(n,cols,r0,r1,al)=>{for(const col of cols){g.fillStyle=col;g.globalAlpha=al;g.beginPath();for(let k=0;k<n/cols.length;k++){const x=R()*S,y=R()*S,r=r0+R()*(r1-r0);g.moveTo(x+r,y);g.arc(x,y,r,0,TAU)}g.fill()}g.globalAlpha=1};
+ const stone=(X,Y,rx,ry,col,rot)=>{g.save();g.translate(X,Y);g.rotate(rot||0);g.fillStyle='rgba(6,5,4,.45)';g.beginPath();g.ellipse(1,2,rx+1,ry+1,0,0,TAU);g.fill();g.fillStyle=col;g.beginPath();g.ellipse(0,0,rx,ry,0,0,TAU);g.fill();
+  g.strokeStyle='rgba(12,10,8,.75)';g.lineWidth=1.2;g.stroke();g.strokeStyle='rgba(255,246,225,.13)';g.lineWidth=1.1;g.beginPath();g.ellipse(-.5,-.8,rx*.75,ry*.6,0,3.5,5.6);g.stroke();g.restore()};
+ const blades=(n,cols,lw,l0,l1,skip)=>{const B=cols.map(()=>new Path2D());for(let k=0;k<n;k++){const x=R()*S,y=R()*S;if(skip&&skip(x,y))continue;const L=l0+R()*(l1-l0),dx=(R()-.5)*L*.7,b=B[(R()*B.length)|0];
+   for(const ox of (x<12?[0,S]:x>S-12?[0,-S]:[0]))for(const oy of (y<20?[0,S]:y>S-20?[0,-S]:[0])){b.moveTo(x+ox,y+oy);b.quadraticCurveTo(x+ox+dx*.2,y+oy-L*.6,x+ox+dx,y+oy-L)}}
+  g.lineWidth=lw;B.forEach((p,j)=>{g.strokeStyle=cols[j];g.stroke(p)})};
+ // periodic voronoi, pixel pass (chunked). shade(o,cell,id2,e,d1,x,y) writes rgb into D
+ function* voro(Gn,jit,shade){const P=[],cs=S/Gn;for(let y=0;y<Gn;y++)for(let x=0;x<Gn;x++)P.push([(x+.5+(R()-.5)*jit)*cs,(y+.5+(R()-.5)*jit)*cs,R(),R()]);
+  const im=g.getImageData(0,0,S,S),D=im.data;
+  for(let y=0;y<S;y++){const gy=Math.floor(y/cs);for(let x=0;x<S;x++){const gx=Math.floor(x/cs);let d1=1e9,d2=1e9,a=0,b=0,ax=0,ay=0,bx=0,by=0;
+    for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){let cx=gx+ox,cy=gy+oy,sx=0,sy=0;if(cx<0){cx+=Gn;sx=-S}else if(cx>=Gn){cx-=Gn;sx=S}if(cy<0){cy+=Gn;sy=-S}else if(cy>=Gn){cy-=Gn;sy=S}
+     const k=cy*Gn+cx,p=P[k],px=p[0]+sx,py=p[1]+sy,d=(px-x)*(px-x)+(py-y)*(py-y);if(d<d1){d2=d1;b=a;bx=ax;by=ay;d1=d;a=k;ax=px;ay=py}else if(d<d2){d2=d;b=k;bx=px;by=py}}
+    const L=Math.hypot(bx-ax,by-ay)||1,e=(d2-d1)/(2*L);shade((y*S+x)*4,D,P[a],P[b],a,b,e,Math.sqrt(d1),x,y)}
+   if((y&31)===31)yield}
+  g.putImageData(im,0,0)}
+ const ph=(a,b)=>{const h=Math.sin(a*127.1+b*311.7+a*b*.013)*43758.5;return h-Math.floor(h)},pairH=(a,b)=>a<b?ph(a,b):ph(b,a),nz=()=>(Math.random()-.5);
+ if(i===0){ // ---------- Lumbridge Fields
+  g.fillStyle='#2a3a1c';g.fillRect(0,0,S,S);soft(34,['#21301a','#344a24','#2c3a1a'],90,220,.55);yield;
+  const py=per(70,S*.3),px=per(60,S*.7),onP=(x,y)=>{const a=Math.abs(((y-py(x))%S+S*1.5)%S-S/2),b=Math.abs(((x-px(y))%S+S*1.5)%S-S/2);return a<20||b<16};
+  const path=(f,horiz,w)=>{for(const o of [-S,0,S]){for(const [lw,col,al] of [[w+12,'#211a10',.55],[w,'#45372a',1],[w*.55,'#54432f',.55]]){g.strokeStyle=col;g.globalAlpha=al;g.lineWidth=lw;g.beginPath();for(let u=-24;u<=S+24;u+=8){const v=f(u)+o;horiz?(u===-24?g.moveTo(u,v):g.lineTo(u,v)):(u===-24?g.moveTo(v,u):g.lineTo(v,u))}g.stroke()}}g.globalAlpha=1};
+  path(py,1,40);path(px,0,32);yield;
+  specks(2600,['#2a2016','#5e4c36','#6a5a44'],.5,1.6,.55);
+  for(const [f,h,w] of [[py,1,40],[px,0,32]])for(let u=0;u<S;u+=13){if(R()<.45)continue;const v=f(u)+(R()-.5)*w*.6,X=h?u:v,Y=h?v:u,c=['#5c574c','#666052','#545046'][(R()*3)|0];W8(X,Y,14,(x,y)=>stone(x,y,5+R()*6,3.5+R()*3.5,c,R()*3))}yield;
+  blades(14000,['#26381a','#304a20','#3b5826','#466a2c'],1.25,5,11,(x,y)=>onP(x,y)&&R()<.92);yield;
+  for(let k=0;k<420;k++){const x=R()*S,y=R()*S;if(onP(x,y))continue;W8(x,y,20,(X,Y)=>{g.fillStyle='rgba(8,12,5,.4)';g.beginPath();g.ellipse(X,Y+1,9,3.5,0,0,TAU);g.fill();const n=7+(R()*6|0);for(let j=0;j<n;j++){const a=-1.57+(j/(n-1)-.5)*1.9+(R()-.5)*.2,L=9+R()*8;g.strokeStyle=j%3?'#3e5c28':'#2c4420';g.lineWidth=1.5;g.beginPath();g.moveTo(X,Y);g.quadraticCurveTo(X+Math.cos(a)*L*.4,Y+Math.sin(a)*L*.7,X+Math.cos(a)*L,Y+Math.sin(a)*L);g.stroke();if(j%2){g.strokeStyle='#5a7c36';g.lineWidth=1;g.beginPath();g.moveTo(X+Math.cos(a)*L*.75,Y+Math.sin(a)*L*.75);g.lineTo(X+Math.cos(a)*L,Y+Math.sin(a)*L);g.stroke()}}})}
+  for(let k=0;k<26;k++){const x=R()*S,y=R()*S;if(onP(x,y))continue;W8(x,y,12,(X,Y)=>stone(X,Y,4+R()*4,3+R()*2.5,'#58544a',R()*3))}}
+ else if(i===1){ // ---------- Draynor Swamp
+  g.fillStyle='#24221a';g.fillRect(0,0,S,S);soft(30,['#1b1912','#2e2c1e','#22261a'],80,200,.6);specks(5000,['#18160f','#353222','#2c2a1c'],.6,1.8,.6);yield;
+  for(let k=0;k<16;k++){const x=R()*S,y=R()*S,r=50+R()*70,p=blob(1,.32,12);W8(x,y,r*1.4,(X,Y)=>{g.save();bpath(p,X,Y,r);g.fillStyle='#2a3a20';g.fill();g.strokeStyle='#18200f';g.lineWidth=5;g.stroke();g.clip();
+   for(const [col,n] of [['#344a26',260],['#3e5a2c',200],['#4a6a32',90],['#202c16',160]]){g.fillStyle=col;g.beginPath();for(let j=0;j<n;j++){const a=X+(R()-.5)*r*2.6,b=Y+(R()-.5)*r*2.6,s=.8+R()*1.8;g.moveTo(a+s,b);g.arc(a,b,s,0,TAU)}g.fill()}g.restore()})}yield;
+  for(let k=0;k<20;k++){let x=R()*S,y=R()*S,a=R()*TAU;const pts=[[x,y]];for(let j=0;j<10;j++){a+=(R()-.5)*.9;x+=Math.cos(a)*13;y+=Math.sin(a)*13;pts.push([x,y])}
+   for(const ox of [-S,0,S])for(const oy of [-S,0,S])for(const [lw,col,d] of [[6,'#120c07',0],[3.2,'#3a2a1a',-.8],[1.2,'#5a4430',-1.4]]){g.strokeStyle=col;g.lineWidth=lw;g.beginPath();pts.forEach((p,j)=>{const t=lw*(1-j/pts.length*.5);j?g.lineTo(p[0]+ox,p[1]+oy+d):g.moveTo(p[0]+ox,p[1]+oy+d)});g.stroke()}}yield;
+  for(let k=0;k<14;k++){const x=R()*S,y=R()*S,r=22+R()*42,p=blob(1,.25,10);W8(x,y,r*1.4,(X,Y)=>{bpath(p,X,Y,r*1.08);g.fillStyle='#14120b';g.fill();bpath(p,X,Y,r);const q=g.createLinearGradient(X,Y-r,X,Y+r);q.addColorStop(0,'#1c2e2c');q.addColorStop(.6,'#0e1a1a');q.addColorStop(1,'#0a1212');g.fillStyle=q;g.fill();
+   g.save();g.clip();g.fillStyle='rgba(170,200,195,.10)';g.beginPath();g.ellipse(X-r*.2,Y-r*.25,r*.5,r*.12,-.15,0,TAU);g.fill();g.restore();
+   g.strokeStyle='rgba(175,205,195,.38)';g.lineWidth=1.4;g.beginPath();const n=p.length;for(let j=Math.round(n*.5);j<=Math.round(n*.92);j++){const a=p[j%n];j===Math.round(n*.5)?g.moveTo(X+a[0]*r*.93,Y+a[1]*r*.93):g.lineTo(X+a[0]*r*.93,Y+a[1]*r*.93)}g.stroke()})}yield;
+  const by=per(40,S*.58);for(let u=0;u<S;u+=16){if(R()<.07)continue;const yc=by(u+8),j=(R()-.5)*3,col=['#4a3522','#553e26','#3e2e1c','#5a4228'][(R()*4)|0];W8(u+8,yc,40,(X,Y)=>{g.save();g.translate(X,Y+j);g.rotate((R()-.5)*.05);
+   g.fillStyle='rgba(4,4,3,.5)';g.fillRect(-6.5,-27,14,58);g.fillStyle=col;g.fillRect(-6.5,-30,13,58);g.strokeStyle='rgba(10,7,4,.8)';g.lineWidth=1;g.strokeRect(-6.5,-30,13,58);g.strokeStyle='rgba(20,14,8,.45)';g.beginPath();g.moveTo(-2,-28);g.lineTo(-2.5,26);g.moveTo(3,-26);g.lineTo(2.5,24);g.stroke();
+   g.fillStyle='rgba(230,200,150,.10)';g.fillRect(-6.5,-30,13,2);g.fillStyle='#1a1410';g.fillRect(-1,-25,2,2);g.fillRect(-1,21,2,2);g.restore()})}
+  for(let u=0;u<S;u+=128){const yc=by(u)-40;W8(u,yc,12,(X,Y)=>{g.fillStyle='rgba(4,4,3,.55)';g.beginPath();g.ellipse(X+2,Y+3,7,5,0,0,TAU);g.fill();g.fillStyle='#3a2a1a';g.beginPath();g.arc(X,Y,6,0,TAU);g.fill();g.fillStyle='#5a4430';g.beginPath();g.arc(X-.5,Y-.5,4,0,TAU);g.fill();g.strokeStyle='rgba(20,14,8,.7)';g.lineWidth=.8;g.beginPath();g.arc(X-.5,Y-.5,2,0,TAU);g.stroke()})}
+  {const cx=R()*S,cy=by(cx)+70;for(let k=0;k<46;k++){const x=cx+(R()-.5)*120,y=cy+(R()-.5)*50;W8(x,y,12,(X,Y)=>stone(X,Y,5+R()*4,4+R()*2.5,['#4e4c44','#58554a','#46443c'][(R()*3)|0],R()*3))}}yield;
+  blades(2600,['#3a5228','#4a6430','#2a3c1c'],1.2,6,13)}
+ else if(i===2){ // ---------- Wilderness: cracked dry earth plates + crazing
+  g.fillStyle='#3a3024';g.fillRect(0,0,S,S);
+  yield* voro(8,.9,(o,D,pa,pb,a,b,e,d1,x,y)=>{const v=.86+pa[2]*.22,n=1+nz()*.07,f=Math.min(1,e/34);let r=62*v,gg=52*v,bb=38*v;const s=(.8+.2*f)*n;r*=s;gg*=s;bb*=s;const w=1.4+pairH(a,b)*1.6;
+   if(e<w){r=16;gg=12;bb=9}else if(e<w+2.5){const k=.55+.45*(e-w)/2.5;r*=k;gg*=k;bb*=k}else if(e<w+5&&y>0){r*=1.06;gg*=1.06;bb*=1.05}D[o]=r;D[o+1]=gg;D[o+2]=bb});
+  yield* voro(26,.95,(o,D,pa,pb,a,b,e)=>{if(e<.7&&pairH(a,b)<.55){D[o]*=.62;D[o+1]*=.62;D[o+2]*=.62}});
+  soft(9,['#0c0806','#120a06'],50,120,.5);yield;
+  for(let k=0;k<240;k++){const x=R()*S,y=R()*S;W8(x,y,14,(X,Y)=>{const n=5+(R()*5|0);for(let j=0;j<n;j++){const a=-1.57+(j/(n-1)-.5)*1.6+(R()-.5)*.3,L=6+R()*7;g.strokeStyle=['#6a5a38','#7e6c46','#544628'][(R()*3)|0];g.lineWidth=1.1;g.beginPath();g.moveTo(X,Y);g.quadraticCurveTo(X+Math.cos(a)*L*.5,Y+Math.sin(a)*L*.6,X+Math.cos(a+.3)*L,Y+Math.sin(a+.3)*L);g.stroke()}})}
+  for(let k=0;k<340;k++){const x=R()*S,y=R()*S;W8(x,y,8,(X,Y)=>stone(X,Y,1.5+R()*3.5,1.2+R()*2.4,['#4a4236','#564c3e','#3e362c'][(R()*3)|0],R()*3))}}
+ else if(i===3){ // ---------- Karamja Volcano: columnar basalt hexes + lava seams
+  g.fillStyle='#262120';g.fillRect(0,0,S,S);const cols=10,rows=12,sx=S/cols,sy=S/rows,HP=[];
+  // hex lattice voronoi (custom points, periodic)
+  const P=[];for(let r=0;r<rows;r++)for(let q=0;q<cols;q++)P.push([(q+.5+(r%2?.5:0))*sx+(R()-.5)*10,(r+.5)*sy+(R()-.5)*8,R(),R()]);
+  const im=g.getImageData(0,0,S,S),D=im.data;
+  for(let y=0;y<S;y++){const gy=Math.floor(y/sy);for(let x=0;x<S;x++){const gx=Math.floor(x/sx);let d1=1e9,d2=1e9,a=0,b=0,ax=0,ay=0,bx=0,by=0;
+    for(let oy=-1;oy<=1;oy++)for(let ox=-2;ox<=1;ox++){let cx=gx+ox,cy=gy+oy,ssx=0,ssy=0;if(cx<0){cx+=cols;ssx=-S}else if(cx>=cols){cx-=cols;ssx=S}if(cy<0){cy+=rows;ssy=-S}else if(cy>=rows){cy-=rows;ssy=S}
+     const k=cy*cols+cx,p=P[k],px=p[0]+ssx,py=p[1]+ssy,d=(px-x)*(px-x)+(py-y)*(py-y);if(d<d1){d2=d1;b=a;bx=ax;by=ay;d1=d;a=k;ax=px;ay=py}else if(d<d2){d2=d;b=k;bx=px;by=py}}
+    const L=Math.hypot(bx-ax,by-ay)||1,e=(d2-d1)/(2*L),o=(y*S+x)*4,v=.82+P[a][2]*.3,f=Math.min(1,e/30),n=1+nz()*.08,hot=pairH(a,b)<.3;
+    let r=40*v,gg=35*v,bb=34*v;const s=(.72+.34*f)*n;r*=s;gg*=s;bb*=s;
+    if(hot){if(e<1.1){r=255;gg=196;bb=96}else if(e<2.6){r=236;gg=86;bb=22}else if(e<4){r=60;gg=14;bb=8}else{const k=Math.exp(-(e-4)/9)*.7;r+=200*k;gg+=56*k;bb+=10*k}}
+    else if(e<2.2){r=10;gg=8;bb=8}else if(e<4.5){const k=.55+.45*(e-2.2)/2.3;r*=k;gg*=k;bb*=k}
+    D[o]=r;D[o+1]=gg;D[o+2]=bb}if((y&31)===31)yield}
+  g.putImageData(im,0,0);
+  yield* voro(30,.95,(o,D,pa,pb,a,b,e)=>{if(e<.6&&pairH(a,b)<.4&&D[o]<120){D[o]*=.6;D[o+1]*=.6;D[o+2]*=.6}});
+  specks(2600,['#5e5650','#4a4440','#7a6a60'],.4,1.3,.35);specks(160,['#ff7a2a','#ffb04a'],.6,1.3,.65)}
+ else if(i===5){ // ---------- Abyss: membrane cells, dark veins, glowing sinew
+  g.fillStyle='#2a1226';g.fillRect(0,0,S,S);
+  yield* voro(9,.92,(o,D,pa,pb,a,b,e,d1,x,y)=>{const v=.8+pa[2]*.35,f=Math.min(1,e/48),n=1+nz()*.06,hue=pa[3];let r=(60+hue*14)*v,gg=24*v,bb=(46+(1-hue)*16)*v;const s=(.45+.6*Math.pow(f,.7))*n;r*=s;gg*=s;bb*=s;
+   const hot=pairH(a,b)<.34;if(e<2.6){r=16;gg=4;bb=13}else if(e<4.5){const k=.4+.6*(e-2.6)/1.9;r*=k;gg*=k;bb*=k}
+   if(hot){if(e<1.1){r=214;gg=70;bb=118}else if(e<2.6){r=120;gg=22;bb=56}else{const k=Math.exp(-(e-2.6)/7)*.5;r+=110*k;gg+=16*k;bb+=50*k}}
+   if(pb&&((x*7+y*13)%97===0)&&f>.5){r*=.5;gg*=.5;bb*=.5}D[o]=r;D[o+1]=gg;D[o+2]=bb});
+  yield* voro(34,.9,(o,D,pa,pb,a,b,e)=>{if(e<.6&&pairH(a,b)<.5&&D[o]<150){D[o]*=.7;D[o+1]*=.68;D[o+2]*=.7}});
+  for(let k=0;k<12;k++){let x=R()*S,y=R()*S,a=R()*TAU;const pts=[[x,y]];for(let j=0;j<14;j++){a+=(R()-.5)*1.1;x+=Math.cos(a)*12;y+=Math.sin(a)*12;pts.push([x,y])}
+   for(const ox of [-S,0,S])for(const oy of [-S,0,S])for(const [lw,col] of [[4,'#12030e'],[1.3,'#7a1c44']]){g.strokeStyle=col;g.lineWidth=lw;g.beginPath();pts.forEach((p,j)=>j?g.lineTo(p[0]+ox,p[1]+oy):g.moveTo(p[0]+ox,p[1]+oy));g.stroke()}}
+  specks(900,['#12030e','#4a1a3a'],.6,1.8,.6);specks(60,['#e05a9a'],.6,1.3,.6)}
+ else{const s=AR.ground(i);c.width=s.c.width;c.height=s.c.height;g.drawImage(s.c,0,0)}
+ return c}
+function P3Tjob(i){P3TJ=P3TJ||[];let j=P3TJ[i];if(!j){j=P3TJ[i]={it:P3Tgen(i),c:null,i};}return j}
+function P3Tstep(j,i){if(j.c)return true;let r;try{r=j.it.next()}catch(e){console.warn('P3Tgen',e&&e.stack);r={done:true}}if(r.done){j.c=r.value||AR.ground(j.i).c;return true}return false}
+function P3Tget(i){const j=P3Tjob(i);while(!P3Tstep(j));return j.c}
+function P3Tpump(){try{if(typeof AR==='undefined'||!AR.ground){setTimeout(P3Tpump,300);return}const t0=performance.now();for(let i=0;i<6;i++){const j=P3Tjob(i);while(!j.c&&performance.now()-t0<5)P3Tstep(j);if(!j.c)break}
+ if(!P3TJ.every(j=>j&&j.c))setTimeout(P3Tpump,20)}catch(e){console.warn('P3Tpump',e&&e.stack)}}
+setTimeout(P3Tpump,400);
+
 // ===== part3 world grade v66f: per-area ground (v64 area tiles, baked darker/contrastier), per-area props, crisp graded props/decals, vignette + player light =====
 // Per frame: 1 multiply blit (2 during a 10 s area fade) + 1 small colour-dodge rect. Everything else is baked once per area.
 var P3WC,P3WREV,P3WV,P3WDC,P3XC;
@@ -4722,7 +4826,7 @@ function P3Wpx(src,exp,desat,con,tint,tAmt){const w=src.width,h=src.height,c=doc
   D[o]=r<0?0:r>255?255:r;D[o+1]=gg<0?0:gg>255?255:gg;D[o+2]=b<0?0:b>255?255:b}
  g.putImageData(im,0,0);return c}
 // ground: the v64 area tile, graded per area
-function P3W(i){P3Wchk();if(P3WC[i])return P3WC[i];const A=P3Acfg(i),s=AR.ground(i);return P3WC[i]={c:P3Wpx(s.c,A.exp,A.desat,A.con,A.tint,A.tintAmt),w:s.w,h:s.h}}
+function P3W(i){P3Wchk();if(P3WC[i])return P3WC[i];const A=P3Acfg(i),c=P3Tget(i);return P3WC[i]={c:P3Wpx(c,A.exp,A.desat,A.con,A.tint,A.tintAmt),w:c.width,h:c.height}}
 // props / decals: graded per area at bake time, cached per source sprite (atlas frames swap in when ready -> new bake)
 const P3DECK={flowers:1,pebble:1,mush:1,bones:1,ash:1};
 function P3WD(s,k,i){if(!s)return s;P3Wchk();let c=null;try{c=s.c}catch(e){}if(!c||!c.width)return s;const key=i+'|'+k;let m=P3WDC.get(s);if(!m){m={};P3WDC.set(s,m)}let o=m[key];if(o&&o.src===c)return o;
@@ -4761,7 +4865,7 @@ function P3grade(){const C=WORLD_GRADE;P3Wchk();P3Wshadow();if(!C.enabled||G.men
  if(!(META.opt.lq&&C.lqSkipVignette)){ctx.globalCompositeOperation='multiply';if(b.f<1&&b.i>0){ctx.globalAlpha=1-b.f;ctx.drawImage(P3Wov(b.i-1).m,0,0);ctx.globalAlpha=b.f}ctx.drawImage(P3Wov(b.i).m,0,0);ctx.globalAlpha=1}
  if(C.lightStrength>0){if(!P3WC.L||P3WC.L.r!==DPR)P3WC.L=P3Wlight();const d=P3WC.L.d;ctx.globalCompositeOperation='color-dodge';ctx.drawImage(d,(w-d.width)/2|0,(hh-d.height)/2|0)}
  ctx.restore();
- const a=C.gemRestore;if(a>0&&typeof gems!=='undefined'){const now=NOW;ctx.globalAlpha=a;for(const g of gems.a)if(g.a){const t=g.tier||0,s=SPR.gem[t],k=(.8+t*.2)*.6,yy=g.y+Math.sin(now*5+g.x)*1.5;dI(s,g.x-s.w*k/2,yy-s.h*k/2,s.w*k,s.h*k)}ctx.globalAlpha=1}}
+ const a=C.gemRestore;if(a>0&&typeof gems!=='undefined'){const now=NOW;ctx.globalAlpha=a;for(const g of gems.a)if(g.a){const vt=gemVT(g),s=vt===3?SPR.gem[2]:gemSpr(vt),k=[.5,.62,.74,.72][vt],yy=g.y+Math.sin(now*5+g.x)*1.5;dI(s,g.x-s.w*k/2,yy-s.h*k/2,s.w*k,s.h*k)}ctx.globalAlpha=1}}
 
 window.__p3ICONURL=ICONURL;
 // ===== v66f: keep the v61 card text/markup as-is (name, class tag, Lv chip, +levels/heal line, projectile pill, stat lines, full evo hint); only tag the rarity class
