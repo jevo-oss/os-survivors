@@ -616,6 +616,9 @@ html body #lvl .lvtools button,html body #lvl button,html body #lvl .btn{text-tr
 /* v66g: HUD 18% smaller; speed beside pause; 44pt hit areas via pseudo-element */
 html body .spdb{top:calc(env(safe-area-inset-top) + 7px)!important;right:47px!important;width:40px!important;height:26px!important;line-height:24px!important;font-size:13.5px!important;overflow:visible!important}
 html body .spdb:after,html body .pbtn:after{content:""!important;position:absolute!important;inset:-9px -4px!important;background:none!important;box-shadow:none!important;width:auto!important;height:auto!important;border:0!important}
+/* v66h: canvas fills the layout viewport (no stale 100vh after iOS resume) */
+html body canvas#c{top:0!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;height:100%!important}
+html,body{position:fixed!important;inset:0!important;width:100%!important;height:100%!important}
 </style>
 </head><body>
 <div id="sat"></div>
@@ -3171,11 +3174,13 @@ const PROP={
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 let W=0,H=0,DPR=1,SAT=0,VIG=null,LOWV=null;
 const probe=document.getElementById('sat');
-function resize(){DPR=Math.min(window.devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='low';
- SAT=probe?probe.getBoundingClientRect().height:0;
+function resize(){DPR=Math.min(window.devicePixelRatio||1,2);const _de=document.documentElement,_sa=!!(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches));if(scrollY||scrollX)scrollTo(0,0);W=innerWidth;H=Math.max(innerHeight,_de.clientHeight|0);if(_sa&&Math.abs(screen.width-W)<2&&screen.height>H)H=screen.height;cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='low';
+ SAT=probe?probe.getBoundingClientRect().height:0;try{if(SAT>0)localStorage.setItem('oss_sat',SAT);else if(_sa&&W<H)SAT=+localStorage.getItem('oss_sat')||0}catch(_){}
  VIG=document.createElement('canvas');VIG.width=Math.max(2,W/2|0);VIG.height=Math.max(2,H/2|0);const v=VIG.getContext('2d'),q=v.createRadialGradient(VIG.width/2,VIG.height*.48,Math.min(VIG.width,VIG.height)*.32,VIG.width/2,VIG.height/2,Math.hypot(VIG.width,VIG.height)*.6);q.addColorStop(0,'rgba(14,8,22,0)');q.addColorStop(1,'rgba(14,8,22,.62)');v.fillStyle=q;v.fillRect(0,0,VIG.width,VIG.height)}
 function mkLowV(){LOWV=document.createElement('canvas');LOWV.width=Math.max(2,W/3|0);LOWV.height=Math.max(2,H/3|0);const v=LOWV.getContext('2d'),q=v.createRadialGradient(LOWV.width/2,LOWV.height/2,Math.min(LOWV.width,LOWV.height)*.28,LOWV.width/2,LOWV.height/2,Math.hypot(LOWV.width,LOWV.height)*.55);q.addColorStop(0,'rgba(200,0,0,0)');q.addColorStop(.6,'rgba(190,0,10,.35)');q.addColorStop(1,'rgba(150,0,0,.85)');v.fillStyle=q;v.fillRect(0,0,LOWV.width,LOWV.height)}
 addEventListener('resize',()=>{resize();mkLowV()});resize();mkLowV();
+function reLay(){[0,120,400,1000].forEach(t=>setTimeout(()=>{resize();mkLowV()},t))}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reLay()});addEventListener('pageshow',reLay);addEventListener('focus',reLay);addEventListener('orientationchange',reLay);if(window.visualViewport)visualViewport.addEventListener('resize',reLay);
 ['gesturestart','gesturechange','dblclick','contextmenu'].forEach(e=>document.addEventListener(e,ev=>ev.preventDefault(),{passive:false}));
 document.addEventListener('touchmove',e=>{if(e.target===cv)e.preventDefault()},{passive:false});
 let lastTouch=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTouch<300&&e.target===cv)e.preventDefault();lastTouch=n},{passive:false});
@@ -3807,8 +3812,9 @@ function cellProps(cx,cy){const r=n=>hash(cx*13+n,cy*7-n*3),k=r(1),out=[],ox=cx*
  return out}
 const PROPCACHE=new Map();function propsAt(cx,cy){const A=P3area(),k=A+':'+cx+','+cy;let v=PROPCACHE.get(k);if(!v){v=P3cellProps(cx,cy,A);if(PROPCACHE.size>400)PROPCACHE.clear();PROPCACHE.set(k,v)}return v}
 function dI(s,x,y,w,h){ctx.drawImage(s.c,x,y,w??s.w,h??s.h)}
-function drawGround(cx,cy){const m=new DOMMatrix([1/1.5,0,0,1/1.5,-cx,-cy]),b=bioState();if(G&&!G.menu&&G.bio!==b.i){if(G.bio!=null&&!G.banner)G.banner={txt:'Entering '+BIO[b.i],life:2.8,col:'#F5B53D'};G.bio=b.i}
- if(b.f<1){const P0=gpat(b.i-1);P0.setTransform(m);ctx.fillStyle=P0;ctx.fillRect(0,0,W,H);ctx.globalAlpha=b.f}const P=gpat(b.i);P.setTransform(m);ctx.fillStyle=P;ctx.fillRect(0,0,W,H);ctx.globalAlpha=1}
+function P3gfill(i,cx,cy){const P=gpat(i),t=P3W(i),Tw=t.w/1.5,Th=t.h/1.5,ox=((cx%Tw)+Tw)%Tw,oy=((cy%Th)+Th)%Th;ctx.save();ctx.translate(-ox,-oy);ctx.scale(1/1.5,1/1.5);ctx.fillStyle=P;ctx.fillRect(0,0,(W+ox)*1.5+4,(H+oy)*1.5+4);ctx.restore()}
+function drawGround(cx,cy){const b=bioState();if(G&&!G.menu&&G.bio!==b.i){if(G.bio!=null&&!G.banner)G.banner={txt:'Entering '+BIO[b.i],life:2.8,col:'#F5B53D'};G.bio=b.i}
+ if(b.f<1){P3gfill(b.i-1,cx,cy);ctx.globalAlpha=b.f}P3gfill(b.i,cx,cy);ctx.globalAlpha=1}
 const fmtT=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 function addGlow(img,x,y,s,a){ctx.globalAlpha=a*(META.opt.lq?.42:.62)*(P3GK||1);ctx.drawImage(img.c,x-s/2,y-s/2,s,s)}
 let DMASK=null;const AMBP=[];for(let i=0;i<34;i++)AMBP.push([Math.random(),Math.random(),Math.random(),Math.random()*6.283]);
@@ -4331,7 +4337,7 @@ function sandboxRestore(){if(!SANDSNAP)return;const m=JSON.parse(SANDSNAP.meta),
 function gameOverSB(){if(!G.sandbox)return;sandboxRestore();try{$('overT').textContent+=' · SANDBOX';$('newrec').insertAdjacentHTML('afterbegin','<p style="color:#ff8a6a;font-weight:bold">SANDBOX · no rewards (no gold, class XP or progress saved)</p>');$('cxp').innerHTML='';buildMenu()}catch(_){}}
 const ladUnl=c=>Math.min(LADDER.length-1,((META.lad||{})[c]|0)),ladSel=c=>Math.max(0,Math.min((META.ladSel||{})[c]|0,ladUnl(c)));
 function start(){newGame();G.lad=G.sandbox?0:ladSel(G.cls);G.hordeI=0;if(G.lad)setTimeout(()=>{if(G&&!G.over&&!G.banner)G.banner={txt:'⚔ '+LAD().n,life:2.2,col:LAD().c,big:1}},400);if(bustOn()){bustedBuild()}else G.pots=Object.keys(META.pots||{}).filter(k=>POTS[k]);if(!G.sandbox&&G.pots.length){META.pots={};saveMeta();applyPots();G.banner={txt:'Potions active: '+G.pots.map(k=>POTS[k].name).join(', '),life:3,col:'#9fe0ff'};if(G.pots.includes('wise')){G.xp+=G.next*.9;pop(G.p.x,G.p.y-40,'+20% XP (levels & skills)','#d8d0ff',2)}}clearRun();['menu','clsDet','over','lvl','chest','shop','pause','codex','settings'].forEach(id=>show(id,0));running=true;last=performance.now();$('pauseBtn').style.display='block';setTimeout(updPotHud,0);
- if(premOn()){const k=pickMega();grantMega(k);G.premK=k;G.banner={txt:'★ Premium start: '+MEGA[k].name,life:3,col:'#ffd24a',big:1}}
+ if(premOn()){const k=pickMega();grantMega(k);G.premK=k;G.megaN=Math.max(G.megaN||0,1);G.banner={txt:'★ Premium start: '+MEGA[k].name,life:3,col:'#ffd24a',big:1}}
  if(G.sig.head)setTimeout(()=>{if(G&&!G.over&&!G.paused&&!G.menu)levelUp()},500)}
 // ---------- pause / save ----------
 const SAVE_KEY='oss_run';
@@ -4341,7 +4347,7 @@ function saveRun(auto){if(!running||!G||G.over||G.menu)return false;const o={v:1
  o.p={x:G.p.x,y:G.p.y,hp:G.p.hp,face:G.p.face,star:Math.max(0,G.p.star)};o.cannons=G.cannons.map(c=>({x:c.x,y:c.y,life:c.life}));saveSkills();LS.set(SAVE_KEY,o);return true}
 const hasRun=()=>{const r=LS.get(SAVE_KEY,null);return r&&r.v===1?r:null};
 function clearRun(){try{localStorage.removeItem(SAVE_KEY)}catch(_){}}
-function continueRun(){const r=hasRun();if(!r)return start();META.cls=r.cls;saveMeta();CONT=1;try{newGame()}finally{CONT=0}
+function continueRun(){reLay();const r=hasRun();if(!r)return start();META.cls=r.cls;saveMeta();CONT=1;try{newGame()}finally{CONT=0}
  const rl=G.revLeft;SAVE_FIELDS.forEach(k=>{if(r[k]!==undefined&&r[k]!==null)G[k]=r[k]});if(Array.isArray(r.pots)){G.pots=r.pots;applyPots()}
  // migrate older saves: drop unknown keys, default new systems
  for(const k in G.w)if(!WEAPONS[k])delete G.w[k];for(const k in G.pas)if(!PASSIVES[k])delete G.pas[k];for(const k in G.mega)if(!MEGA[k])delete G.mega[k];
@@ -4353,7 +4359,7 @@ function continueRun(){const r=hasRun();if(!r)return start();META.cls=r.cls;save
  if(Array.isArray(r.pendLvl)&&r.pendLvl.length){const ok=r.pendLvl.filter(o=>o&&(o.type==='heal'||o.type==='gold'||o.type==='rr'||o.type==='s'||(o.type==='w'?WEAPONS[o.k]:o.type==='p'?PASSIVES[o.k]:MEGA[o.k])));G.paused=true;G.banMode=false;rollCards(ok);show('lvl',1)}else if(G.xp>=G.next)gainXp(0)}
 function pauseGame(){if(!running||!G||G.over)return;G.hold=true;$('quitConfirm').style.display='none';['quitBtn','saveQuitBtn','resumeBtn'].forEach(id=>$(id).style.display='block');
  $('pstats').innerHTML=`<div>Time<b>${fmtT(G.t)}</b></div><div>Level<b>${G.lvl}</b></div><div>Kills<b>${G.kills}</b></div>`;$('pslots').innerHTML=slotsHtml();show('pause',1)}
-function resumeGame(){show('pause',0);if(G){G.hold=false;last=performance.now()}}
+function resumeGame(){reLay();show('pause',0);if(G){G.hold=false;last=performance.now()}}
 function toMenu(){running=false;if(G&&G.sandbox)sandboxRestore();$('potHud').style.display='none';$('pauseBtn').style.display='none';['statsOv','pause','lvl','chest','over','settings','codex'].forEach(id=>show(id,0));buildMenu();menuScene();show('menu',1)}
 $('pauseBtn').onclick=e=>{e.stopPropagation();pauseGame()};$('resumeBtn').onclick=resumeGame;
 $('saveQuitBtn').onclick=()=>{saveRun();toMenu()};
@@ -4870,7 +4876,7 @@ function P3grade(){const C=WORLD_GRADE;P3Wchk();P3Wshadow();if(!C.enabled||G.men
 window.__p3ICONURL=ICONURL;
 // ===== v66f: keep the v61 card text/markup as-is (name, class tag, Lv chip, +levels/heal line, projectile pill, stat lines, full evo hint); only tag the rarity class
 function rdCard(b){if(b.dataset.rd)return;b.dataset.rd=1;const gem=b.querySelector('.gem'),rar=gem?gem.textContent.trim():'',ti=['Common','Uncommon','Rare','Epic','Mega rare'].indexOf(rar);
- if(b.classList.contains('evo'))b.classList.add('rt4');else if(ti>=0)b.classList.add('rt'+ti)}
+ if(b.classList.contains('evo'))b.classList.add('rtevo');else if(ti>=0)b.classList.add('rt'+ti)}
 (function rdHook(){const c=document.getElementById('choices');if(!c){document.addEventListener('DOMContentLoaded',rdHook);return}
  const run=()=>c.querySelectorAll('.card').forEach(rdCard);new MutationObserver(run).observe(c,{childList:true});run()})();
 
