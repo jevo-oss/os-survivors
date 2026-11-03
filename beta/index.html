@@ -585,6 +585,34 @@ html body #chest .won[class*=rt] img{border:2px solid rgb(var(--tc))!important;b
 html body #chestT small[class*=rt]{color:rgb(var(--tc))!important;font:800 15px BSC,sans-serif!important;letter-spacing:1px!important;text-transform:uppercase!important}
 /* v66e: speed button clear + warm, under pause */
 html body .spdb{top:calc(env(safe-area-inset-top) + 46px)!important;right:6px!important;width:44px!important;height:26px!important;line-height:24px!important;font:800 14px BSC,sans-serif!important;color:#ffe08a!important;background:linear-gradient(#4a3b29,#21180f)!important;box-shadow:inset 0 0 0 1.5px rgba(214,170,90,.85)!important;border-radius:7px!important}
+/* ===== v66f: v61 card text + colours inside the dark/gold theme ===== */
+html body #lvl .card{min-height:0!important;padding:8px 10px 8px 8px!important;margin:0 0 6px!important;gap:10px!important}
+html body #lvl .card img{width:46px!important;height:46px!important;flex:0 0 46px!important}
+html body #lvl .card .t{display:block!important;font:700 16.5px/1.25 BSC,sans-serif!important;color:#F4EEE4!important;padding-right:0!important}
+html body #lvl .card .t:before{content:""!important;float:right!important;width:92px!important;height:16px!important}
+html body #lvl .card .t br{display:block!important}
+html body #lvl .card .lvl{display:inline-block!important;margin:3px 6px 0 0!important;font:700 13px BSC,sans-serif!important;color:#fff!important;background:rgba(0,0,0,.45)!important;border:1px solid rgba(var(--tc),.85)!important;border-radius:5px!important;padding:0 6px!important}
+html body #lvl .card .rb{display:inline!important;font:700 13.5px BSC,sans-serif!important;font-style:normal!important;margin:0!important;letter-spacing:.2px!important}
+html body #lvl .card .pj{display:inline-block!important;margin:3px 0 0 6px!important;font:800 12.5px BSC,sans-serif!important;font-style:normal!important;color:#14260c!important;background:linear-gradient(#b8ff9a,#4fd05a)!important;border:1px solid #0b0806!important;border-radius:5px!important;padding:0 5px!important}
+html body #lvl .card small{display:block!important;font:500 14px/1.3 BSC,sans-serif!important;color:#D9D0C2!important;margin-top:3px!important}
+html body #lvl .card .ev{display:block!important;font:600 13.5px/1.3 BSC,sans-serif!important;color:#ffd77a!important;margin-top:3px!important}
+html body #lvl .card .ev.off{opacity:.55!important;filter:grayscale(1)!important}
+html body #lvl .card .elb{display:inline-block!important;font:800 11.5px BSC,sans-serif!important;font-style:normal!important;letter-spacing:.4px!important;color:#2a0a00!important;border:1px solid #0b0806!important;border-radius:5px!important;padding:0 5px!important;margin-right:5px!important;vertical-align:2px!important}
+html body #lvl .card .elb:not([style]){background:linear-gradient(#ffd27a,#ff6a3a)!important}
+/* v66f: level-up panel always fits (title never clipped) - safe-area padding, auto margin, scroll fallback */
+html body #lvl{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;padding:calc(env(safe-area-inset-top) + 8px) 8px calc(env(safe-area-inset-bottom) + 8px)!important;box-sizing:border-box!important}
+html body #lvl .panel{margin:auto!important;max-height:none!important;padding:10px 10px 10px!important}
+html body #lvl h2{font-size:26px!important;margin:0 0 6px!important}
+html body #lvl .slots{margin:0 0 6px!important}
+/* v66f: v61 wording/casing on buttons + section labels (theme fonts/colours kept) */
+html body .btn,html body .btn.sec,html body .btn.danger,html body .savebtn,html body button.sb,html body .lvtools button,html body #cdBody h4,html body #clsDet .cdhn b,html body #cdName,html body .lad .ln{text-transform:none!important}
+html body #cdBody h4{font-size:15px!important;letter-spacing:.6px!important}
+html body #lvl .card small{font-size:13.5px!important;line-height:1.25!important;margin-top:2px!important}
+html body #lvl .card .ev{font-size:13px!important;line-height:1.25!important;margin-top:2px!important}
+html body #lvl .card{padding:6px 9px 6px 7px!important;margin:0 0 5px!important}
+html body #lvl h2{font-size:24px!important;margin:0 0 4px!important}
+html body #lvl .lvtools button,html body #lvl .btn{min-height:46px!important}
+html body #lvl .lvtools button,html body #lvl button,html body #lvl .btn{text-transform:none!important}
 </style>
 </head><body>
 <div id="sat"></div>
@@ -2714,10 +2742,11 @@ const WORLD_GRADE=window.WORLD_GRADE={
  specks:900,        // ash/gravel specks per 1024px tile
  embers:10,         // dim ember specks per tile (replaces the bright yellow dots)
  tile:1024,         // ground tile size in px (drawn at 1/1.5 => ~680 screen px, so no visible repeat grid)
- // --- global grade (3 cheap full-screen composites, all caches prebaked)
+ // --- global grade (3 cheap full-screen composites, overlays prebaked)
  desat:.40,         // scene desaturation 0..1 (0.35-0.45 = brief)
+ ashGrey:'#7d8189', // grey the desaturation pulls toward; slightly blue = cool ashen shadows
  exposure:.84,      // overall exposure multiplier (0.84 = ~16% darker; x shadowTint => ~18% total)
- shadowTint:'#eef1f6', // cool ashen tint multiplied into everything (lighter = weaker)
+ shadowTint:'#f1f2f5', // extra cool tint multiplied with exposure (lighter = weaker)
  highlightTint:'#2c0b09', // warm crimson accent, colour-dodged (boosts bright areas most)
  highlightAmt:.22,  // strength of the crimson highlight accent across the screen
  vignette:.34,      // edge darkening 0..1 (corners = exposure*(1-vignette))
@@ -4089,15 +4118,15 @@ function hud(now){const p=G.p,T=(typeof SAT!=='undefined'?SAT:0);const d=Math.mi
  for(const e of enemies.a)if(e.a&&e.boss){const w=Math.min(W-40,420)|0,bx=(W-w)/2,by=H-64-HS.sab,f=Math.max(0,e.hp/e.max),enr=f<.3;hDraw(bkBoss(w),bx,by);
   ctx.save();ctx.beginPath();ctx.rect(bx+18,by+11,(w-36)*f,9);ctx.clip();{const bg=ctx.createLinearGradient(0,by+11,0,by+20);bg.addColorStop(0,'#b0323a');bg.addColorStop(1,'#4c080d');ctx.fillStyle=bg;ctx.fillRect(bx+12,by+11,w-24,9);ctx.fillStyle='rgba(255,200,180,.25)';ctx.fillRect(bx+12,by+12,w-24,1)}ctx.restore();
   if(enr){ctx.save();ctx.globalAlpha=.25+.2*Math.sin(now*5);ctx.shadowColor='#c0353c';ctx.shadowBlur=8;ctx.strokeStyle='#c0353c';ctx.lineWidth=1;ctx.strokeRect(bx+16.5,by+9.5,w-33,13);ctx.restore()}
-  const nm=(e.fin?'Ember Titan':e.bname||'Three-headed Dragon').toUpperCase();hText(nm,W/2,by-6,15,enr?'#e2a294':GT.goldLt,{al:'center',w:600,st:3,ls:3,glow:'rgba(240,190,100,.55)',gb:8});
+  const nm=(e.fin?'Ember Titan':e.bname||'Three-headed dragon');hText(nm,W/2,by-6,16,enr?'#e2a294':GT.goldLt,{al:'center',w:600,st:3,ls:3,glow:'rgba(240,190,100,.55)',gb:8});
   if(G.bossT>0){const t=Math.ceil(G.bossT);hText(`${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`,W/2,by-28,20,t<=15&&Math.floor(G.bossT*4)%2?'#ff5a4a':GT.bone,{al:'center'})}break}
  if(G.toast){const o=G.toast,a=Math.min(1,o.life*2,(3.6-o.life)*4),tw=Math.min(W-24,320)|0,x=(W-tw)/2,y=H*.8+(1-Math.min(1,(3.6-o.life)*4))*20;ctx.globalAlpha=a;hDraw(bkPlate(tw,46),x,y);
-  const ic=hIcoB('star',GI('star'),'bright');if(ic)ctx.drawImage(ic,x+9,y+8,28,28);hText(o.a.n,x+46,y+20,14,GT.goldLt,{st:3,ls:1});hText(o.a.r,x+46,y+36,13,GT.boneDim,{f:IKF.lab,w:600,st:2});ctx.globalAlpha=1}
+  const ic=hIcoB('star',GI('star'),'bright');if(ic)ctx.drawImage(ic,x+9,y+8,28,28);hText('Achievement: '+o.a.n,x+46,y+20,14,'#ffcf6a',{st:3,ls:1});hText(o.a.r,x+46,y+36,13,GT.boneDim,{f:IKF.lab,w:600,st:2});ctx.globalAlpha=1}
  if(G.banner){const b=G.banner,a=Math.min(1,b.life*2),y=H*.4,sz=b.big?20:16;ctx.font=`700 ${sz}px ${IKF.num}`;ctx.letterSpacing='2px';const tw=Math.min(W-20,ctx.measureText(b.txt).width+56)|0;ctx.letterSpacing='0px';ctx.globalAlpha=a;
   hDraw(bkPlate(tw,sz+18),W/2-tw/2,y-sz-6);hText(b.txt,W/2,y+2,sz,b.col&&b.col!=='#F5B53D'?b.col:GT.goldLt,{al:'center',st:3.5,ls:2});ctx.globalAlpha=1}
  if(typeof joy!=='undefined'&&joy.on){ctx.save();ctx.globalAlpha=.55;ctx.lineWidth=1;ctx.strokeStyle='rgba(201,163,95,.8)';ctx.beginPath();ctx.arc(joy.bx,joy.by,joy.R,0,6.283);ctx.stroke();ctx.strokeStyle='rgba(201,163,95,.3)';ctx.beginPath();ctx.arc(joy.bx,joy.by,joy.R-5,3.5,5.8);ctx.stroke();
   const jx=joy.x-joy.bx,jy=joy.y-joy.by,l=Math.hypot(jx,jy),m=Math.min(l,joy.R)/(l||1);ctx.globalAlpha=.9;hDraw(bkStud(),joy.bx+jx*m-15,joy.by+jy*m-15);ctx.restore()}
- else if(G.t<6){ctx.globalAlpha=Math.min(1,(6-G.t));hText('Drag anywhere to move  ·  WASD',W/2,H-40,15,GT.boneDim,{al:'center',f:IKF.lab,w:600,st:2.5,ls:.5});ctx.globalAlpha=1}}
+ else if(G.t<6){ctx.globalAlpha=Math.min(1,(6-G.t));hText('Touch & drag anywhere to move  ·  WASD',W/2,H-40,15,'#f4e6c0',{al:'center',f:IKF.lab,w:600,st:2.5,ls:.5});ctx.globalAlpha=1}}
 function hCoin(x,y,k){k=k||1;const c=hB('coin',10,10,g=>{g.beginPath();g.arc(5,5,4.4,0,6.283);g.fillStyle='rgba(5,4,4,.7)';g.fill();g.save();g.shadowColor='rgba(240,190,100,.8)';g.shadowBlur=3;g.lineWidth=1;g.strokeStyle='#e2c27e';g.stroke();g.restore();g.beginPath();g.arc(5,5,2.2,0,6.283);g.fillStyle='#c9a35f';g.fill()});ctx.drawImage(c,x-PAD*k,y-PAD*k,c.width*k/HS.dpr,c.height*k/HS.dpr)}
 function hSkull(x,y,k){k=k||1;const c=hB('skull',10,11,g=>{g.fillStyle='rgba(5,4,4,.8)';g.beginPath();g.arc(5,4.6,4.4,0,6.283);g.fill();g.fillRect(2.4,6,5.2,4.6);g.fillStyle='#a89c86';g.beginPath();g.arc(5,4.4,3.6,0,6.283);g.fill();g.fillRect(3,6,4,3.8);
  g.fillStyle='#060404';g.fillRect(2.8,4,1.7,1.9);g.fillRect(5.5,4,1.7,1.9);g.fillRect(4.6,8.2,.8,1.6)});ctx.drawImage(c,x-PAD*k,y-PAD*k,c.width*k/HS.dpr,c.height*k/HS.dpr)}
@@ -4681,7 +4710,7 @@ var P3GLY;function P3gly(){if(P3GLY)return P3GLY;const W='#fff',Dk='#222';
  };return P3GLY}
 
 // ===== part3 world grade: grim ground tiles + one cheap screen-space grade (config: WORLD_GRADE at the top of the game script) =====
-// Per frame cost: 1 saturation fillRect + 2 drawImage of prebaked half-res canvases. No getImageData / ctx.filter per frame.
+// Per frame cost: 1 'color' fillRect + 2 unscaled drawImage of prebaked device-res canvases (~4 ms CPU raster at DPR2, trivial on GPU). No getImageData / ctx.filter per frame.
 var P3WC,P3WREV,P3WV,P3WDC;
 function P3hex(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]}
 function P3Wchk(){const r=WORLD_GRADE.rev;if(P3WREV!==r){P3WREV=r;P3WC=[];P3WV=null;P3WDC=new Map();try{GPATS.length=0}catch(e){}}}
@@ -4712,23 +4741,26 @@ function P3W(i){P3Wchk();if(P3WC[i])return P3WC[i];
  for(let n=0;n<C.specks;n++){const x=R()*S,y=R()*S,r=.5+R()*R()*1.8,gr=R()<.35;W8(x,y,r+1,(X,Y)=>{if(gr){g.fillStyle='rgba(8,8,7,.45)';g.beginPath();g.ellipse(X,Y+.6,r*1.2,r*.8,0,0,6.283);g.fill()}g.fillStyle=rgba(Q.speck,gr?.5:.18+R()*.22);g.beginPath();g.ellipse(X,Y,r,r*.75,0,0,6.283);g.fill()})}
  for(let n=0;n<C.embers;n++){const x=R()*S,y=R()*S,r=.8+R()*.8;W8(x,y,6,(X,Y)=>{const q=g.createRadialGradient(X,Y,0,X,Y,5);q.addColorStop(0,'rgba(150,50,28,.22)');q.addColorStop(1,'rgba(150,50,28,0)');g.fillStyle=q;g.fillRect(X-5,Y-5,10,10);g.fillStyle='rgba(176,80,44,.5)';g.beginPath();g.arc(X,Y,r,0,6.283);g.fill()})}
  return P3WC[i]={c,w:S,h:S}}
-// cached half-res overlays: m = exposure x cool shadow tint x vignette (multiply); d = crimson highlight accent + player light (color-dodge)
-function P3Wbake(){const C=WORLD_GRADE,w=Math.max(2,Math.ceil(W/2)),hh=Math.max(2,Math.ceil(H/2)),cx=w/2,cy=hh/2,Rd=Math.hypot(cx,cy),T=P3hex(C.shadowTint),col=k=>`rgb(${T[0]*C.exposure*k|0},${T[1]*C.exposure*k|0},${T[2]*C.exposure*k|0})`;
- const m=document.createElement('canvas');m.width=w;m.height=hh;let g=m.getContext('2d'),q=g.createRadialGradient(cx,cy,Rd*C.vignetteInner,cx,cy,Rd);const v=C.vignette;
+// cached overlays baked once per screen size at DEVICE resolution, blitted 1:1 (a scaled blit costs ~4x more on CPU raster):
+//   m = exposure x vignette (multiply);  d = crimson highlight accent + warm player light (color-dodge)
+function P3Wbake(){const C=WORLD_GRADE,w=Math.round(W*DPR),hh=Math.round(H*DPR),cx=w/2,cy=hh/2,Rd=Math.hypot(cx,cy),T=P3hex(C.shadowTint),col=k=>`rgb(${T[0]*C.exposure*k|0},${T[1]*C.exposure*k|0},${T[2]*C.exposure*k|0})`,v=C.vignette;
+ const m=document.createElement('canvas');m.width=w;m.height=hh;let g=m.getContext('2d'),q=g.createRadialGradient(cx,cy,Rd*C.vignetteInner,cx,cy,Rd);
  q.addColorStop(0,col(1));q.addColorStop(.35,col(1-v*.25));q.addColorStop(.7,col(1-v*.7));q.addColorStop(1,col(1-v));g.fillStyle=q;g.fillRect(0,0,w,hh);
  const d=document.createElement('canvas');d.width=w;d.height=hh;g=d.getContext('2d');const Hc=P3hex(C.highlightTint),Lc=P3hex(C.lightTint);
  g.fillStyle=`rgba(${Hc[0]},${Hc[1]},${Hc[2]},${C.highlightAmt})`;g.fillRect(0,0,w,hh);
- const lr=C.lightRadius/2;q=g.createRadialGradient(cx,cy,0,cx,cy,lr);q.addColorStop(0,`rgba(${Lc[0]},${Lc[1]},${Lc[2]},${C.lightStrength})`);q.addColorStop(.5,`rgba(${Lc[0]},${Lc[1]},${Lc[2]},${C.lightStrength*.45})`);q.addColorStop(1,`rgba(${Lc[0]},${Lc[1]},${Lc[2]},0)`);g.fillStyle=q;g.fillRect(cx-lr,cy-lr,lr*2,lr*2);
- return {m,d,w:W,h:H}}
+ const lr=C.lightRadius*DPR;q=g.createRadialGradient(cx,cy,0,cx,cy,lr);q.addColorStop(0,`rgba(${Lc[0]},${Lc[1]},${Lc[2]},${C.lightStrength})`);q.addColorStop(.5,`rgba(${Lc[0]},${Lc[1]},${Lc[2]},${C.lightStrength*.45})`);q.addColorStop(1,`rgba(${Lc[0]},${Lc[1]},${Lc[2]},0)`);g.fillStyle=q;g.fillRect(cx-lr,cy-lr,lr*2,lr*2);
+ return {m,d,w:W,h:H,r:DPR}}
 function P3Wshadow(){const S0=typeof SPR!=='undefined'&&SPR.shadow;if(!S0||S0._wg||!S0.c||!S0.c.width)return;const k=WORLD_GRADE.shadowAlpha;S0._wg=1;if(!(k>1))return;
  const c=document.createElement('canvas');c.width=S0.c.width;c.height=S0.c.height;const g=c.getContext('2d');g.drawImage(S0.c,0,0);let r=k-1;while(r>0){g.globalAlpha=Math.min(1,r);g.drawImage(S0.c,0,0);r-=1}S0.c=c}
 // called in world space right before damage numbers; draws in screen space
 function P3grade(){const C=WORLD_GRADE;P3Wchk();P3Wshadow();if(!C.enabled||G.menu&&!G.p)return;
- if(!P3WV||P3WV.w!==W||P3WV.h!==H)P3WV=P3Wbake();
- ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=1;
- if(C.desat>0&&!(META.opt.lq&&C.lqSkipDesat)){ctx.globalCompositeOperation='saturation';ctx.globalAlpha=Math.min(1,C.desat);ctx.fillStyle='#808080';ctx.fillRect(0,0,W,H);ctx.globalAlpha=1}
- ctx.globalCompositeOperation='multiply';ctx.drawImage(P3WV.m,0,0,W,H);
- ctx.globalCompositeOperation='color-dodge';ctx.drawImage(P3WV.d,0,0,W,H);
+ if(!P3WV||P3WV.w!==W||P3WV.h!==H||P3WV.r!==DPR)P3WV=P3Wbake();
+ ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;
+ // 1) desaturate + cool ashen tint in ONE pass: 'color' blend with a cool grey (keeps luminosity, pulls hue/sat toward ash)
+ if(C.desat>0&&!(META.opt.lq&&C.lqSkipDesat)){ctx.globalCompositeOperation='color';ctx.globalAlpha=Math.min(1,C.desat);ctx.fillStyle=C.ashGrey;ctx.fillRect(0,0,P3WV.m.width,P3WV.m.height);ctx.globalAlpha=1}
+ // 2) exposure + vignette, 3) crimson highlights + player light
+ ctx.globalCompositeOperation='multiply';ctx.drawImage(P3WV.m,0,0);
+ if(C.highlightAmt>0||C.lightStrength>0){ctx.globalCompositeOperation='color-dodge';ctx.drawImage(P3WV.d,0,0)}
  ctx.restore();
  // readability: XP gems re-drawn over the grade so they keep their colour
  const a=C.gemRestore;if(a>0&&typeof gems!=='undefined'){const now=NOW;ctx.globalAlpha=a;for(const g of gems.a)if(g.a){const t=g.tier||0,s=SPR.gem[t],k=(.8+t*.2)*.6,yy=g.y+Math.sin(now*5+g.x)*1.5;dI(s,g.x-s.w*k/2,yy-s.h*k/2,s.w*k,s.h*k)}ctx.globalAlpha=1}}
@@ -4738,23 +4770,9 @@ function P3WD(s,k){const a=WORLD_GRADE.decalDim;if(!s||!(a>0)||!s.c||!s.c.width)
  o={c,w:s.w,h:s.h,src:s.c};P3WDC.set(s,o);return o}
 
 window.__p3ICONURL=ICONURL;
-// ===== v66 readability: level-up cards -> icon | bold name / one description line / one tag line, rarity gem
-function rdTxt(h){const d=document.createElement('div');d.innerHTML=h;return d.textContent.replace(/\s+/g,' ').trim()}
-function rdEvo(s){if(!s)return'';let m;if(/Ready to evolve/.test(s))return'★ Evolve ready';if((m=s.match(/with (.+?) \(/))||(m=s.match(/evolves with (.+)$/)))return'★ Evo: '+m[1];if((m=s.match(/^Evolves (.+?) \(/)))return'Evolves '+m[1];return s.length<30?s:''}
-function rdCard(b){if(b.dataset.rd)return;const t=b.querySelector('.t');if(!t)return;b.dataset.rd=1;
- const tags=[];let nm='';
- for(const n of t.childNodes){if(n.nodeName==='BR'||n.nodeName==='SMALL'||(n.classList&&(n.classList.contains('lvl')||n.classList.contains('rb')||n.classList.contains('ev'))))break;
-  if(n.classList&&n.classList.contains('elb')){const x=n.textContent.replace('★','').trim();tags.push(x.charAt(0)+x.slice(1).toLowerCase());continue}nm+=n.textContent}
- nm=nm.trim();const lv=t.querySelector('.lvl'),rb=t.querySelector('.rb'),pj=t.querySelector('.pj'),sm=t.querySelector('small'),ev=t.querySelector('.ev');
- if(lv)tags.unshift(lv.textContent.replace(/^NEW/,'New').trim());
- if(rb){const r=rb.textContent.split('·').map(x=>x.trim()).filter(x=>!(lv&&/^\+\d+ levels?$/.test(x)));if(r.length)tags.push(...r)}
- if(pj)tags.push(pj.textContent.trim());
- const e=rdEvo(ev&&ev.textContent.trim());if(e)tags.push(e);
- const desc=sm?rdTxt(sm.innerHTML.split(/<br\s*\/?>/i)[0]):'';
- const img=b.querySelector('img'),gem=b.querySelector('.gem'),rar=gem?gem.textContent.trim():'';
- b.innerHTML='';if(img)b.appendChild(img);const T=document.createElement('span');T.className='t';
- T.innerHTML=`<b class="nm"></b>${desc?'<span class="ds"></span>':''}${tags.length?'<span class="rtag"></span>':''}`;T.querySelector('.nm').textContent=nm;if(desc)T.querySelector('.ds').textContent=desc;if(tags.length)T.querySelector('.rtag').textContent=tags.join('  ·  ');
- b.appendChild(T);const ti=['Common','Uncommon','Rare','Epic','Mega rare'].indexOf(rar);if(b.classList.contains('evo'))b.classList.add('rt4');else if(ti>=0)b.classList.add('rt'+ti);if(rar){const g=document.createElement('span');g.className='gem';g.innerHTML='<i></i>';g.appendChild(document.createTextNode(rar));b.appendChild(g)}}
+// ===== v66f: keep the v61 card text/markup as-is (name, class tag, Lv chip, +levels/heal line, projectile pill, stat lines, full evo hint); only tag the rarity class
+function rdCard(b){if(b.dataset.rd)return;b.dataset.rd=1;const gem=b.querySelector('.gem'),rar=gem?gem.textContent.trim():'',ti=['Common','Uncommon','Rare','Epic','Mega rare'].indexOf(rar);
+ if(b.classList.contains('evo'))b.classList.add('rt4');else if(ti>=0)b.classList.add('rt'+ti)}
 (function rdHook(){const c=document.getElementById('choices');if(!c){document.addEventListener('DOMContentLoaded',rdHook);return}
  const run=()=>c.querySelectorAll('.card').forEach(rdCard);new MutationObserver(run).observe(c,{childList:true});run()})();
 
