@@ -290,15 +290,15 @@ p{font-size:13px;line-height:1.4}
 #saveOv textarea{width:100%;height:90px;box-sizing:border-box;border-radius:6px;border:1px solid var(--stE);background:#211810;color:#f0dcb0;font:11px ui-monospace,monospace;padding:6px;word-break:break-all;resize:none}#saveOv p{font:12.5px var(--body);color:#d6c6a2;margin:6px 0}.mlinks{display:flex;flex-wrap:wrap;justify-content:center;gap:0 6px;margin-top:10px}.mlinks .savebtn{margin:0}#fbOv p{font:13px/1.45 var(--body);color:#d6c6a2;margin:6px 0 4px}#fbOv a.btn{text-decoration:none;text-align:center;box-sizing:border-box}#saveMsg{min-height:16px;color:#9dff7a!important}
 
 html body /* v63 inked UI */
-.panel{background:#27231f!important;background-image:repeating-linear-gradient(-38deg,rgba(0,0,0,.09) 0 2px,transparent 2px 7px)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:3px solid #15110e!important;box-shadow:inset 0 0 0 2px #5a4a36,inset 0 0 0 4px #15110e,0 6px 0 rgba(0,0,0,.5)!important;border-radius:6px!important}
-html body .panel:before{background:#5a4a36!important;border-color:#15110e!important;border-width:3px!important}
-html body h1,html body h2{color:#e0c890!important;text-shadow:0 2px 0 #15110e!important;letter-spacing:1px!important}
-html body .logo{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:#e0c890!important;filter:none!important;text-shadow:0 3px 0 #15110e,2px 0 0 #15110e,-2px 0 0 #15110e,0 -2px 0 #15110e!important;letter-spacing:2px!important}
+.panel{background:#27231f!important;background-image:repeating-linear-gradient(-38deg,rgba(0,0,0,.045) 0 1px,transparent 1px 6px)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:2px solid #2b211c!important;box-shadow:inset 0 1px 0 rgba(255,236,200,.12),inset 0 0 0 2px rgba(110,90,64,.55),0 6px 14px rgba(10,6,4,.45)!important;border-radius:12px!important;-webkit-font-smoothing:antialiased!important;text-rendering:optimizeLegibility!important}
+html body .panel:before{background:#5a4a36!important;border-color:#2b211c!important;border-width:2px!important;border-radius:10px!important}
+html body h1,html body h2{color:#e0c890!important;text-shadow:0 2px 0 #2b211c!important;letter-spacing:1px!important}
+html body .logo{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:#e0c890!important;filter:none!important;text-shadow:0 2px 0 #2b211c,0 0 2px #2b211c,0 4px 10px rgba(10,6,4,.5)!important;letter-spacing:2px!important}
 html body .sub{color:#a89a7a!important}
-html body .btn{border-radius:5px!important;border:3px solid #15110e!important;background:#b08a44!important;background-image:linear-gradient(#c49c52 0 55%,#9a7638 55%)!important;color:#1a120a!important;box-shadow:0 4px 0 #15110e!important;text-shadow:none!important;letter-spacing:1px!important}
-html body .btn.sec{background:#5a5048!important;background-image:linear-gradient(#6a5e54 0 55%,#4e443c 55%)!important;color:#e8dcc0!important}
-html body .btn.danger{background:#8a3a2a!important;background-image:linear-gradient(#9a4430 0 55%,#7a3024 55%)!important;color:#f0e0c8!important}
-html body .card,html body .cls{border-radius:5px!important;box-shadow:0 3px 0 #15110e!important}
+html body .btn{border-radius:10px!important;border:2px solid #2b211c!important;background:#b08a44!important;background-image:linear-gradient(#c8a058 0 46%,#b48c48 54%,#9a7638)!important;color:#1a120a!important;box-shadow:inset 0 1px 0 rgba(255,240,200,.35),0 3px 0 #2b211c,0 5px 10px rgba(10,6,4,.35)!important;text-shadow:0 1px 0 rgba(255,236,190,.25)!important;letter-spacing:1px!important}
+html body .btn.sec{background:#5a5048!important;background-image:linear-gradient(#6a5e54 0 46%,#5c5148 54%,#4e443c)!important;color:#e8dcc0!important}
+html body .btn.danger{background:#8a3a2a!important;background-image:linear-gradient(#9a4430 0 46%,#8a3a2a 54%,#7a3024)!important;color:#f0e0c8!important}
+html body .card,html body .cls{border-radius:10px!important;box-shadow:inset 0 1px 0 rgba(255,236,200,.1),0 3px 8px rgba(10,6,4,.4)!important}
 </style></head><body>
 <div id="sat"></div>
 <canvas id="c"></canvas>
@@ -312,10 +312,11 @@ html body .card,html body .cls{border-radius:5px!important;box-shadow:0 3px 0 #1
  <div class="mlinks"><button type="button" class="savebtn" id="saveBtn">Backup / restore save</button><button type="button" class="savebtn" id="fbBtn">💬 Feedback</button></div>
 </div></div>
 <div class="ov" id="notes"><div class="panel"><h2>What's new · v63</h2><div class="scroll pnotes" style="max-height:min(58vh,500px);overflow-y:auto;-webkit-overflow-scrolling:touch;margin-bottom:12px;padding-right:4px;text-align:left;font-size:13px;line-height:1.45">
-<p><b>Hand-inked art overhaul.</b> Heroes, monsters, bosses, loot, chests and every icon have been redrawn in a darker, inked fantasy style with crisp outlines and hard shading.</p>
+<p><b>Hand-inked art overhaul.</b> Heroes, monsters, bosses, loot, chests and every icon have been redrawn in a darker, hand-inked fantasy style.</p>
+<p><b>Smoother look.</b> Softer outlines and shading, sharper sprites on high-res screens, gentler glows, rounder menus, and each region now tints its monsters to match the scene. The game also starts faster.</p>
 <p><b>Six regions.</b> Runs now travel from Lumbridge Fields through Draynor Swamp, the Wilderness, Karamja Volcano and Taverley Dungeon into the Abyss. Each region has its own ground, scenery and colours.</p>
 <p><b>28 new monster looks.</b> Frogs, spiders, zombies, imps, ghosts, moss giants, wolves, bandits, dark wizards, hill giants, black knights, scorpions, TzHaar, demons, hellhounds, druids, leeches, ankou, gargoyles, abyssal demons and coloured dragons. Each one has walk and hit frames. Difficulty is unchanged.</p>
-<p><b>Cleaner menus.</b> Panels and buttons have a flatter, inked look. Loot beams are now crisp bands of light.</p>
+<p><b>Cleaner menus.</b> Panels and buttons have a flatter, inked look. Loot beams are now soft bands of light.</p>
 <p style="opacity:.75;margin-top:10px"><i>From v61:</i></p>
 <p><b>Juicier hits.</b> Monsters flash and recoil when you hit them, and critical hitsplats land bigger.</p>
 <p><b>Level-up fanfare.</b> Levelling up now pops with a burst of light and fireworks before you pick your upgrade.</p>
@@ -359,7 +360,7 @@ window.OSSART=(()=>{'use strict';
 // ===== INK core: original hand-authored SVG toolkit (v63) =====
 // Hard cel shading (shadow/base/highlight via offset-clipping), variable-weight ink, hatching, tapered strokes.
 const R2=v=>Math.round(v*10)/10;
-const INK='#15110e';
+const INK='#2b211c';// dark warm-tinted ink (never pure black)
 let _id=0;const uid=p=>(p||'i')+(++_id).toString(36);
 // colour utils
 const hx=c=>{c=c.replace('#','');if(c.length===3)c=c.split('').map(x=>x+x).join('');return[0,2,4].map(i=>parseInt(c.substr(i,2),16))};
@@ -388,28 +389,29 @@ function limb(a,b,r1,r2,bf,bb){const d=nrm(sub(b,a)),n=perp(d),m=lerp(a,b,.45),L
  return shp([add(a,mul(n,r1)),add(m,mul(n,rm+bf)),add(b,mul(n,r2)),add(b,mul(d,r2*.9)),add(b,mul(n,-r2)),add(m,mul(n,-(rm+bb))),add(a,mul(n,-r1)),add(a,mul(d,-r1*.9))])}
 // ---- SVG emit ----
 let DEFS=null;let INKK=1;// ink/shade scale: >1 for small sprites so line weight + highlights survive at 48-64px
-function cel(d,c,o){o=o||{};const s=(o.s==null?5:o.s)*INKK,h=(o.h==null?2.2:o.h)*INKK*(INKK>1?1.25:1),lx=o.lx==null?-.42:o.lx,ly=o.ly==null?-.9:o.ly,w=(o.w==null?4:o.w)*INKK,
+function cel(d,c,o){o=o||{};const s=(o.s==null?5:o.s)*INKK,h=(o.h==null?2.2:o.h)*INKK,lx=o.lx==null?-.42:o.lx,ly=o.ly==null?-.9:o.ly,w=(o.w==null?4:o.w)*INKK,
   base=c,dk=o.dk||shd(c,o.st==null?.5:o.st),hi=o.hi||lit(c,o.ht),id=uid('c');let out='';
  // weighted ink: heavier toward the shadow side (offset ink slab under the shape)
- if(w>0)out+=`<path d="${d}" fill="${INK}" stroke="${INK}" stroke-width="${R2(w*.9)}" stroke-linejoin="round" transform="translate(${R2(-lx*w*.55)} ${R2(-ly*w*.55)})"/>`;
+ if(w>0)out+=`<path d="${d}" fill="${INK}" stroke="${INK}" stroke-width="${R2(w*.72)}" stroke-linejoin="round" transform="translate(${R2(-lx*w*.42)} ${R2(-ly*w*.42)})"/>`;
  out+=`<clipPath id="${id}"><path d="${d}"/></clipPath><g clip-path="url(#${id})"><path d="${d}" fill="${s>0?(o.s2?mix(dk,INK,.45):dk):base}"/>`;
  if(o.s2)out+=`<path d="${d}" fill="${dk}" transform="translate(${R2(lx*o.s2*INKK)} ${R2(ly*o.s2*INKK)})"/>`;
- if(s>0)out+=`<path d="${d}" fill="${base}" transform="translate(${R2(lx*s)} ${R2(ly*s)})"/>`;
- if(o.hatch&&s>0){const hid=uid('k');out+=`<clipPath id="${hid}"><path clip-rule="evenodd" transform="translate(${R2(lx*s*1.7)} ${R2(ly*s*1.7)})" d="M-3000 -3000H6000V6000H-3000Z${d}"/></clipPath><rect x="-3000" y="-3000" width="9000" height="9000" fill="url(#${o.hatch===2?'hx2':o.hatch===3?'hx3':'hx'})" clip-path="url(#${hid})" opacity="${Math.min(.8,(o.ho||.55)*(INKK>1?1.35:1))}"/>`}
- if(h>0){const hid=uid('h');out+=`<clipPath id="${hid}"><path clip-rule="evenodd" transform="translate(${R2(-lx*h)} ${R2(-ly*h)})" d="M-3000 -3000H6000V6000H-3000Z${d}"/></clipPath><path d="${d}" fill="${hi}" clip-path="url(#${hid})"/>`}
+ if(s>0)out+=(s>=2?`<path d="${d}" fill="${mix(dk,base,.5)}" transform="translate(${R2(lx*s*.55)} ${R2(ly*s*.55)})"/>`:'')+`<path d="${d}" fill="${base}" transform="translate(${R2(lx*s)} ${R2(ly*s)})"/>`;
+ if(o.hatch&&s>0){const hid=uid('k');out+=`<clipPath id="${hid}"><path clip-rule="evenodd" transform="translate(${R2(lx*s*1.7)} ${R2(ly*s*1.7)})" d="M-3000 -3000H6000V6000H-3000Z${d}"/></clipPath><rect x="-3000" y="-3000" width="9000" height="9000" fill="url(#${o.hatch===2?'hx2':o.hatch===3?'hx3':'hx'})" clip-path="url(#${hid})" opacity="${R2(Math.min(.42,(o.ho||.55)*.55)*100)/100}"/>`}
+ if(h>0){const hid=uid('h');out+=`<clipPath id="${hid}"><path clip-rule="evenodd" transform="translate(${R2(-lx*h*1.7)} ${R2(-ly*h*1.7)})" d="M-3000 -3000H6000V6000H-3000Z${d}"/></clipPath><path d="${d}" fill="${mix(base,hi,.45)}" clip-path="url(#${hid})"/><path d="${d}" fill="${mix(hi,base,.15)}" clip-path="url(#${hid})" transform="translate(${R2(-lx*h*.7)} ${R2(-ly*h*.7)})"/>`}
+ if(s>=3&&w>0){const rid=uid('r'),rr=1.6*INKK;out+=`<clipPath id="${rid}"><path clip-rule="evenodd" transform="translate(${R2(lx*rr)} ${R2(ly*rr)})" d="M-3000 -3000H6000V6000H-3000Z${d}"/></clipPath><path d="${d}" fill="${mix(base,'#b8c8e0',.38)}" opacity=".45" clip-path="url(#${rid})"/>`}
  if(o.inner)out+=o.inner;
  out+='</g>';
- if(w>0)out+=`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${R2(w*.5)}" stroke-linejoin="round"/>`;
+ if(w>0)out+=`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${R2(w*.4)}" stroke-linejoin="round" stroke-linecap="round"/>`;
  return out}
 // flat fill (no shading) with optional ink
-const flat=(d,c,w,op)=>(w?`<path d="${d}" fill="${c}" stroke="${INK}" stroke-width="${R2(w)}" stroke-linejoin="round"${op?` opacity="${op}"`:''}/>`:`<path d="${d}" fill="${c}"${op?` opacity="${op}"`:''}/>`);
+const flat=(d,c,w,op)=>(w?`<path d="${d}" fill="${c}" stroke="${INK}" stroke-width="${R2(w*.8)}" stroke-linejoin="round"${op?` opacity="${op}"`:''}/>`:`<path d="${d}" fill="${c}"${op?` opacity="${op}"`:''}/>`);
 // tapered ink stroke along polyline (hand-inked line: thick middle, sharp ends)
 function tap(pts,w,col,o){o=o||{};const n=pts.length;if(n<2)return'';const a0=o.a==null?0.15:o.a,b0=o.b==null?0.15:o.b;
  // resample smooth via quad-mid
  const P=[];for(let i=0;i<n-1;i++){const steps=6;for(let k=0;k<steps;k++){const t=k/steps;if(n===2){P.push(lerp(pts[0],pts[1],t));continue}
   P.push(lerp(pts[i],pts[i+1],t))}}P.push(pts[n-1]);
  const L=[],Rr=[];const m=P.length;for(let i=0;i<m;i++){const t=i/(m-1),pr=P[Math.max(0,i-1)],nx=P[Math.min(m-1,i+1)],nd=perp(nrm(sub(nx,pr)));
-  const wf=w*Math.max(.04,Math.min(1,Math.min(t/a0,(1-t)/b0,1)));L.push(add(P[i],mul(nd,wf/2)));Rr.push(add(P[i],mul(nd,-wf/2)))}
+  const wf=w*Math.max(.2,Math.min(1,Math.min(t/a0,(1-t)/b0,1)));L.push(add(P[i],mul(nd,wf/2)));Rr.push(add(P[i],mul(nd,-wf/2)))}
  return `<path d="${poly(L.concat(Rr.reverse()))}" fill="${col||INK}"${o.op?` opacity="${o.op}"`:''}/>`}
 // many short strokes (fur / hatch / scratches)
 function ticks(list,w,col,op){return list.map(([x,y,a,l])=>tap([[x,y],J([x,y],l,a)],w,col,{a:.2,b:.7,op})).join('')}
@@ -421,8 +423,8 @@ const grp=(s,t,op)=>`<g${t?` transform="${t}"`:''}${op!=null?` opacity="${op}"`:
 let GLOWS={};function glowDef(c){const k='gl'+c.replace('#','');GLOWS[k]=c;return k}
 const glow=(x,y,r,c,op)=>`<circle cx="${R2(x)}" cy="${R2(y)}" r="${R2(r)}" fill="url(#${glowDef(c)})"${op?` opacity="${op}"`:''}/>`;
 // document
-function svgDoc(w,h,vb,body){const HK=INKK>1?INKK*1.25:1;const defs=`<pattern id="hx" width="${R2(7*HK)}" height="${R2(7*HK)}" patternUnits="userSpaceOnUse" patternTransform="rotate(-38)"><rect width="${R2(1.8*HK)}" height="${R2(7*HK)}" fill="${INK}"/></pattern><pattern id="hx2" width="${R2(5*HK)}" height="${R2(5*HK)}" patternUnits="userSpaceOnUse" patternTransform="rotate(-38)"><rect width="${R2(1.4*HK)}" height="${R2(5*HK)}" fill="${INK}"/></pattern><pattern id="hx3" width="${R2(7*HK)}" height="${R2(7*HK)}" patternUnits="userSpaceOnUse" patternTransform="rotate(-38)"><rect width="${R2(1.8*HK)}" height="${R2(7*HK)}" fill="${INK}"/><rect width="${R2(7*HK)}" height="${R2(1.4*HK)}" fill="${INK}"/></pattern>`+
- Object.keys(GLOWS).filter(k=>body.includes('#'+k+')')).map(k=>`<radialGradient id="${k}"><stop offset="0" stop-color="${GLOWS[k]}" stop-opacity=".9"/><stop offset=".35" stop-color="${GLOWS[k]}" stop-opacity=".35"/><stop offset="1" stop-color="${GLOWS[k]}" stop-opacity="0"/></radialGradient>`).join('');
+function svgDoc(w,h,vb,body){const HK=INKK>1?INKK*1.08:1;const defs=`<pattern id="hx" width="${R2(7*HK)}" height="${R2(7*HK)}" patternUnits="userSpaceOnUse" patternTransform="rotate(-38)"><rect width="${R2(1.15*HK)}" height="${R2(7*HK)}" fill="${INK}"/></pattern><pattern id="hx2" width="${R2(5*HK)}" height="${R2(5*HK)}" patternUnits="userSpaceOnUse" patternTransform="rotate(-38)"><rect width="${R2(.95*HK)}" height="${R2(5*HK)}" fill="${INK}"/></pattern><pattern id="hx3" width="${R2(7*HK)}" height="${R2(7*HK)}" patternUnits="userSpaceOnUse" patternTransform="rotate(-38)"><rect width="${R2(1.15*HK)}" height="${R2(7*HK)}" fill="${INK}"/><rect width="${R2(7*HK)}" height="${R2(.95*HK)}" fill="${INK}"/></pattern>`+
+ Object.keys(GLOWS).filter(k=>body.includes('#'+k+')')).map(k=>`<radialGradient id="${k}"><stop offset="0" stop-color="${GLOWS[k]}" stop-opacity=".55"/><stop offset=".3" stop-color="${GLOWS[k]}" stop-opacity=".26"/><stop offset=".65" stop-color="${GLOWS[k]}" stop-opacity=".08"/><stop offset="1" stop-color="${GLOWS[k]}" stop-opacity="0"/></radialGradient>`).join('');
  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="${vb}"><defs>${defs}</defs>${body}</svg>`}
 // seeded rng
 function RNG(s){let x=s|0||1;return()=>{x^=x<<13;x^=x>>>17;x^=x<<5;return((x>>>0)%100000)/100000}}
@@ -945,13 +947,13 @@ function chestBody(t,open){const P=CHEST_PAL[t];let s='';
  // design 192x192, chest ~ 150 wide; 3/4 view: front face + right side + lid
  const F=[[24,92],[146,92],[146,166],[24,166]],Sd=[[146,92],[170,78],[170,150],[146,166]];
  s+=`<path d="${ell(98,170,80,12)}" fill="${INK}" opacity=".35"/>`;
- if(open){s+=glow(104,60,84,'#ffcf6a',.7);const LB=[[44,80],[172,80],[180,22],[52,18]];s+=cel(shp(LB.map(p=>[p[0],p[1],1])),shd(P.wood,.5),{s:0,h:1.4,w:5.4,inner:line([[48,52],[176,50]],1.8,INK,.6)+ticks([[80,40,92,18],[140,64,88,16]],1.2,INK,.5)})+[60,134].map(x=>cel(poly([[x,80],[x+14,80],[x+16,20],[x+2,19]]),shd(P.band,.3),{s:0,h:1,w:3.4})).join('')+cel(poly([[44,80],[172,80],[172,88],[44,88]]),P.trim,{s:2,h:1.4,w:3.4})}
+ if(open){s+=glow(100,70,70,'#ffcf6a',.45);const LB=[[44,80],[172,80],[180,22],[52,18]];s+=cel(shp(LB.map(p=>[p[0],p[1],1])),shd(P.wood,.5),{s:0,h:1.4,w:5.4,inner:line([[48,52],[176,50]],1.8,INK,.6)+ticks([[80,40,92,18],[140,64,88,16]],1.2,INK,.5)})+[60,134].map(x=>cel(poly([[x,80],[x+14,80],[x+16,20],[x+2,19]]),shd(P.band,.3),{s:0,h:1,w:3.4})).join('')+cel(poly([[44,80],[172,80],[172,88],[44,88]]),P.trim,{s:2,h:1.4,w:3.4})}
  // side face (in shadow)
  s+=cel(poly(Sd),shd(P.wood,.35),{s:0,h:0,w:5,inner:[100,124].map(y=>line([[150,y-10+(y-92)*0],[168,y-22]],1.4,INK,.6)).join('')});
  // front planks
  s+=cel(poly(F),P.wood,{s:9,s2:3,h:2.6,w:5.4,hatch:1,ho:.3,inner:[116,140].map(y=>line([[26,y],[144,y]],2,INK,.75)).join('')+ticks([[40,104,80,22],[92,126,96,18],[118,150,84,16],[60,148,92,14]],1.3,mix(P.wood,INK,.5),.8)+ticks([[52,100,95,10],[128,130,85,9]],1.1,lit(P.wood,.4),.6)});
  // lid
- if(open){s+=cel(poly([[24,92],[146,92],[170,78],[48,78]]),'#1a120e',{s:0,h:0,w:5});s+=cel(shp([[30,92,1],[46,80],[80,72],[120,70],[156,78],[146,92,1]]),'#e8b040',{s:5,h:2.4,w:4,hi:'#fff4c0',inner:[[56,84],[74,78],[94,82],[112,76],[130,82],[100,88],[70,88]].map(([x,y])=>`<path d="${ell(x,y,7,3.4)}" fill="#ffd860" stroke="${INK}" stroke-width="1.6"/>`).join('')});s+=cel(shp([[100,74,1],[106,62,1],[112,74,1],[106,80,1]]),'#d04a5a',{s:2,h:1.6,w:3,hi:'#fff'})+[[72,62],[132,58],[96,46]].map(([x,y],i)=>tap([[x-8+i,y],[x+8-i,y]],2.2,'#fffbe0')+tap([[x,y-8+i],[x,y+8-i]],2.2,'#fffbe0')).join('')}
+ if(open){s+=cel(poly([[24,92],[146,92],[170,78],[48,78]]),'#1a120e',{s:0,h:0,w:5});s+=cel(shp([[30,92,1],[46,80],[80,72],[120,70],[156,78],[146,92,1]]),'#e8b040',{s:5,h:2.4,w:4,hi:'#fff4c0',inner:[[56,84],[74,78],[94,82],[112,76],[130,82],[100,88],[70,88]].map(([x,y])=>`<path d="${ell(x,y,7,3.4)}" fill="#ffd860" stroke="${INK}" stroke-width="1.6"/>`).join('')});s+=cel(shp([[100,74,1],[106,62,1],[112,74,1],[106,80,1]]),'#d04a5a',{s:2,h:1.6,w:3,hi:'#fff'})+tap([[103,66],[107,72]],1.8,'#fff4d8',{op:.9})+tap([[62,80],[70,78]],1.6,'#fff4c0',{op:.7})+tap([[124,76],[130,75]],1.4,'#fff4c0',{op:.6})}
  const lidF=open?[[24,92],[146,92],[160,40],[38,40]]:[[20,94],[150,94],[150,64],[136,48],[34,48],[20,64]];
  const lidS=open?[[146,92],[170,78],[184,26],[160,40]]:[[150,94],[170,80],[170,52],[156,38],[136,48],[150,64]];
  if(!open){s+=cel(poly(lidS),shd(P.wood,.3),{s:0,h:1.6,w:5});
@@ -977,7 +979,7 @@ FXA.cbase=()=>sd(34,28,'0 0 136 112',cel(poly([[20,104],[68,56],[116,104],[102,1
 FXA.cbarrel=()=>sd(26,12,'0 0 104 48',cel(shp([[8,10],[84,8],[100,14,1],[100,34,1],[84,40],[8,38]]),'#4a4a50',{s:5,h:2,w:4,inner:line([[30,8],[30,40]],2.4,lit('#4a4a50',.3))+line([[60,8],[60,40]],2.4,lit('#4a4a50',.3))})+cel(ell(98,24,5,11),'#1e1e22',{s:0,h:0,w:2.4}));
 const xShard=(c,x,y,h,w,tl)=>{const P=[[x-w,y],[x-w,y-h],[x+tl,y-h-w*1.6],[x+w,y-h],[x+w,y],[x,y+w*.7]];return cel(poly(P.map(([px,py])=>{const dx=px-x,dy=py-y,cs=Math.cos(tl*.03),sn=Math.sin(tl*.03);return [x+dx*cs-dy*sn,y+dx*sn+dy*cs]})),c,{s:4,h:2.6,w:3.6,hi:'#fff',inner:''})};
 const xFacet=(c,x,y,h,w,tl)=>{const cs=Math.cos(tl*.03),sn=Math.sin(tl*.03),T=(dx,dy)=>[x+dx*cs-dy*sn,y+dx*sn+dy*cs];return line([T(0,w*.7),T(0,-h),T(tl,-h-w*1.6)],1.5,INK,.6)+line([T(-w*.6,-h*.15),T(-w*.6,-h*.85)],2.6,lit(c,.75),.9)};
-const gemSV=(c)=>sd(26,30,'0 0 104 120',glow(52,64,46,c,.5)+`<path d="${ell(52,104,30,7)}" fill="${INK}" opacity=".3"/>`+xShard(shd(c,.15),32,100,34,9,-14)+xFacet(c,32,100,34,9,-14)+xShard(shd(c,.05),74,100,30,9,14)+xFacet(c,74,100,30,9,14)+xShard(c,52,104,60,13,0)+xFacet(c,52,104,60,13,0)+dot(44,30,3,'#fff')+tap([[40,30],[48,30]],1.6,'#fff')+tap([[44,26],[44,34]],1.6,'#fff'));
+const gemSV=(c)=>sd(26,30,'0 0 104 120',glow(52,70,40,c,.38)+`<path d="${ell(52,104,30,7)}" fill="${INK}" opacity=".3"/>`+xShard(shd(c,.15),32,100,34,9,-14)+xFacet(c,32,100,34,9,-14)+xShard(shd(c,.05),74,100,30,9,14)+xFacet(c,74,100,30,9,14)+xShard(c,52,104,60,13,0)+xFacet(c,52,104,60,13,0)+tap([[47,40],[49,58]],2,'#fff',{op:.8}));
 FXA.gem0=()=>gemSV('#4a8ac0');FXA.gem1=()=>gemSV('#c8a840');FXA.gem2=()=>gemSV('#c86a2a');
 const splatS=(c)=>{const P=[];const r=RNG(7);for(let i=0;i<14;i++){const a=i/14*6.283,rr=(i%2?30:44)*(0.8+r()*.3);P.push([60+Math.cos(a)*rr,52+Math.sin(a)*rr*.8,i%2?0:1])}return sd(30,26,'0 0 120 104',cel(shp(P),c,{s:5,h:0,w:4})+dot(30,20,5,c)+dot(98,86,4,c))};
 FXA.splat=()=>splatS('#7a1e1e');FXA.splatB=()=>splatS('#3a5a8a');
@@ -998,10 +1000,10 @@ const BEAMC=['#e8e4d8','#5ad06a','#5a9aff','#b47aff','#ffa83a','#e0a060','#dfeaf
 function beamSVG(c){_id=0;GLOWS={};const W=240,H=1024;let s='';
  const band=(hw,op,col)=>`<path d="M${120-hw} ${H}L${120-hw*.55} 0H${120+hw*.55}L${120+hw} ${H}Z" fill="${col}" opacity="${op}"/>`;
  s+=`<linearGradient id="fd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="1"/></linearGradient><mask id="mk"><rect width="${W}" height="${H}" fill="url(#fd)"/></mask>`;
- s+=`<g mask="url(#mk)">`+band(110,.22,c)+band(70,.35,c)+band(36,.6,mix(c,'#fff',.4))+band(12,.95,'#fff')+[0,1,2,3,4,5].map(i=>`<rect x="${40+i*30}" y="${100+i*130%700}" width="6" height="${60+i*14}" fill="${mix(c,'#fff',.5)}" opacity=".7"/>`).join('')+`</g>`;
+ s+=`<g mask="url(#mk)">`+band(112,.12,c)+band(88,.14,c)+band(64,.2,c)+band(42,.32,mix(c,'#fff',.25))+band(24,.5,mix(c,'#fff',.55))+band(9,.8,mix(c,'#fff',.85))+[[86,180,5],[150,330,3.4],[104,560,4.2],[138,720,2.6]].map(([x,y,r])=>`<path d="${ell(x,y,r*.8,r*1.6)}" fill="${mix(c,'#fff',.6)}" opacity=".55"/>`).join('')+`</g>`;
  return svgDoc(60,256,`0 0 ${W} ${H}`,s)}
-function ringSVG(c){_id=0;GLOWS={};let s='';s+=`<path d="${ell(144,144,128,128)}" fill="none" stroke="${c}" stroke-width="10" opacity=".9"/><path d="${ell(144,144,104,104)}" fill="none" stroke="${c}" stroke-width="4" opacity=".8" stroke-dasharray="22 12"/>`;
- for(let i=0;i<12;i++){const a=i*30,p=J([144,144],116,a),q=J([144,144],128,a+8);s+=`<path d="M${R2(p[0])} ${R2(p[1])}L${R2(q[0])} ${R2(q[1])}" stroke="#fff" stroke-width="5" opacity=".9"/>`}
+function ringSVG(c){_id=0;GLOWS={};let s='';s+=`<path d="${ell(144,144,128,128)}" fill="none" stroke="${c}" stroke-width="9" opacity=".7"/><path d="${ell(144,144,104,104)}" fill="none" stroke="${c}" stroke-width="4" opacity=".8" stroke-dasharray="22 12"/>`;
+ [[8,10,5],[47,6,3.4],[63,9,4],[131,12,5],[152,5,3],[218,10,4.4],[262,7,3.6],[300,11,4.6],[318,5,3]].forEach(([a,l,w])=>{const p=J([144,144],114,a),q=J([144,144],114+l,a+l*.5);s+=tap([p,q],w,mix(c,'#fff',.55),{a:.3,b:.5,op:.75})});
  return svgDoc(72,72,'0 0 288 288',s)}
 
 // ===== UI: icon frames + hand-inked glyphs (192 design space = 48 logical) =====
@@ -1017,7 +1019,7 @@ function swordG(b,t,w,col,o){o=o||{};const d=nrm(sub(t,b)),p=perp(d),g=add(b,mul
  s+=cel(bl,col,{s:3,h:2.4,w:4,hi:'#f0f0e8',inner:o.fuller===0?'':line([add(g,mul(d,6)),lerp(g,t,.75)],2,shd(col,.5),.8)});
  const gw=o.gw||w*2.6;s+=cel(poly([add(add(g,mul(p,-gw)),mul(d,-3)),add(add(g,mul(p,gw)),mul(d,-3)),add(add(g,mul(p,gw)),mul(d,4)),add(add(g,mul(p,-gw)),mul(d,4))]),o.guard||C.gold,{s:2,h:1.4,w:3.4});return s}
 function heartG(c,x,y,k){x=x==null?96:x;y=y==null?100:y;k=k||1;return cel(shp([[x,y+46*k,1],[x-50*k,y-4*k],[x-44*k,y-38*k],[x-18*k,y-44*k],[x,y-22*k,1],[x+18*k,y-44*k],[x+44*k,y-38*k],[x+50*k,y-4*k]]),c,{s:8*k,s2:3*k,h:3,hatch:1,ho:.35,w:5,inner:tap([[x-30*k,y-24*k],[x-36*k,y-6*k]],4*k,lit(c,.6))})}
-function starG(n,r1,r2,c,x,y,rt){x=x||96;y=y||96;const P=[];for(let i=0;i<n*2;i++){const r=i%2?r2:r1,a=i*Math.PI/n-Math.PI/2+(rt||0);P.push([x+Math.cos(a)*r,y+Math.sin(a)*r,1])}return cel(shp(P),c,{s:6,h:2.6,w:4.4})}
+function starG(n,r1,r2,c,x,y,rt){x=x||96;y=y||96;const P=[];for(let i=0;i<n*2;i++){const jt=[1,.9,1.06,.94,1.02,.88,1.04,.96][i%8],r=(i%2?r2:r1)*jt,a=i*Math.PI/n-Math.PI/2+(rt||0)+(i%3-1)*.035;P.push(i%2?[x+Math.cos(a)*r,y+Math.sin(a)*r]:[x+Math.cos(a)*r,y+Math.sin(a)*r,1])}return cel(shp(P),c,{s:6,h:2.6,w:4.4})}
 function potG(liq,round){let s='';s+=cel(poly([[84,30],[108,30],[108,48],[84,48]]),C.wood,{s:2,h:1,w:3.4});
  const body=round?shp([[84,50],[108,50],[108,64],[136,90],[136,130],[96,160],[56,130],[56,90],[84,64]]):shp([[84,50],[108,50],[108,70],[132,104],[132,156,1],[60,156,1],[60,104],[84,70]]);
  s+=cel(body,'#8aa0a8',{s:5,h:2.4,w:5,inner:grp(cel(`M40 ${round?96:106}H152V170H40Z`,liq,{s:8,s2:3,h:0,w:0,hatch:1}),'')+line([[60,round?96:106],[136,round?96:106]],2,INK,.7)+tap([[72,100],[70,140]],5,'#eef4f0',{op:.7})});return s}
@@ -1266,7 +1268,7 @@ function dagK(x,k,c,acc,kind,fr,far){const hit=fr===2,b=fr===1?3:0,sw=hit?0:fr?1
  if(kind===2)for(let i=0;i<3;i++){const r=lerp(sh,el,.3+i*.3);s+=cel(poly([[r[0]-3*k,r[1]],[r[0]-12*k,r[1]-14*k],[r[0]+4*k,r[1]-2*k]]),'#e0d0a0',{s:0,h:0,w:2})}
  s+=leg(P(6,-44),1,C,12.5);
  return s}
-BOSS.b_dks=fr=>dagK(62,.72,'#3a5a70','#7ad0ff',1,fr,1)+dagK(176,.74,'#7a5a2c','#f0c040',2,fr,1)+dagK(112,.92,'#4a5a3a','#e0c040',0,fr,0);
+BOSS.b_dks=fr=>grp(dagK(74,.7,'#3a5a70','#7ad0ff',1,fr,1),'translate(148 -18) scale(-1 1)')+grp(dagK(172,.7,'#7a5a2c','#f0c040',2,fr,1),'translate(0 -24)')+grp(dagK(118,.9,'#4a5a3a','#e0c040',0,fr,0),'translate(0 4)');
 BOSS.b_zul=fr=>{let s='';const c='#3e6034',bel='#a8a868',acc='#e8c040',hit=fr===2,sw=fr===1?8:-8;
  // pool
  s+=cel(ell(112,148,92,12),'#1e2a26',{s:3,h:0,w:4,inner:line([[40,148],[70,144],[100,147]],1.6,'#6a8a7a',.7)+line([[130,150],[170,146]],1.6,'#6a8a7a',.7)});
@@ -1376,7 +1378,9 @@ HUM.druid=fr=>hum(fr,{sk:PAL.skin,lean:10,robe:1,B:{hy:170,shx:10,shbx:-12},legs
  back:j=>TS(j,[[-8,-66],[-24,-50],[-30,30,1],[-12,40,1],[-6,-20]],farC('#3a4228'),{s:4,h:0,inner:ticks([[...j.T(-22,-10),200,14],[...j.T(-24,20),190,12]],1.4,'#6a7a4a',.7)}),
  mid:j=>robe(j,'#4a5232',{},{trim:'#8a7a4a',short:0})+TS(j,[[-12,-10],[14,-10],[10,40,1],[2,30],[-6,44,1],[-10,20]],'#6a5a3a',{s:3,h:1,w:3,inner:ticks([[...j.T(0,0),180,14]],1,INK,.6)}),
  top:j=>torsoStd(j,'#4a5232',{inner:[0,1,2,3].map(i=>dot(...j.T(-12+i*8,-58+i*2),2.4,['#c8b070','#8a5a3a','#c8b070','#6a8a4a'][i])).join('')})+beltStd(j,'#6a4b33')+cel(shp([...[j.T(16,-14),j.T(24,-10),j.T(26,-2,1),j.T(20,-6)]]),'#a8acb0',{s:1,h:1,w:2.6}),
- head:j=>{const x=j.head[0],y=j.head[1];const ant=(sx,f)=>{const b=[x-2+sx,y-26],P=[b,[b[0]-14-sx*.8,b[1]-12],[b[0]-34-sx,b[1]-18]];return tap(P,5.4,INK,{a:.1,b:.9})+tap(P,3,f?'#a89878':'#c8b898',{a:.1,b:.9})+tap([P[1],[P[1][0]+12,P[1][1]-14]],5,INK,{a:.1,b:.9})+tap([P[1],[P[1][0]+12,P[1][1]-14]],2.6,'#c8b898',{a:.1,b:.9})+tap([lerp(P[1],P[2],.5),[P[2][0]-2,P[2][1]+12]],3.6,INK,{a:.1,b:.9})};
+ head:j=>{const x=j.head[0],y=j.head[1];const ant=(sx,f)=>{const b=[x-2+sx,y-16],P=[b,[b[0]-14-sx*.5,b[1]-8],[b[0]-30-sx,b[1]-11],[b[0]-44-sx,b[1]-7]],cc=f?'#9a8a6c':'#d0c09a';let o=tap(P,7,INK,{a:.1,b:.95})+tap(P,4,cc,{a:.1,b:.95});
+  [[1,12,-12],[2,9,-11],[2.6,-2,-8]].forEach(([t,dx,dy],i)=>{const q=lerp(P[Math.floor(t)],P[Math.min(3,Math.floor(t)+1)],t%1),e=[q[0]+dx*.4+(i===1&&!f?3:0),q[1]+dy];o+=tap([q,e],5.4,INK,{a:.05,b:.9})+tap([q,e],2.8,cc,{a:.05,b:.9})});
+  if(!f)o+=tap([[P[1][0]-2,P[1][1]+1],[P[1][0]-6,P[1][1]+8]],2.6,'#5a7a3a',{a:.2,b:.6})+dot(P[1][0]-6,P[1][1]+9,2.4,'#6a8a44');return o};
   return headP(j.head,PAL.skin,{nose:7,brow:3.6,beard:'#c8c4b8',inner:(x,y)=>''})+cel(shp([[x-6,y+8],[x+16,y+10],[x+18,y+26],[x+10,y+44,1],[x+2,y+30],[x-6,y+20]]),'#c8c4b8',{s:3,h:1.6,inner:[0,1].map(i=>tap([[x+4+i*6,y+14],[x+6+i*4,y+36]],1.1,INK,{op:.5})).join('')})+hood(j.head,'#3a4228')+ant(-8,1)+ant(6,0)},
  wpn:(j,fr)=>{const h=j.haF,a=fr===2?40:-4,top=J(h,-72,a),bot=J(h,44,a);return tap([bot,lerp(bot,h,.5).map((v,i)=>v+(i?0:3)),h,lerp(h,top,.5).map((v,i)=>v+(i?0:-4)),top],8,INK,{a:.02,b:.02})+tap([bot,lerp(bot,h,.5).map((v,i)=>v+(i?0:3)),h,lerp(h,top,.5).map((v,i)=>v+(i?0:-4)),top],4.8,'#5e4630',{a:.02,b:.02})+[0,1,2].map(i=>tap([J(top,i*6,a),J(J(top,i*6,a),16,a+(i%2?120:-120))],3,'#4a6a34',{a:.1,b:.9})).join('')+tap([top,J(top,-14,a+20),J(top,-10,a+70)],4.4,INK)+tap([top,J(top,-14,a+20),J(top,-10,a+70)],2.2,'#a8acb0')}});
 // ghost: see-through wraith (body translucent, eyes solid, tail fades)
@@ -1398,8 +1402,16 @@ QUAD.cow=fr=>quad(fr,{c:'#b4aa98',len:120,lh:58,br:24,lr:6.2,wither:1.05,rump:1.
  fur:(cx,by,R,sh,hp)=>[[hp[0]+4,by-R*.6,30,9],[cx-10,by,20,10],[cx+10,by+2,20,10],[cx+24,by,15,9],[sh[0]-4,by+R*.2,0,9]],
  marks:(cx,by,R,sh,hp)=>`<path d="${shp([[cx-24,by-R*.8],[cx+8,by-R*.9],[cx+14,by-R*.3],[cx-4,by+2],[cx-28,by-8]])}" fill="#3a332c"/><path d="${shp([[hp[0]-14,by-6],[hp[0]+8,by-16],[hp[0]+12,by+12],[hp[0]-12,by+14]])}" fill="#3a332c"/>`+cel(poly([[hp[0]-10,by-R*1.12],[hp[0]+2,by-R*1.4],[hp[0]+12,by-R*1.08]]),'#b4aa98',{s:0,h:1.6,w:3})+tap([[hp[0]-12,by-R*1.1],[hp[0]+2,by-R*1.36]],1.6,'#e8e0d0')+[0,1,2].map(i=>tap([[cx+4+i*10,by-R*.4],[cx+i*10,by+R*.4]],1.4,INK,{op:.6})).join(''),
  tail:(hp,by,fr)=>tap([[hp[0]-18,by-20],[hp[0]-26,by+12+(fr?3:0)],[hp[0]-22,by+40]],4,INK,{a:.05,b:.4})+cel(shp([[hp[0]-26,by+36],[hp[0]-18,by+36],[hp[0]-20,by+52,1]]),'#2e2824',{s:0,h:0,w:2}),
- head:(h,fr)=>{const x=h[0]+2,y=h[1]+(fr===2?-4:6);return cel(shp([[x-14,y-12],[x+6,y-14],[x+22,y-4],[x+34,y+16,1],[x+32,y+30,1],[x+16,y+30],[x+2,y+14],[x-10,y+6]]),'#bcb2a2',{s:5,h:2.2,inner:`<path d="${shp([[x+18,y+16],[x+34,y+18],[x+32,y+30],[x+16,y+30]])}" fill="#8a7a70"/>`+dot(x+28,y+22,1.6,INK)+tap([[x+2,y-8],[x+14,y-6]],3.6,INK)+eyeS(x+9,y-3,2.2,'#1e1612')+`<path d="${shp([[x-6,y-12],[x+6,y-12],[x+2,y-2]])}" fill="#3a332c"/>`+ticks([[x+14,y+2,20,8],[x+18,y+4,20,7]],1.2,INK,.6)})+
-  tap([[x-2,y-12],[x-14,y-24],[x-2,y-38]],6,INK,{a:.05,b:.95})+tap([[x-2,y-12],[x-14,y-24],[x-2,y-38]],3.4,'#d8ccb0',{a:.05,b:.95})+cel(shp([[x-10,y-4],[x-30,y-8],[x-14,y+2]]),'#a89e8e',{s:2,h:1})}});
+ head:(h,fr)=>{const x=h[0]+2,y=h[1]+(fr===2?-4:6),hc='#bcb2a2';
+  const hornF=[[x+2,y-12],[x-4,y-24],[x+6,y-32]],hornN=[[x-4,y-12],[x-16,y-20],[x-10,y-30]];
+  return tap(hornF,5,INK,{a:.05,b:.9})+tap(hornF,2.8,'#9a907a',{a:.05,b:.9})
+  +cel(shp([[x-8,y-8],[x-30,y-16],[x-33,y-10,1],[x-26,y-2],[x-12,y+4]]),'#a89e8e',{s:2,h:1,w:3.4,inner:tap([[x-26,y-9],[x-14,y-3]],2.6,'#c89a8a',{op:.8})+`<path d="M${x-31} ${y-14}l5 1l-3 4z" fill="${INK}"/>`})
+  +cel(shp([[x-12,y-14],[x+4,y-17],[x+14,y-10],[x+22,y+4],[x+29,y+17],[x+33,y+30,1],[x+19,y+37],[x+8,y+31],[x-2,y+15],[x-12,y+4]]),hc,{s:5,h:2,
+   inner:`<path d="${shp([[x-3,y-14],[x+7,y-14],[x+15,y+2],[x+21,y+16],[x+13,y+11],[x+4,y-2]])}" fill="#e4dccb"/><path d="${shp([[x-12,y-6],[x-2,y-10],[x+2,y+2],[x-6,y+10],[x-12,y+4]])}" fill="#4a4038" opacity=".9"/>`
+   +cel(shp([[x+15,y+19],[x+29,y+15],[x+35,y+27],[x+29,y+37,1],[x+15,y+35]]),'#c4a496',{s:3,h:1.4,w:2.6,inner:tap([[x+27,y+21],[x+31,y+25]],2.6,INK)+tap([[x+17,y+33],[x+28,y+34]],1.4,INK,{op:.7})})
+   +eyeS(x+8,y-1,2.3,'#1e1612')+tap([[x+3,y-5],[x+13,y-4]],2.4,INK,{a:.2,b:.3})+ticks([[x+16,y+6,25,7],[x+19,y+9,25,6]],1.1,INK,.45)})
+  +ticks([[x-6,y-15,160,9],[x-2,y-16,190,8],[x+2,y-15,200,7]],2,'#8a8070',.9)
+  +tap(hornN,7,INK,{a:.05,b:.6})+tap(hornN,4,'#d8ccb0',{a:.05,b:.6})+tap([hornN[1],hornN[2]],4,'#7a6c58',{a:.05,b:.5})+tap([[hornN[2][0]-3,hornN[2][1]+1],[hornN[2][0]+3,hornN[2][1]+3]],1.4,INK)}});
 QUAD.chicken=fr=>{const hit=fr===2,w=fr===1?6:0;let s='';const c='#b8ac94',x=114,y=hit?72:78;
  const lg=(a,far)=>{const k=[x+a,y+40],f=[x+a*1.6,y+68];return line([[x+(far?-4:4),y+20],k,f],5,INK)+line([[x+(far?-4:4),y+20],k,f],2.6,far?'#8a6a2a':'#b08a34')+tap([f,[f[0]+14,f[1]+2]],2.4,INK)+tap([f,[f[0]-9,f[1]+1]],2,INK)+tap([[k[0]-1,k[1]+12],[k[0]-7,k[1]+14]],1.8,INK)+[.3,.6].map(t=>{const p=lerp(k,f,t);return line([[p[0]-2,p[1]],[p[0]+2,p[1]]],1,INK,.7)}).join('')};
  s+=lg(hit?-10:(fr?8:-8),1);
@@ -2504,7 +2516,7 @@ function bar(x,y,w,h,f,c1,c2,label){ctx.save();ctx.beginPath();ctx.roundRect(x,y
 function slot(x,y,s,k,lv,col){if(k){dI(ICON[k],x,y,s,s);if(lv!=null){ctx.beginPath();ctx.roundRect(x+s-15,y+s-13,15,13,4);ctx.fillStyle=col||'#1a120a';ctx.fill();ctx.strokeStyle='#0b0806';ctx.stroke();txt(''+lv,x+s-7.5,y+s-2.8,'#fff',10,'center')}}
  else{ctx.beginPath();ctx.roundRect(x+2,y+2,s-4,s-4,s*.2);ctx.fillStyle='rgba(10,7,4,.55)';ctx.fill();ctx.strokeStyle='rgba(214,170,90,.3)';ctx.setLineDash([3,3]);ctx.stroke();ctx.setLineDash([])}}
 const fmtT=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
-function addGlow(img,x,y,s,a){ctx.globalAlpha=a;ctx.drawImage(img.c,x-s/2,y-s/2,s,s)}
+function addGlow(img,x,y,s,a){ctx.globalAlpha=a*.72;ctx.drawImage(img.c,x-s/2,y-s/2,s,s)}
 function hdBeam(x,y,ci,H,wid,now,sd,al,gl){const b=HD['beam'+ci],r=HD['ring'+ci];if(!b||!r)return false;const pul=.86+.14*Math.sin(now*3+sd);ctx.save();ctx.globalCompositeOperation='lighter';
  ctx.globalAlpha=al*pul;ctx.drawImage(b.c,x-22*wid,y-H+4,44*wid,H);
  ctx.save();ctx.translate(x,y);ctx.scale(1,.38);ctx.rotate(now*.7);ctx.globalAlpha=al*.9;const R0=26*wid;ctx.drawImage(r.c,-R0,-R0,R0*2,R0*2);ctx.restore();
@@ -2623,7 +2635,8 @@ const DBG={};function render(){const now=NOW=performance.now()/1000;const p=G.p;
   if(o.kind){const s=o.kind===2?SPR.splatB:SPR.splat,ag=.75-o.life,k=(o.kind===3?1:o.kind===2?1.08:.85)*(ag<.08?1+(o.kind===2?.7:.4)*(1-ag/.08):1);dI(s,o.x-15*k,o.y-14*k,30*k,26*k);txt(o.txt,o.x,o.y+4*k,'#fff',Math.round(12*Math.max(1,k/.85)),'center',800)}else txt(o.txt,o.x,o.y,o.col,14,'center')}ctx.globalAlpha=1;
  ctx.restore();
  if(zm!==1)ctx.restore();
- if(!DBG.nv)ctx.drawImage(VIG,0,0,W,H);
+  {const GR=[['#c8b070',.14],['#6a8a6a',.16],['#a07060',.14],['#e07a3a',.15],['#7088a8',.16],['#8a60a0',.17]][Math.min(5,biomeAt(G.t||0))];if(GR&&!DBG.ngr){ctx.save();ctx.globalCompositeOperation='soft-light';ctx.globalAlpha=GR[1];ctx.fillStyle=GR[0];ctx.fillRect(0,0,W,H);ctx.restore()}}
+  if(!DBG.nv)ctx.drawImage(VIG,0,0,W,H);
  if(G.flash>0){ctx.fillStyle=`rgba(255,240,200,${G.flash*.8})`;ctx.fillRect(0,0,W,H)}
  if(G.tint){const c=G.tint.col,r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),b=parseInt(c.slice(5,7),16);ctx.fillStyle=`rgba(${r},${g},${b},${G.tint.life*.4})`;ctx.fillRect(0,0,W,H)}
  if(p.hp<p.max*.35&&!G.menu&&LOWV){const k=1-p.hp/(p.max*.35);ctx.globalAlpha=Math.min(1,(.35+.65*k)*(.75+.25*Math.sin(now*(5+k*4))));ctx.drawImage(LOWV,0,0,W,H);ctx.globalAlpha=1}
@@ -2955,7 +2968,14 @@ window.__game={TUNE,LADDER,addSkillXp,SPR,WEAPONS,spawnEvent,evTick,set XP(v){[X
 (()=>{const SSl=Math.max(1.5,Math.min(2,window.devicePixelRatio||1)),HD=window.__HD={};let t0=performance.now();
  const go=()=>{window.__HDms=Math.round(performance.now()-t0);window.__OSS_MAIN()};
  let J;try{J=OSSART.JOBS()}catch(e){console.warn('art gen failed',e);go();return}
- const one=([k,svg,w,h])=>new Promise(res0=>{let res=res0;const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=Math.ceil(w*SSl);c.height=Math.ceil(h*SSl);const g=c.getContext('2d');g.drawImage(im,0,0,c.width,c.height);
-   const o={c,w,h};if(k[0]==='m'||k[0]==='h'){let f=null;Object.defineProperty(o,'f',{get(){if(!f){f=document.createElement('canvas');f.width=c.width;f.height=c.height;const fg=f.getContext('2d');fg.drawImage(c,0,0);fg.globalCompositeOperation='source-atop';fg.fillStyle='#fff';fg.fillRect(0,0,f.width,f.height)}return f}})}else o.f=c;HD[k]=o}catch(e){}res()};im.onerror=()=>res();const u=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));const r0=res;res=()=>{URL.revokeObjectURL(u);r0()};im.src=u});
- Promise.all(J.map(one)).then(go,go)})();
+ // v63.1: every sprite gets its canvas up front (so lookups/patterns resolve), current+next biome art is rasterized before start,
+ // later-biome mobs, bosses and props fill their canvases in the background a few at a time.
+ const DEF=/^(p[2-5]|m_b_|m_titan|m_dragon_(red|black|blue)|m_(bat|wolf|bandit|hillgiant|blackknight|darkwiz|scorpion|tzhaar|lesserdemon|greaterdemon|hellhound|druid|leech|ankou|gargoyle|abyssal)[0-9])/;
+ const mk=([k,svg,w,h])=>{const c=document.createElement('canvas');c.width=Math.ceil(w*SSl);c.height=Math.ceil(h*SSl);const o={c,w,h,ok:0};
+   if(k[0]==='m'||k[0]==='h'){let f=null;Object.defineProperty(o,'f',{get(){if(!o.ok)return c;if(!f){f=document.createElement('canvas');f.width=c.width;f.height=c.height;const fg=f.getContext('2d');fg.drawImage(c,0,0);fg.globalCompositeOperation='source-atop';fg.fillStyle='#fff';fg.fillRect(0,0,f.width,f.height)}return f}})}else o.f=c;HD[k]=o};
+ const one=([k,svg])=>new Promise(res=>{const o=HD[k],im=new Image(),u=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));const done=()=>{URL.revokeObjectURL(u);res()};
+   im.onload=()=>{try{const g=o.c.getContext('2d');g.imageSmoothingQuality='high';g.drawImage(im,0,0,o.c.width,o.c.height);o.ok=1}catch(e){}done()};im.onerror=done;im.src=u});
+ J.forEach(mk);const pri=J.filter(j=>!DEF.test(j[0])),rest=J.filter(j=>DEF.test(j[0]));
+ const bg=()=>{let i=0;const step=()=>{const b=rest.slice(i,i+10);i+=10;if(!b.length){window.__HDall=Math.round(performance.now()-t0);return}Promise.all(b.map(one)).then(()=>setTimeout(step,0))};setTimeout(step,30)};
+ Promise.all(pri.map(one)).then(()=>{go();bg()},()=>{go();bg()})})();
 </script></body></html>
