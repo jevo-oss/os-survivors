@@ -583,6 +583,8 @@ html body #chest .won.rt3{border-style:double!important;border-width:4px!importa
 html body #chest .won[class*=rt] b{color:rgb(var(--tc))!important;font-weight:800!important;text-transform:uppercase!important;letter-spacing:.8px!important}
 html body #chest .won[class*=rt] img{border:2px solid rgb(var(--tc))!important;border-radius:5px!important}
 html body #chestT small[class*=rt]{color:rgb(var(--tc))!important;font:800 15px BSC,sans-serif!important;letter-spacing:1px!important;text-transform:uppercase!important}
+/* v66e: speed button clear + warm, under pause */
+html body .spdb{top:calc(env(safe-area-inset-top) + 46px)!important;right:6px!important;width:44px!important;height:26px!important;line-height:24px!important;font:800 14px BSC,sans-serif!important;color:#ffe08a!important;background:linear-gradient(#4a3b29,#21180f)!important;box-shadow:inset 0 0 0 1.5px rgba(214,170,90,.85)!important;border-radius:7px!important}
 </style>
 </head><body>
 <div id="sat"></div>
@@ -2691,7 +2693,48 @@ return{LZ,mob,mobFrames,hero,drawHero:drawHeroP2,heroPortrait:heroPortraitP2,her
 </script>
 <script>
 (()=>{
-'use strict';const AR=window.OSSART,ZOOM=window.__ZOOM||1,HK=.78,HWS=window.__HWS||.52;
+'use strict';
+// ================= WORLD_GRADE: world colour-grade + ground config (part3/p3_grade_cfg.js) =================
+// Visual only. Applies to the WORLD (ground, props, entities, fx); damage numbers, ambient motes and the HUD draw after it, ungraded.
+// Live tuning: edit window.WORLD_GRADE in the console, then run WORLD_GRADE.rev++ to rebake the cached tiles and overlays.
+const WORLD_GRADE=window.WORLD_GRADE={
+ rev:0,             // bump after live edits to rebake ground tiles + overlays
+ enabled:true,      // master switch for the overlay pass (ground tiles stay)
+ // --- ground: one entry per biome [Fields, Swamp, Wilderness, Volcano, Dungeon, Abyss]
+ //   base = main tile colour, dirt = darker dirt patches, speck = ash/gravel specks, moss = dead-moss tufts / detail
+ ground:[
+  {base:'#2c3127',dirt:'#1f231b',speck:'#62625a',moss:'#363d2d',detail:'moss'},     // Lumbridge Fields: charred earth / dead moss
+  {base:'#262c25',dirt:'#181c18',speck:'#545a52',moss:'#30372d',detail:'pools'},    // Draynor Swamp: wet black moss
+  {base:'#302e29',dirt:'#201f1c',speck:'#66625b',moss:'#3a3731',detail:'cracks'},   // Wilderness: ash + cracked dirt
+  {base:'#2b2726',dirt:'#1b1818',speck:'#5d5853',moss:'#5a1a1c',detail:'seams'},    // Volcano: basalt + dim crimson seams
+  {base:'#323135',dirt:'#212024',speck:'#615f64',moss:'#161518',detail:'flag'},     // Dungeon: worn flagstones
+  {base:'#2c252a',dirt:'#1c171b',speck:'#5c5258',moss:'#3e1c24',detail:'veins'}],   // Abyss: dark flesh-stone veins
+ groundNoise:.06,   // low-contrast value noise amplitude (0..~.15); fine grain + soft blotches
+ dirtPatches:.55,   // darker dirt patch coverage (0..1)
+ specks:900,        // ash/gravel specks per 1024px tile
+ embers:10,         // dim ember specks per tile (replaces the bright yellow dots)
+ tile:1024,         // ground tile size in px (drawn at 1/1.5 => ~680 screen px, so no visible repeat grid)
+ // --- global grade (3 cheap full-screen composites, all caches prebaked)
+ desat:.40,         // scene desaturation 0..1 (0.35-0.45 = brief)
+ exposure:.84,      // overall exposure multiplier (0.84 = ~16% darker; x shadowTint => ~18% total)
+ shadowTint:'#eef1f6', // cool ashen tint multiplied into everything (lighter = weaker)
+ highlightTint:'#2c0b09', // warm crimson accent, colour-dodged (boosts bright areas most)
+ highlightAmt:.22,  // strength of the crimson highlight accent across the screen
+ vignette:.34,      // edge darkening 0..1 (corners = exposure*(1-vignette))
+ vignetteInner:.30, // clear radius around the player (fraction of half-diagonal)
+ // --- lighting
+ lightRadius:170,   // player light radius in screen px
+ lightStrength:.38, // player light (warm dodge) strength 0..1
+ lightTint:'#3c2c22',  // player light colour (warm bone/ember)
+ shadowAlpha:1.45,  // entity contact-shadow density multiplier (1 = original)
+ // --- readability keepers
+ gemRestore:.55,    // XP gems redrawn this strongly on top of the grade (0 = graded like everything else)
+ ambientAsh:'#8a857c', ambientEmber:'#b0462a', ambientAlpha:.28, // field "pollen" motes become dim ash + rare embers
+ decalDim:.55,      // flowers / mushrooms / pebbles decals: desaturate + darken (0 = original)
+ lqSkipDesat:true   // Low-quality option skips the desaturation composite (cheapest path)
+};
+
+const AR=window.OSSART,ZOOM=window.__ZOOM||1,HK=.78,HWS=window.__HWS||.52;
 // ================= ART: cohesive shaded vector sprites (original), pre-rendered once =================
 if(!CanvasRenderingContext2D.prototype.roundRect){CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){r=Math.min(r,w/2,h/2);this.moveTo(x+r,y);this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath()}}
 const SS=Math.max(1.5,Math.min(2,window.devicePixelRatio||1)); // sprite supersample = canvas DPR so sprites blit 1:1
@@ -2952,7 +2995,7 @@ const mkBeam=(TC,HB)=>{const b=AR.beam(TC,HB+20);return{c:b.c,f:b.c,w:60,h:HB+20
 const BEAM=TIERS.map(t=>t.beam?mkBeam(t.c,t.beam):null);
 
 // ---------- ICONS: 48px, identical frame + shading for all ----------
-function frame(g,rim){P3frame(g,rim);return;RR(g,2,2,44,44,10,'#2a2219',{hi:.12,lo:.5,spec:0,rim:.15,ol:'#0b0806',lw:1.6});
+function frame(g,rim){RR(g,2,2,44,44,10,'#2a2219',{hi:.12,lo:.5,spec:0,rim:.15,ol:'#0b0806',lw:1.6});
  const q=g.createRadialGradient(20,18,2,24,24,26);q.addColorStop(0,'#4a3d2c');q.addColorStop(1,'#17110b');g.fillStyle=q;g.beginPath();g.roundRect(5,5,38,38,8);g.fill();
  g.strokeStyle=rim||'rgba(214,170,90,.75)';g.lineWidth=1.2;g.beginPath();g.roundRect(4.5,4.5,39,39,8.5);g.stroke();
  g.strokeStyle='rgba(255,240,200,.12)';g.beginPath();g.moveTo(9,6);g.lineTo(39,6);g.stroke()}
@@ -3034,7 +3077,7 @@ const IC={
  relic:g=>{g.fillStyle='#ffe28a';g.strokeStyle='#0b0806';g.lineWidth=2;g.beginPath();g.moveTo(24,6);g.lineTo(30,18);g.lineTo(42,18);g.lineTo(32,26);g.lineTo(36,40);g.lineTo(24,32);g.lineTo(12,40);g.lineTo(16,26);g.lineTo(6,18);g.lineTo(18,18);g.closePath();g.fill();g.stroke();g.fillStyle='#fff';g.beginPath();g.arc(24,23,4,0,7);g.fill()},
  whip:g=>{glw(g,24,26,18,'rgba(140,255,200,.4)');const wp=g=>{g.beginPath();g.moveTo(12,37);g.bezierCurveTo(2,20,42,30,34,12);g.quadraticCurveTo(31,6,39,6)};g.lineCap='round';strokeP(g,wp,'#0b0806',6);strokeP(g,wp,'#6a9a5a',3.4);RR(g,7,35,10,7,2,'#3a2a1a');dot(g,12,38.5,1.7,PAL.gold)},
 };
-for(const k in IC){const s=AR.glyph(k);if(s)IC[k]=g=>g.drawImage(s.c,0,0,48,48)}P3wrapIC(IC);
+
 const MEGAKEYS=['tbow','shadow','scythe','ely','obl'];
 const ICON={},ICONURL={};const defURL=k=>{const fix=v=>Object.defineProperty(ICONURL,k,{value:v,writable:true,enumerable:true,configurable:true});Object.defineProperty(ICONURL,k,{get(){const v=ICON[k].c.toDataURL();fix(v);return v},set:fix,enumerable:true,configurable:true})};const LZI=f=>AR.LZ(48,48,()=>mk(48,48,f));
 for(const k in IC){ICON[k]=LZI(g=>{frame(g,MEGAKEYS.includes(k)?'rgba(255,170,40,.95)':null);g.save();IC[k](g);g.restore()});defURL(k)}
@@ -3716,7 +3759,7 @@ function update(dt){if(G.offerQ&&G.offerQ.length&&!window.__sim){showOffer();ret
  skSaveT-=dt;if(skSaveT<=0){skSaveT=5;saveSkills()}}
 const DCOL={chicken:'#e8e4d8',rat:'#7a7268',goblin:'#6a8a3e',cow:'#d8d0c0',skeleton:'#d6cab0',dragon:'#9a3a2a',man:'#a8845a',frog:'#5a8a3a',spider:'#3a3030',zombie:'#6a7a5a',imp:'#b03a2a',ghost:'#b8c4c0',mossgiant:'#5a7a3a',bat:'#4e4448',wolf:'#8a8a86',bandit:'#8a5a3a',darkwiz:'#4a4a7a',hillgiant:'#b08c6e',blackknight:'#4a4a52',scorpion:'#8a5a2e',tzhaar:'#ff7a2a',lesserdemon:'#a83a2c',greaterdemon:'#8a2a24',druid:'#4e7a3a',hellhound:'#6a2a20',leech:'#8a2a3a',ankou:'#6a5a9a',gargoyle:'#7a7c78',abyssal:'#a03a5a',dragon_green:'#4e7638',dragon_blue:'#38648e',dragon_red:'#9e3024',dragon_black:'#3a363c'};const DSK=k=>k&&DCOL[k.split('@')[0]];
 // ================= RENDER =================
-const GPATS=[],gpat=i=>GPATS[i]||(GPATS[i]=ctx.createPattern(P3G(i).c,'repeat'));
+const GPATS=[],gpat=i=>GPATS[i]||(GPATS[i]=ctx.createPattern(P3W(i).c,'repeat'));
 const BIO_FADE=10;function bioState(){const t=G?G.t:0,i=biomeAt(t),f=i>0?Math.min(1,(t-BIO_T[i])/BIO_FADE):1;return{i,f}}
 function PRP(k){const b=bioState(),i=b.f<.5?Math.max(0,b.i-1):b.i;return AR.prop(i,k)}
 const hash=(x,y)=>{let h=(x*374761393+y*668265263)|0;h=(h^(h>>>13))*1274126177|0;return((h^(h>>>16))>>>0)/4294967296};
@@ -3739,7 +3782,7 @@ function addGlow(img,x,y,s,a){ctx.globalAlpha=a*(META.opt.lq?.42:.62)*(P3GK||1);
 let DMASK=null;const AMBP=[];for(let i=0;i<34;i++)AMBP.push([Math.random(),Math.random(),Math.random(),Math.random()*6.283]);
 function ambient(now,kind,p){if(!kind)return;const N=enemies&&enemies.n>250?16:34,WW=W+40,HH=H+40;ctx.save();
  for(let i=0;i<N;i++){const a=AMBP[i];let x,y,r,col,al;const px=p.x*ZOOM*(.5+a[2]*.5),py=p.y*ZOOM*(.5+a[2]*.5);
-  if(kind==='pollen'){x=a[0]*WW-px+Math.sin(now*.6+a[3])*14;y=a[1]*HH-py-now*6*(1+a[2]);r=1.1+a[2]*1.2;col='#f4ecb0';al=.45}
+  if(kind==='pollen'){x=a[0]*WW-px+Math.sin(now*.6+a[3])*14;y=a[1]*HH-py-now*6*(1+a[2]);r=1.1+a[2]*1.2;col=a[2]>.86?WORLD_GRADE.ambientEmber:WORLD_GRADE.ambientAsh;al=WORLD_GRADE.ambientAlpha}
   else if(kind==='mist'){x=a[0]*WW-px*.4+now*8;y=a[1]*HH-py*.4;r=1.4+a[2];col='#cfe8d8';al=.28}
   else if(kind==='dust'){x=a[0]*WW-px+now*22*(1+a[2]);y=a[1]*HH-py+Math.sin(now+a[3])*8;r=.9+a[2];col='#d8c8a8';al=.4}
   else if(kind==='embers'){x=a[0]*WW-px+Math.sin(now*1.3+a[3])*10;y=a[1]*HH-py-now*40*(1+a[2]);r=1+a[2]*1.4;col=a[2]>.5?'#ffb24a':'#ff6a1a';al=.55+.35*Math.sin(now*5+a[3])}
@@ -3801,7 +3844,7 @@ const DBG={};function render(){const now=NOW=performance.now()/1000;const p=G.p;
  ctx.save();ctx.translate(-cx,-cy);
  // world props: decals first, then sorted with entities by y
  const c0=Math.floor((cx-120)/CELL),c1=Math.floor((cx+W+120)/CELL),r0=Math.floor((cy-120)/CELL),r1=Math.floor((cy+H+160)/CELL),draw=[];
- for(let i=c0;i<=c1;i++)for(let j=r0;j<=r1;j++)for(const q of propsAt(i,j)){const s=PRP(q[0]);if(q[0]==='flowers'||q[0]==='pebble'||q[0]==='mush')dI(s,q[1]-s.w/2,q[2]-s.h/2);else draw.push([q[2],0,q])}
+ for(let i=c0;i<=c1;i++)for(let j=r0;j<=r1;j++)for(const q of propsAt(i,j)){const s=P3WD(PRP(q[0]),q[0]);if(q[0]==='flowers'||q[0]==='pebble'||q[0]==='mush')dI(s,q[1]-s.w/2,q[2]-s.h/2);else draw.push([q[2],0,q])}
  // ground fx (aura, ice decals)
  if(G.w.prayer)prayerGround(wstat('prayer',G.w.prayer).area,now);
  if(G.sanct){const Z=G.sanct,a=Math.min(1,Z.t*2);ctx.save();ctx.globalAlpha=.07*a;ctx.fillStyle='#6E1218';ctx.beginPath();ctx.arc(Z.x,Z.y,Z.r,0,6.283);ctx.fill();ctx.globalAlpha=.32*a;ctx.strokeStyle='#d8d0c4';ctx.lineWidth=1.4;ctx.setLineDash([12,8]);ctx.lineDashOffset=-now*30;ctx.stroke();ctx.restore()}
@@ -3901,7 +3944,7 @@ const DBG={};function render(){const now=NOW=performance.now()/1000;const p=G.p;
   ctx.restore()}
  if(!DBG.np)for(const q of parts.a)if(q.a&&q.gl){const t=q.life/q.max;ctx.globalAlpha=t;ctx.drawImage(q.gl.c,q.x-q.r*1.5,q.y-q.r*1.5,q.r*3,q.r*3)}
  ctx.restore();
- for(const q of parts.a)if(q.a&&!q.gl){ctx.globalAlpha=Math.min(1,q.life/q.max*1.5);ctx.fillStyle=q.col;ctx.beginPath();ctx.arc(q.x,q.y,q.r,0,6.283);ctx.fill()}ctx.globalAlpha=1;if(G.eldf)for(const f of G.eldf)P3eldf(f);ctx.globalAlpha=1;
+ for(const q of parts.a)if(q.a&&!q.gl){ctx.globalAlpha=Math.min(1,q.life/q.max*1.5);ctx.fillStyle=q.col;ctx.beginPath();ctx.arc(q.x,q.y,q.r,0,6.283);ctx.fill()}ctx.globalAlpha=1;if(G.eldf)for(const f of G.eldf)P3eldf(f);ctx.globalAlpha=1;P3grade();
  // hitsplats / pops
  if(!DBG.npop) for(const o of pops.a){if(!o.a)continue;const a=Math.min(1,o.life*3);ctx.globalAlpha=a;
   if(o.kind>=4){dmgNumDraw(ctx,o.x,o.y,o.txt,o.kind===5,.75-o.life,1)}else if(o.kind){const s=o.kind===2?SPR.splatB:SPR.splat,ag=.75-o.life,k=(o.kind===3?1:o.kind===2?1.08:.85)*(ag<.08?1+(o.kind===2?.7:.4)*(1-ag/.08):1);dI(s,o.x-15*k,o.y-14*k,30*k,26*k);txt(o.txt,o.x,o.y+4*k,'#fff',Math.round(12*Math.max(1,k/.85)),'center',800)}else txt(o.txt,o.x,o.y,o.col,14,'center')}ctx.globalAlpha=1;
@@ -3980,6 +4023,12 @@ function bkBoss(w){return hB('boss'+w,w,30,g=>{const P=[[18,9],[w-18,9],[w-10,15
 function bkStamp(){return hB('stamp',86,26,g=>{g.strokeStyle='rgba(201,163,95,.55)';g.lineWidth=1;g.strokeRect(5.5,3.5,75,19);g.strokeStyle='rgba(201,163,95,.22)';g.strokeRect(8.5,6.5,69,13);
  g.font=`600 10.5px ${IKF.num}`;g.letterSpacing='3px';g.textAlign='center';g.fillStyle='rgba(225,195,135,.8)';g.fillText('SANDBOX',44.5,17)})}
 function bkPlate(w,h){return hB('pl'+w+'x'+h,w,h,g=>{gPath(g,cut(.5,.5,w-1,h-1,h*.3));veil(g,.75);hair(g,.8,1,5);g.beginPath();g.moveTo(h*.6,h-4.5);g.lineTo(w-h*.6,h-4.5);hair(g,.2)})}
+// --- v66e helpers
+function hRR(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,Math.min(r,h/2,w/2));if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.lineWidth=1.5;ctx.strokeStyle=stroke;ctx.stroke()}}
+function hPan(x,y,w,h){ctx.save();ctx.beginPath();ctx.roundRect(x,y,w,h,8);const g=ctx.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'rgba(58,44,30,.86)');g.addColorStop(1,'rgba(30,22,15,.86)');ctx.fillStyle=g;ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle='rgba(214,170,90,.8)';ctx.stroke();ctx.restore()}
+function hSlot(x,y,s,ic,col,lv,maxed){ctx.save();if(!ic){ctx.setLineDash([3,3]);hRR(x+.5,y+.5,s-1,s-1,5,'rgba(10,8,6,.45)',col);ctx.restore();return}
+ if(ic.c)ctx.drawImage(ic.c,x,y,s,s);else ctx.drawImage(ic,x,y,s,s);ctx.beginPath();ctx.roundRect(x+.5,y+.5,s-1,s-1,5);ctx.lineWidth=maxed?2:1.5;ctx.strokeStyle=maxed?'#ffd24a':col;ctx.stroke();ctx.restore();
+ if(maxed){hDraw(bkStar(),x+s-10,y+s-10)}else if(lv!=null&&lv!==''){hText(''+lv,x+s-2,y+s-1,13,'#ffffff',{al:'right',st:3})}}
 // --- live pieces
 function hBlood(x,y,f,lag,now,low){const P=HCH,x0=x+12,x1=x+HP_W-8,w=x1-x0;ctx.save();ctx.beginPath();ctx.moveTo(x+P[0][0],y+P[0][1]);for(let i=1;i<P.length;i++)ctx.lineTo(x+P[i][0],y+P[i][1]);ctx.closePath();ctx.clip();
  const e=x0+w*f,el=x0+w*lag;
@@ -3992,35 +4041,44 @@ function hSock(x,y,s,st,ico,lv,maxed){hDraw(bkSock(st,s),x,y);if(ico){const i=s*
  if(maxed){hDraw(bkStar(),x+s-11,y+s-11.5)}else if(lv!=null&&lv!==''){const t=''+lv;ctx.font=`700 14px ${IKF.num}`;const bw=Math.max(14,Math.ceil(ctx.measureText(t).width)+6);hDraw(bkBadge(bw),x+s-bw+1,y+s-11);hText(t,x+s-bw/2+1,y+s+.5,14,GT.goldLt,{al:'center',st:2.4})}}
 function hud(now){const p=G.p,T=(typeof SAT!=='undefined'?SAT:0);const d=Math.min(1/30,Math.max(0,now-(HS.t||now)));HS.t=now;
  if(HS.sab<0){const q=document.createElement('div');q.style.cssText='position:fixed;bottom:0;height:env(safe-area-inset-bottom);width:1px;visibility:hidden';document.body.appendChild(q);HS.sab=q.offsetHeight||0;q.remove()}
- // XP: a single lit gold thread along the top edge
- const xf=Math.max(0,Math.min(1,G.xp/G.next));if(xf<HS.xp-.02||G.lvl!==HS.lv)HS.xp=xf;HS.xp+=(xf-HS.xp)*Math.min(1,d*8);if(xf>HS.lastXp+.001)HS.xpGain=0;HS.lastXp=xf;HS.xpGain+=d;
- ctx.fillStyle='rgba(201,163,95,.16)';ctx.fillRect(0,T+2,W,1);ctx.save();ctx.shadowColor='rgba(240,190,100,.8)';ctx.shadowBlur=6;ctx.fillStyle='#d8b56e';ctx.fillRect(0,T+1,W*HS.xp,2.5);ctx.restore();
- ctx.fillStyle='#fff0c8';ctx.fillRect(Math.max(0,W*HS.xp-3),T+.5,3,3.5);if(HS.xpGain<.35&&HS.xp>0){ctx.save();ctx.globalAlpha=(1-HS.xpGain/.35);ctx.shadowColor='#ffd890';ctx.shadowBlur=10;ctx.fillStyle='#fff3cf';ctx.fillRect(W*HS.xp-8,T,8,4);ctx.restore()}
- // HP
+ // v66e: v61-style clear HUD - red HP bar w/ number, blue XP bar, level badge, coloured item icons, compact + balanced (top ~18%)
+ const xf=Math.max(0,Math.min(1,G.xp/G.next));if(xf<HS.xp-.02||G.lvl!==HS.lv)HS.xp=xf;HS.xp+=(xf-HS.xp)*Math.min(1,d*8);
  const hf=Math.max(0,Math.min(1,p.hp/p.max));if(HS.lastHp<0){HS.hp=HS.lag=hf}if(hf<HS.hp-.001){HS.lagHold=.45;HS.lag=Math.max(HS.lag,HS.hp)}HS.hp=hf>HS.hp?HS.hp+(hf-HS.hp)*Math.min(1,d*10):hf;HS.lastHp=hf;
  HS.lagHold-=d;if(HS.lagHold<=0)HS.lag=Math.max(HS.hp,HS.lag-d*.55);if(HS.lag<HS.hp)HS.lag=HS.hp;
- const X=8,Y=T+9;hDraw(bkHp(),X+36,Y+6);hBlood(X+36,Y+6,HS.hp,HS.lag,now,hf<.3);
- const hpS=''+Math.max(0,Math.ceil(p.hp));ctx.font=`600 15px ${IKF.num}`;const mw=ctx.measureText('/'+Math.round(p.max)).width;hText(hpS,X+36+HP_W-12-mw,Y+64,19,hf<.3?'#ff7a6e':GT.bone,{al:'right',st:3.2});
- hText('/'+Math.round(p.max),X+36+HP_W-10-mw,Y+64,15,GT.bone,{w:600,st:3.4,sc:'rgba(3,2,2,.95)'});
- // level badge: ring with arc flourishes
- if(G.lvl!==HS.lv){if(HS.lv)HS.lvPop=0;HS.lv=G.lvl}HS.lvPop+=d;hDraw(bkCrest(),X,Y);const pop=HS.lvPop<.35?1+.3*Math.sin(HS.lvPop/.35*Math.PI):1;
- ctx.save();ctx.translate(X+23,Y+27);ctx.scale(pop,pop);hText(''+G.lvl,0,7,G.lvl>99?15:19,GT.goldLt,{al:'center',f:IKF.tit,st:3.5,glow:'rgba(240,190,100,.7)',gb:8});ctx.restore();
- if(HS.lvPop<.6){ctx.save();ctx.globalAlpha=(1-HS.lvPop/.6);ctx.shadowColor='#f0c070';ctx.shadowBlur=8;ctx.strokeStyle='#e6c47a';ctx.lineWidth=1;ctx.beginPath();ctx.arc(X+23,Y+27,22+HS.lvPop*34,0,6.283);ctx.stroke();ctx.restore()}
- // gold + kills
- const ry=Y+64;hCoin(X+40,ry-12,1.4);hText(''+Math.floor(G.gold),X+57,ry,18,'#F1DCA4',{st:3});ctx.font=`700 18px ${IKF.num}`;const gw=ctx.measureText(''+Math.floor(G.gold)).width;hSkull(X+68+gw,ry-12.5,1.4);hText(''+G.kills,X+85+gw,ry,18,GT.bone,{st:3});
- // timer + pause ring
- hText(fmtT(G.t),W-46,T+30,21,GT.goldLt,{al:'right',st:3,ls:.5});hDraw(bkStud(),W-38,T+9);
- if(G.sandbox){hDraw(bkStamp(),W-130,T+35)}
- // slots
- const small=W<520,NS=Math.max(G.ws,G.ps,1),s=Math.min(small?44:50,Math.floor((W*.6-12)/NS)-3),gp=3,wk=Object.keys(G.w),pk=Object.keys(G.pas),mk=Object.keys(G.mega),sy=Y+74,rows=mk.length?3:2;
- hDraw(bkBack(NS*(s+gp)-gp+8,rows*(s+gp)-gp+8),X-4,sy-4);
- for(let i=0;i<G.ws;i++){const k=wk[i],x=X+i*(s+gp);if(!k){hSock(x,sy,s,'empty');continue}const W8=WEAPONS[k],mx=G.w[k]>=W8.max,ev=G.evo[k],st=ev?'evo':W8.elite?'elite':mx?'max':'n';
-  hSock(x,sy,s,st,hIcoB(wicon(k),GI(wicon(k)),ev||mx?'bright':'gold'),G.w[k],mx&&!ev||ev)}
- for(let i=0;i<G.ps;i++){const k=pk[i],x=X+i*(s+gp),y=sy+s+gp;if(!k){hSock(x,y,s,'empty');continue}const mx=PASSIVES&&PASSIVES[k]&&G.pas[k]>=PASSIVES[k].max;hSock(x,y,s,mx?'max':'n',hIcoB(k,GI(k),mx?'bright':'gold'),G.pas[k],mx)}
- mk.forEach((k,i)=>{const x=X+i*(s+gp),y=sy+2*(s+gp);hSock(x,y,s,'mega',hIcoB(k,GI(k),'bright'),'x'+G.mega[k],0)});
- // skills sidebar
- const n=SKILLS.length,stx=W-SBW-6,sty=T+66;hDraw(bkStrip(n),stx,sty);SKILLS.forEach((k,i)=>{const y=sty+4+i*SR,ic=hIcoB('sk'+k,GI(k),'gold');if(ic)ctx.drawImage(ic,stx+11,y+2,28,28);hText(''+sLvl(k),stx+SBW-5,y+SR-2,17,GT.bone,{al:'right',st:3})});
- let dy=0;for(const k in G.drops){const dd=G.drops[k],a=Math.min(1,dd.life*2);ctx.globalAlpha=a;const y=sty+n*SR+30+dy-(1.4-dd.life)*18,ic=hIcoB('sk'+k,GI(k),'gold');if(ic)ctx.drawImage(ic,W-96,y-16,20,20);hText('+'+Math.round(dd.v),W-14,y,15,GT.goldLt,{al:'right',st:3});dy+=22}ctx.globalAlpha=1;
+ const X=8,Y=T+8,bw=Math.min(170,W*.4)|0,bx=X+50,by=Y+6;
+ hPan(X-3,Y-3,bx+bw-X+74,52);
+ // HP bar
+ hRR(bx,by,bw,20,5,'#1a0b0a','rgba(0,0,0,.9)');
+ if(HS.lag>HS.hp){ctx.fillStyle='rgba(255,170,150,.45)';hRR(bx+2,by+2,(bw-4)*HS.lag,16,4,'rgba(255,170,150,.45)')}
+ if(HS.hp>0){const g=ctx.createLinearGradient(0,by,0,by+20);g.addColorStop(0,'#ff6a5a');g.addColorStop(.5,'#d8302a');g.addColorStop(1,'#8e1414');hRR(bx+2,by+2,Math.max(8,(bw-4)*HS.hp),16,4,g);
+  if(hf<.3){ctx.globalAlpha=.18+.12*Math.sin(now*6);hRR(bx+2,by+2,Math.max(8,(bw-4)*HS.hp),16,4,'#000');ctx.globalAlpha=1}
+  ctx.fillStyle='rgba(255,255,255,.28)';ctx.fillRect(bx+6,by+4,Math.max(0,(bw-4)*HS.hp-8),2)}
+ hText(Math.max(0,Math.ceil(p.hp))+' / '+Math.round(p.max),bx+bw/2,by+15.5,15,'#ffffff',{al:'center',st:3.4,sc:'rgba(40,0,0,.95)'});
+ // XP bar
+ const xy=by+25;hRR(bx,xy,bw,11,4,'#0a1220','rgba(0,0,0,.9)');if(HS.xp>0){const g=ctx.createLinearGradient(0,xy,0,xy+11);g.addColorStop(0,'#7cc0ff');g.addColorStop(.5,'#3d8bff');g.addColorStop(1,'#1d55c0');hRR(bx+1.5,xy+1.5,Math.max(5,(bw-3)*HS.xp),8,3,g)}
+ // level badge
+ if(G.lvl!==HS.lv){if(HS.lv)HS.lvPop=0;HS.lv=G.lvl}HS.lvPop+=d;const pop=HS.lvPop<.35?1+.3*Math.sin(HS.lvPop/.35*Math.PI):1,cx=X+22,cy=Y+23;
+ ctx.save();ctx.translate(cx,cy);ctx.scale(pop,pop);{const g=ctx.createRadialGradient(-5,-6,2,0,0,21);g.addColorStop(0,'#f6d27a');g.addColorStop(.55,'#c9952f');g.addColorStop(1,'#7a5214');ctx.beginPath();ctx.arc(0,0,20,0,6.283);ctx.fillStyle=g;ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle='#2a1a08';ctx.stroke();ctx.beginPath();ctx.arc(0,0,15,0,6.283);ctx.fillStyle='#3a2810';ctx.fill()}
+ hText(''+G.lvl,0,7,G.lvl>99?15:19,'#ffe7a8',{al:'center',st:3});ctx.restore();
+ if(HS.lvPop<.6){ctx.save();ctx.globalAlpha=(1-HS.lvPop/.6);ctx.strokeStyle='#ffd27a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,22+HS.lvPop*34,0,6.283);ctx.stroke();ctx.restore()}
+ // timer centred top, pause top-right
+ hText(fmtT(G.t),W-46,T+31,22,'#ffffff',{al:'right',st:3.6,ls:.5});hDraw(bkStud(),W-38,T+9);
+ if(G.sandbox){hDraw(bkStamp(),W/2-43,H-150)}
+ // gold + kills + slots panel
+ const wk=Object.keys(G.w),pk=Object.keys(G.pas),mk=Object.keys(G.mega),NS=G.ws+G.ps,s=Math.max(24,Math.min(30,Math.floor((W*.66-24)/NS)-3)),gp=3,px0=X+G.ws*(s+gp)+7,ly=Y+75,sy=Y+80,rows=mk.length?2:1,pw=Math.max(bx+bw-X+6,px0+G.ps*(s+gp)-X+4);
+ hPan(X-3,Y+52,pw,30+rows*(s+gp)+2);
+ const ry=Y+70;{ctx.font=`700 16px ${IKF.num}`;const gs=''+Math.floor(G.gold),ks=''+G.kills,gw=ctx.measureText(gs).width,kw=ctx.measureText(ks).width,gx=bx+bw+8,gy=Y+20;
+  hCoin(gx,gy-12,1.2);hText(gs,gx+17,gy,16,'#ffd75a',{st:3});hSkull(gx,gy+9.5,1.2);hText(ks,gx+17,gy+22,16,'#ffffff',{st:3})}
+ hText('Weapons '+wk.length+'/'+G.ws,X+1,ry,13,'#ff9a7a',{w:700,st:3});
+ hText('Passives '+pk.length+'/'+G.ps,px0,ry,13,'#8ec8ff',{w:700,st:3});
+ for(let i=0;i<G.ws;i++){const k=wk[i],x=X+i*(s+gp);if(!k){hSlot(x,sy,s,null,'#7a4a30');continue}const W8=WEAPONS[k],mx=G.w[k]>=W8.max,ev=G.evo[k];hSlot(x,sy,s,ICON[wicon(k)]||ICON[k],ev?'#ffd24a':'#c0603e',G.w[k],mx||ev)}
+ ctx.fillStyle='rgba(214,170,90,.45)';ctx.fillRect(px0-5,sy+2,1.5,s-4);
+ for(let i=0;i<G.ps;i++){const k=pk[i],x=px0+i*(s+gp);if(!k){hSlot(x,sy,s,null,'#3a5a7a');continue}const mx=PASSIVES&&PASSIVES[k]&&G.pas[k]>=PASSIVES[k].max;hSlot(x,sy,s,ICON[k],'#4a8acc',G.pas[k],mx)}
+ mk.forEach((k,i)=>{hSlot(X+i*(s+gp),sy+s+gp,s,ICON[k],'#e8b33a','x'+G.mega[k],0)});
+ // skills column (compact, right)
+ const n=SKILLS.length,SR2=23,stx=W-48,sty=T+77;hPan(stx-3,sty-3,47,n*SR2+5);
+ SKILLS.forEach((k,i)=>{const y=sty+i*SR2,ic=ICON[k];if(ic&&ic.c)ctx.drawImage(ic.c,stx,y,21,21);else{const g2=GI(k);if(g2)ctx.drawImage(g2.c||g2,stx,y,21,21)}hText(''+sLvl(k),W-6,y+16,15,'#ffffff',{al:'right',st:3})});
+ let dy=0;for(const k in G.drops){const dd=G.drops[k],a=Math.min(1,dd.life*2);ctx.globalAlpha=a;const y=sty+n*SR2+22+dy-(1.4-dd.life)*18,ic=ICON[k];if(ic&&ic.c)ctx.drawImage(ic.c,W-80,y-15,18,18);hText('+'+Math.round(dd.v),W-8,y,14,'#ffe7a8',{al:'right',st:3});ctx.globalAlpha=1;dy+=20}
  // treasure goblin indicator
  for(const e of enemies.a)if(e.a&&e.tgob){const ex=(e.x-p.x)*ZOOM+W/2,ey=(e.y-p.y)*ZOOM+H/2,M=30,top=T+92,bot=H-120,on=ex>M&&ex<W-M&&ey>top&&ey<bot,pul=.5+.5*Math.sin(now*6);
   if(on){const y=ey-(e.r+30)*ZOOM-pul*4;hArrow(ex,y,Math.PI/2,.8)}
@@ -4621,6 +4679,63 @@ var P3GLY;function P3gly(){if(P3GLY)return P3GLY;const W='#fff',Dk='#222';
   knives:g=>{knife(g,-.5);knife(g,.5)},
   darts:g=>{for(let i=0;i<3;i++){g.save();g.translate(14+i*10,26-i*2);g.rotate(.7);pg(g,[0,-17,3.2,-9,-3.2,-9]);g.fillStyle=W;g.fillRect(-1.4,-10,2.8,18);pg(g,[0,6,5,14,0,11,-5,14]);g.restore()}}
  };return P3GLY}
+
+// ===== part3 world grade: grim ground tiles + one cheap screen-space grade (config: WORLD_GRADE at the top of the game script) =====
+// Per frame cost: 1 saturation fillRect + 2 drawImage of prebaked half-res canvases. No getImageData / ctx.filter per frame.
+var P3WC,P3WREV,P3WV,P3WDC;
+function P3hex(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]}
+function P3Wchk(){const r=WORLD_GRADE.rev;if(P3WREV!==r){P3WREV=r;P3WC=[];P3WV=null;P3WDC=new Map();try{GPATS.length=0}catch(e){}}}
+function P3W(i){P3Wchk();if(P3WC[i])return P3WC[i];
+ const C=WORLD_GRADE,Q=C.ground[i]||C.ground[0],S=C.tile|0||1024,H2=S>>1,c=document.createElement('canvas');c.width=c.height=S;const g=c.getContext('2d'),R=P3rng(4241+i*7919);
+ const lat=n=>{const a=new Float32Array(n*n);for(let k=0;k<a.length;k++)a[k]=R();return a},L1=lat(6),L2=lat(16),L3=lat(48),L4=lat(128),LD=lat(5);
+ const smp=(L,n,x,y)=>{const fx=x*n/H2,fy=y*n/H2,x0=fx|0,y0=fy|0,tx=fx-x0,ty=fy-y0,sx=tx*tx*(3-2*tx),sy=ty*ty*(3-2*ty),X0=x0%n,Y0=y0%n,X1=(x0+1)%n,Y1=(y0+1)%n,a=L[Y0*n+X0],b=L[Y0*n+X1],e=L[Y1*n+X0],d=L[Y1*n+X1],u=a+(b-a)*sx;return u+((e+(d-e)*sx)-u)*sy};
+ // 1) half-res pixel pass: base + dirt patches + low-contrast multi-octave value noise (wraps seamlessly)
+ const h=document.createElement('canvas');h.width=h.height=H2;const hg=h.getContext('2d'),im=hg.createImageData(H2,H2),D=im.data,B=P3hex(Q.base),K=P3hex(Q.dirt),amp=C.groundNoise,cov=C.dirtPatches;
+ const t0=.66-cov*.22,t1=t0+.09;
+ for(let y=0;y<H2;y++)for(let x=0;x<H2;x++){const dn=smp(LD,5,x,y)*.6+smp(L2,16,x,y)*.28+smp(L3,48,x,y)*.12;let m=(dn-t0)/(t1-t0);m=m<0?0:m>1?1:m*m*(3-2*m);m*=.85;
+  const n=(smp(L1,6,x,y)-.5)*.9+(smp(L3,48,x,y)-.5)*.6+(smp(L4,128,x,y)-.5)*.45+(R()-.5)*.35,f=1+n*amp*2,o=(y*H2+x)*4;
+  for(let ch=0;ch<3;ch++)D[o+ch]=Math.max(0,Math.min(255,(B[ch]+(K[ch]-B[ch])*m)*f));D[o+3]=255}
+ hg.putImageData(im,0,0);g.imageSmoothingEnabled=true;g.drawImage(h,0,0,S,S);
+ const rgba=(hx,a)=>{const v=P3hex(hx);return `rgba(${v[0]},${v[1]},${v[2]},${a})`},W8=(x,y,r,fn)=>P3wrap(g,S,x,y,r,fn);
+ // 2) biome detail (all low contrast)
+ const poly=(n,st,turn)=>{let x=R()*S,y=R()*S,a=R()*6.283;const p=[[x,y]];for(let j=0;j<n;j++){a+=(R()-.5)*turn;x+=Math.cos(a)*st;y+=Math.sin(a)*st;p.push([x,y])}return p},
+  strokeW=(p,lw,col)=>{for(const ox of [-S,0,S])for(const oy of [-S,0,S]){g.strokeStyle=col;g.lineWidth=lw;g.beginPath();p.forEach((q,j)=>j?g.lineTo(q[0]+ox,q[1]+oy):g.moveTo(q[0]+ox,q[1]+oy));g.stroke()}};
+ if(Q.detail==='moss'){for(let n=0;n<110;n++){const x=R()*S,y=R()*S,m=2+(R()*4|0);W8(x,y,10,(X,Y)=>{g.strokeStyle=rgba(Q.moss,.35+R()*.25);g.lineWidth=1;for(let j=0;j<m;j++){const a=-1.57+(R()-.5)*1.3,L=3+R()*5;g.beginPath();g.moveTo(X+j*1.5,Y);g.lineTo(X+j*1.5+Math.cos(a)*L,Y+Math.sin(a)*L);g.stroke()}})}
+  for(let n=0;n<10;n++)strokeW(poly(5,10,1.3),1,'rgba(10,11,9,.35)')}
+ else if(Q.detail==='pools'){for(let n=0;n<10;n++){const x=R()*S,y=R()*S,r=24+R()*46,e=.45+R()*.3;W8(x,y,r,(X,Y)=>{g.fillStyle=rgba(Q.dirt,.7);g.beginPath();g.ellipse(X,Y,r,r*e,0,0,6.283);g.fill();g.strokeStyle='rgba(140,150,150,.06)';g.lineWidth=1;g.beginPath();g.ellipse(X,Y-1,r*.9,r*e*.8,0,3.5,5.9);g.stroke()})}
+  for(let n=0;n<60;n++){const x=R()*S,y=R()*S;W8(x,y,8,(X,Y)=>{g.strokeStyle=rgba(Q.moss,.45);g.lineWidth=1;g.beginPath();g.moveTo(X,Y);g.lineTo(X+(R()-.5)*3,Y-4-R()*5);g.stroke()})}}
+ else if(Q.detail==='cracks'){for(let n=0;n<30;n++)strokeW(poly(7,9,1.2),1,'rgba(10,9,8,.5)')}
+ else if(Q.detail==='seams'){for(let n=0;n<18;n++){const p=poly(8,14,1.4);strokeW(p,4,rgba(Q.moss,.08));strokeW(p,1.1,rgba(Q.moss,.28));strokeW(p,.6,'rgba(8,6,7,.8)')}}
+ else if(Q.detail==='flag'){const N=4,Cc=S/N;for(let a=0;a<N;a++)for(let b=0;b<N+1;b++){const off=(a%2)*Cc*.5,x0=b*Cc-off,y0=a*Cc,j=()=>(R()-.5)*8;g.strokeStyle='rgba(10,9,12,.75)';g.lineWidth=3;g.beginPath();g.moveTo(x0+5+j(),y0+5+j());g.lineTo(x0+Cc-5+j(),y0+5+j());g.lineTo(x0+Cc-5+j(),y0+Cc-5+j());g.lineTo(x0+5+j(),y0+Cc-5+j());g.closePath();g.stroke();g.strokeStyle='rgba(255,250,255,.025)';g.lineWidth=1;g.beginPath();g.moveTo(x0+8,y0+Cc-9);g.lineTo(x0+8,y0+8);g.lineTo(x0+Cc-9,y0+8);g.stroke()}}
+ else{for(let n=0;n<14;n++)strokeW(poly(9,12,.9),1.4,rgba(Q.moss,.3))}
+ // 3) ash + gravel specks, a few dim embers (replaces the bright confetti dots)
+ for(let n=0;n<C.specks;n++){const x=R()*S,y=R()*S,r=.5+R()*R()*1.8,gr=R()<.35;W8(x,y,r+1,(X,Y)=>{if(gr){g.fillStyle='rgba(8,8,7,.45)';g.beginPath();g.ellipse(X,Y+.6,r*1.2,r*.8,0,0,6.283);g.fill()}g.fillStyle=rgba(Q.speck,gr?.5:.18+R()*.22);g.beginPath();g.ellipse(X,Y,r,r*.75,0,0,6.283);g.fill()})}
+ for(let n=0;n<C.embers;n++){const x=R()*S,y=R()*S,r=.8+R()*.8;W8(x,y,6,(X,Y)=>{const q=g.createRadialGradient(X,Y,0,X,Y,5);q.addColorStop(0,'rgba(150,50,28,.22)');q.addColorStop(1,'rgba(150,50,28,0)');g.fillStyle=q;g.fillRect(X-5,Y-5,10,10);g.fillStyle='rgba(176,80,44,.5)';g.beginPath();g.arc(X,Y,r,0,6.283);g.fill()})}
+ return P3WC[i]={c,w:S,h:S}}
+// cached half-res overlays: m = exposure x cool shadow tint x vignette (multiply); d = crimson highlight accent + player light (color-dodge)
+function P3Wbake(){const C=WORLD_GRADE,w=Math.max(2,Math.ceil(W/2)),hh=Math.max(2,Math.ceil(H/2)),cx=w/2,cy=hh/2,Rd=Math.hypot(cx,cy),T=P3hex(C.shadowTint),col=k=>`rgb(${T[0]*C.exposure*k|0},${T[1]*C.exposure*k|0},${T[2]*C.exposure*k|0})`;
+ const m=document.createElement('canvas');m.width=w;m.height=hh;let g=m.getContext('2d'),q=g.createRadialGradient(cx,cy,Rd*C.vignetteInner,cx,cy,Rd);const v=C.vignette;
+ q.addColorStop(0,col(1));q.addColorStop(.35,col(1-v*.25));q.addColorStop(.7,col(1-v*.7));q.addColorStop(1,col(1-v));g.fillStyle=q;g.fillRect(0,0,w,hh);
+ const d=document.createElement('canvas');d.width=w;d.height=hh;g=d.getContext('2d');const Hc=P3hex(C.highlightTint),Lc=P3hex(C.lightTint);
+ g.fillStyle=`rgba(${Hc[0]},${Hc[1]},${Hc[2]},${C.highlightAmt})`;g.fillRect(0,0,w,hh);
+ const lr=C.lightRadius/2;q=g.createRadialGradient(cx,cy,0,cx,cy,lr);q.addColorStop(0,`rgba(${Lc[0]},${Lc[1]},${Lc[2]},${C.lightStrength})`);q.addColorStop(.5,`rgba(${Lc[0]},${Lc[1]},${Lc[2]},${C.lightStrength*.45})`);q.addColorStop(1,`rgba(${Lc[0]},${Lc[1]},${Lc[2]},0)`);g.fillStyle=q;g.fillRect(cx-lr,cy-lr,lr*2,lr*2);
+ return {m,d,w:W,h:H}}
+function P3Wshadow(){const S0=typeof SPR!=='undefined'&&SPR.shadow;if(!S0||S0._wg||!S0.c||!S0.c.width)return;const k=WORLD_GRADE.shadowAlpha;S0._wg=1;if(!(k>1))return;
+ const c=document.createElement('canvas');c.width=S0.c.width;c.height=S0.c.height;const g=c.getContext('2d');g.drawImage(S0.c,0,0);let r=k-1;while(r>0){g.globalAlpha=Math.min(1,r);g.drawImage(S0.c,0,0);r-=1}S0.c=c}
+// called in world space right before damage numbers; draws in screen space
+function P3grade(){const C=WORLD_GRADE;P3Wchk();P3Wshadow();if(!C.enabled||G.menu&&!G.p)return;
+ if(!P3WV||P3WV.w!==W||P3WV.h!==H)P3WV=P3Wbake();
+ ctx.save();ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalAlpha=1;
+ if(C.desat>0&&!(META.opt.lq&&C.lqSkipDesat)){ctx.globalCompositeOperation='saturation';ctx.globalAlpha=Math.min(1,C.desat);ctx.fillStyle='#808080';ctx.fillRect(0,0,W,H);ctx.globalAlpha=1}
+ ctx.globalCompositeOperation='multiply';ctx.drawImage(P3WV.m,0,0,W,H);
+ ctx.globalCompositeOperation='color-dodge';ctx.drawImage(P3WV.d,0,0,W,H);
+ ctx.restore();
+ // readability: XP gems re-drawn over the grade so they keep their colour
+ const a=C.gemRestore;if(a>0&&typeof gems!=='undefined'){const now=NOW;ctx.globalAlpha=a;for(const g of gems.a)if(g.a){const t=g.tier||0,s=SPR.gem[t],k=(.8+t*.2)*.6,yy=g.y+Math.sin(now*5+g.x)*1.5;dI(s,g.x-s.w*k/2,yy-s.h*k/2,s.w*k,s.h*k)}ctx.globalAlpha=1}}
+// flowers / mushrooms / pebbles decals: desaturated + darkened (no confetti)
+function P3WD(s,k){const a=WORLD_GRADE.decalDim;if(!s||!(a>0)||!s.c||!s.c.width)return s;P3Wchk();let o=P3WDC.get(s);if(o&&o.src===s.c)return o;
+ const c=document.createElement('canvas');c.width=s.c.width;c.height=s.c.height;const g=c.getContext('2d');g.drawImage(s.c,0,0);g.globalCompositeOperation='saturation';g.globalAlpha=Math.min(1,a*1.4);g.fillStyle='#808080';g.fillRect(0,0,c.width,c.height);g.globalCompositeOperation='source-atop';g.globalAlpha=a*.6;g.fillStyle='#0D0B0E';g.fillRect(0,0,c.width,c.height);
+ o={c,w:s.w,h:s.h,src:s.c};P3WDC.set(s,o);return o}
 
 window.__p3ICONURL=ICONURL;
 // ===== v66 readability: level-up cards -> icon | bold name / one description line / one tag line, rarity gem
