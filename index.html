@@ -619,6 +619,12 @@ html body .spdb:after,html body .pbtn:after{content:""!important;position:absolu
 /* v66h: canvas fills the layout viewport (no stale 100vh after iOS resume) */
 html body canvas#c{top:0!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;height:100%!important}
 html,body{position:fixed!important;inset:0!important;width:100%!important;height:100%!important}
+/* v66k: compact potion HUD row under the weapons/passives panel; under every overlay */
+html body #potHud{top:calc(env(safe-area-inset-top) + var(--potTop,124px))!important;left:8px!important;flex-direction:row!important;flex-wrap:wrap;max-width:250px;gap:4px!important;z-index:4!important;font:700 8.5px/1 var(--body,system-ui)!important}
+html body #potHud span{flex-direction:column!important;gap:2px!important;width:44px;padding:2px 0 3px!important;background:rgba(14,10,6,.72)!important;border:1px solid rgba(201,163,95,.35);border-radius:5px!important;box-shadow:inset 0 -2px 0 var(--pc)}
+html body #potHud img{width:22px!important;height:22px!important;filter:drop-shadow(0 0 3px var(--pc))}
+html body #potHud i{font-style:normal;color:var(--pc);white-space:nowrap;letter-spacing:.2px;text-shadow:0 1px 1px #000}
+body:has(.ov[style*="flex"]) #potHud{display:none!important}
 </style>
 </head><body>
 <div id="sat"></div>
@@ -3291,7 +3297,7 @@ function potIcon(k){if(POTICON[k])return POTICON[k];const P=POTS[k];const c=mk(4
  g.fillStyle='#8a6a40';g.fillRect(19,6,10,6);g.fillStyle='rgba(220,230,240,.55)';g.beginPath();g.moveTo(20,12);g.lineTo(28,12);g.lineTo(28,18);g.quadraticCurveTo(40,24,38,34);g.quadraticCurveTo(36,44,24,44);g.quadraticCurveTo(12,44,10,34);g.quadraticCurveTo(8,24,20,18);g.closePath();g.fill();
  g.fillStyle=P.col;g.beginPath();g.moveTo(11,30);g.quadraticCurveTo(24,26,37,30);g.quadraticCurveTo(36,43,24,43);g.quadraticCurveTo(12,43,11,30);g.fill();g.fillStyle='rgba(255,255,255,.6)';g.beginPath();g.ellipse(17,24,2,4,.4,0,6.283);g.fill()});return POTICON[k]=c.c.toDataURL()}
 function applyPots(){for(const k of G.pots||[])if(POTS[k])for(const e in POTS[k].eff)G.bon[e]=(G.bon[e]||0)+POTS[k].eff[e];updPotHud()}
-function updPotHud(){const h=$('potHud');if(!h)return;const L=(G&&!G.menu&&G.pots)||[];h.innerHTML=L.map(k=>`<span title="${POTS[k].name}"><img src="${potIcon(k)}" alt="">${POTS[k].desc.replace(' this run','')}</span>`).join('');h.style.display=L.length&&running?'flex':'none'}
+function updPotHud(){const h=$('potHud');if(!h)return;const L=(G&&!G.menu&&G.pots)||[];h.innerHTML=L.map(k=>{const P=POTS[k],e=Object.keys(P.eff||{})[0]||'',v=(P.desc.match(/^[+\-]?\d+%/)||[''])[0];return `<span title="${P.name}: ${P.desc}" style="--pc:${P.col||'#e8b33a'}"><img src="${potIcon(k)}" alt=""><i>${v} ${({dmg:'DMG',dr:'DEF',sp:'SPD',gold:'GP',greed:'GP',xp:'XP'})[e]||''}</i></span>`}).join('');h.style.display=L.length&&running?'flex':'none'}
 const shopCost=(r,k)=>{const b=(k&&SHOP[k].base)||50,om=(k&&SHOP[k].om)||99;return r<om?Math.round(b*Math.pow(2,r)):Math.round(b*Math.pow(2,om-1)*Math.pow(1.6,r-om+1)/10)*10};
 const START_BONUS=[{id:'none',n:'None',d:'No starting bonus',L:1},{id:'hardy',n:'Hardy',d:'+20 max HP',L:3,eff:{hp:20}},{id:'scholar',n:'Scholar',d:'+10% XP gained',L:6,eff:{xp:.1}},
  {id:'armed',n:'Armed',d:'Start with a random 2nd weapon',L:9},{id:'lucky',n:'Lucky',d:'+15% luck & +1 reroll',L:13,eff:{luck:.15,reroll:1}},{id:'prospector',n:'Prospector',d:'+30% gold found',L:17,eff:{greed:.3}},{id:'veteran',n:'Veteran',d:'Starting weapon begins at Lv 3',L:22}];
